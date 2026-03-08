@@ -1,30 +1,32 @@
 'use client';
 
 import { useState } from 'react';
-import { Shield, Eye, EyeOff } from 'lucide-react';
+import { Shield, Eye, EyeOff, AtSign, User } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
 
+  const isEmail = identifier.includes('@');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      await login(username, password);
+      await login(identifier, password);
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { detail?: string; errors?: { message: string }[] } } };
       const data = axiosErr.response?.data;
       if (data?.errors && Array.isArray(data.errors)) {
         setError(data.errors.map((e) => e.message).join('. '));
       } else {
-        setError(data?.detail || 'Identifiants incorrects');
+        setError(data?.detail || 'Identifiants incorrects. Vérifiez votre email/username et mot de passe.');
       }
     } finally {
       setLoading(false);
@@ -48,16 +50,27 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Nom d&apos;utilisateur
+              Email ou nom d&apos;utilisateur
             </label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
-              placeholder="Votre username"
-              required
-            />
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                {isEmail ? <AtSign className="h-4 w-4" /> : <User className="h-4 w-4" />}
+              </div>
+              <input
+                type="text"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                placeholder="email@exemple.com ou username"
+                autoComplete="username"
+                required
+              />
+            </div>
+            {identifier && (
+              <p className="text-xs text-gray-400 mt-1">
+                {isEmail ? 'Connexion par adresse email' : 'Connexion par nom d\'utilisateur'}
+              </p>
+            )}
           </div>
 
           <div>
@@ -71,6 +84,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition pr-10"
                 placeholder="••••••••"
+                autoComplete="current-password"
                 required
               />
               <button
@@ -103,10 +117,21 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Accès réservé aux utilisateurs autorisés.<br />
-          Contactez votre administrateur pour obtenir un compte.
-        </p>
+        {/* Info connexion */}
+        <div className="mt-6 bg-gray-50 rounded-xl p-4 space-y-2">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Comment se connecter</p>
+          <div className="flex items-start gap-2 text-xs text-gray-500">
+            <AtSign className="h-3.5 w-3.5 mt-0.5 text-green-500 flex-shrink-0" />
+            <span>Avec votre <span className="font-medium text-gray-700">adresse email</span> : ex. jean.dupont@dgid.gov.gn</span>
+          </div>
+          <div className="flex items-start gap-2 text-xs text-gray-500">
+            <User className="h-3.5 w-3.5 mt-0.5 text-green-500 flex-shrink-0" />
+            <span>Avec votre <span className="font-medium text-gray-700">nom d&apos;utilisateur</span> : ex. jean.dupont</span>
+          </div>
+          <p className="text-xs text-gray-400 pt-1 border-t border-gray-200">
+            Accès réservé aux utilisateurs autorisés. Contactez votre administrateur pour obtenir un compte.
+          </p>
+        </div>
       </div>
     </div>
   );
