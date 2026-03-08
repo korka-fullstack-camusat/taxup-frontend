@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { Shield, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 
@@ -105,10 +104,8 @@ export default function LoginPage() {
         </form>
 
         <p className="text-center text-sm text-gray-500 mt-6">
-          Pas encore de compte ?{' '}
-          <Link href="/register" className="text-green-600 hover:text-green-700 font-medium">
-            S&apos;inscrire
-          </Link>
+          Accès réservé aux utilisateurs autorisés.<br />
+          Contactez votre administrateur pour obtenir un compte.
         </p>
       </div>
     </div>

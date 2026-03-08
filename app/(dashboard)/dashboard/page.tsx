@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import DashboardCitoyen from '@/components/dashboards/DashboardCitoyen';
 import DashboardOperateur from '@/components/dashboards/DashboardOperateur';
@@ -8,6 +10,13 @@ import DashboardDGID from '@/components/dashboards/DashboardDGID';
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user?.role === 'ADMIN') {
+      router.replace('/admin');
+    }
+  }, [user, router]);
 
   switch (user?.role) {
     case 'CITOYEN':
@@ -17,7 +26,6 @@ export default function DashboardPage() {
     case 'AUDITEUR_FISCAL':
       return <DashboardAuditeur />;
     case 'AGENT_DGID':
-    case 'ADMIN':
       return <DashboardDGID />;
     default:
       return null;

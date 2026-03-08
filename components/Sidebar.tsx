@@ -11,6 +11,8 @@ import {
   Bell,
   LogOut,
   Shield,
+  Users,
+  Settings,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 
@@ -21,6 +23,12 @@ const allNavItems = [
   { href: '/audits', label: 'Audits', icon: ClipboardList, roles: ['AUDITEUR_FISCAL', 'AGENT_DGID', 'ADMIN'] },
   { href: '/fraud', label: 'Alertes fraude', icon: AlertTriangle, roles: ['AUDITEUR_FISCAL', 'AGENT_DGID', 'ADMIN'] },
   { href: '/notifications', label: 'Notifications', icon: Bell, roles: ['CITOYEN', 'OPERATEUR_MOBILE', 'AUDITEUR_FISCAL', 'AGENT_DGID', 'ADMIN'] },
+];
+
+const adminNavItems = [
+  { href: '/admin', label: 'Administration', icon: LayoutDashboard },
+  { href: '/admin/users', label: 'Utilisateurs', icon: Users },
+  { href: '/admin/settings', label: 'Paramètres', icon: Settings },
 ];
 
 const roleLabel: Record<string, string> = {
@@ -39,6 +47,8 @@ export default function Sidebar() {
     user?.role && item.roles.includes(user.role)
   );
 
+  const isAdmin = user?.role === 'ADMIN';
+
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-green-700 text-white flex flex-col z-10">
       {/* Logo */}
@@ -54,6 +64,7 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
+        {/* Navigation principale */}
         {navItems.map(({ href, label, icon: Icon }) => {
           const active = pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
           return (
@@ -71,6 +82,32 @@ export default function Sidebar() {
             </Link>
           );
         })}
+
+        {/* Section Admin */}
+        {isAdmin && (
+          <>
+            <div className="pt-4 pb-1 px-4">
+              <p className="text-xs font-bold uppercase tracking-widest text-green-400">Administration</p>
+            </div>
+            {adminNavItems.map(({ href, label, icon: Icon }) => {
+              const active = pathname === href || (href !== '/admin' && pathname.startsWith(href));
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm ${
+                    active
+                      ? 'bg-white/20 text-white font-semibold shadow-sm'
+                      : 'text-green-100 hover:bg-white/10'
+                  }`}
+                >
+                  <Icon className="h-4 w-4 flex-shrink-0" />
+                  <span>{label}</span>
+                </Link>
+              );
+            })}
+          </>
+        )}
       </nav>
 
       {/* User info + logout */}

@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('refresh_token', res.data.refresh_token);
     const me = await api.get('/auth/me');
     setUser(me.data);
-    router.push('/');
+    router.push('/dashboard');
   };
 
   const register = async (data: RegisterData) => {

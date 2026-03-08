@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Shield, ArrowRight, CheckCircle, BarChart2, Bell, Lock } from 'lucide-react';
+import { Shield, BarChart2, Bell, Lock, CheckCircle } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 
 const features = [
@@ -44,11 +44,8 @@ export default function LandingPage() {
             <span className="font-bold text-gray-800 text-lg">TAXUP</span>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="text-sm text-gray-600 hover:text-green-600 font-medium transition-colors">
-              Connexion
-            </Link>
-            <Link href="/register" className="bg-green-600 hover:bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
-              S&apos;inscrire
+            <Link href="/login" className="bg-green-600 hover:bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
+              Se connecter
             </Link>
           </div>
         </div>
@@ -69,12 +66,8 @@ export default function LandingPage() {
             TAXUP centralise la surveillance des transactions mobiles, la détection de fraude et la conformité fiscale en une seule plateforme sécurisée.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/register" className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-8 py-3.5 rounded-xl hover:bg-green-50 transition-colors shadow-lg">
-              Commencer gratuitement
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link href="/login" className="inline-flex items-center gap-2 border border-white/30 text-white font-semibold px-8 py-3.5 rounded-xl hover:bg-white/10 transition-colors">
-              Se connecter
+            <Link href="/login" className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-8 py-3.5 rounded-xl hover:bg-green-50 transition-colors shadow-lg">
+              Accéder à la plateforme
             </Link>
           </div>
         </div>
@@ -133,16 +126,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-16 px-6 bg-green-700 text-white text-center">
-        <h2 className="text-3xl font-bold mb-4">Prêt à commencer ?</h2>
-        <p className="text-green-100 mb-8">Créez votre compte en quelques secondes et accédez à votre tableau de bord.</p>
-        <Link href="/register" className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-8 py-3.5 rounded-xl hover:bg-green-50 transition-colors shadow-lg">
-          Créer un compte gratuit
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-      </section>
-
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 py-8 text-center text-sm">
         <p>© 2026 TAXUP — Plateforme de surveillance fiscale des transactions mobiles</p>
@@ -150,4 +133,3 @@ export default function LandingPage() {
     </div>
   );
 }
-
