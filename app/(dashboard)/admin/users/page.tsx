@@ -4,11 +4,12 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Users, Plus, Search, Edit2, Trash2, X, Eye, EyeOff,
-  ChevronLeft, ChevronRight, Settings2,
+  ChevronLeft, ChevronRight, Settings2, Download,
   UserCheck, UserX, Mail, Phone, Building2, Calendar, KeyRound, ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import api from '@/lib/api';
+import ExportModal, { ExportField } from '@/components/ExportModal';
 
 interface User {
   id: string;
@@ -90,6 +91,21 @@ export default function AdminUsersPage() {
   // Delete confirm
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  // Export
+  const [showExport, setShowExport] = useState(false);
+
+  const EXPORT_FIELDS: ExportField[] = [
+    { key: 'full_name',     label: 'Nom complet' },
+    { key: 'username',      label: "Nom d'utilisateur" },
+    { key: 'email',         label: 'Email' },
+    { key: 'role',          label: 'Rôle' },
+    { key: 'is_active',     label: 'Statut actif' },
+    { key: 'phone_number',  label: 'Téléphone',    defaultSelected: false },
+    { key: 'organization',  label: 'Organisation', defaultSelected: false },
+    { key: 'created_at',    label: 'Date création', defaultSelected: false },
+    { key: 'id',            label: 'ID',            defaultSelected: false },
+  ];
 
   useEffect(() => {
     if (user && user.role !== 'ADMIN') router.replace('/dashboard');
@@ -216,13 +232,23 @@ export default function AdminUsersPage() {
           </h1>
           <p className="text-gray-500 text-sm mt-1">{total} utilisateur{total !== 1 ? 's' : ''} au total</p>
         </div>
-        <button
-          onClick={openCreate}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          Nouvel utilisateur
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowExport(true)}
+            disabled={users.length === 0}
+            className="flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-40"
+          >
+            <Download className="h-4 w-4" />
+            Exporter
+          </button>
+          <button
+            onClick={openCreate}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Nouvel utilisateur
+          </button>
+        </div>
       </div>
 
       {/* ── Filters ────────────────────────────────────────────────── */}
@@ -600,6 +626,17 @@ export default function AdminUsersPage() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* ── Modal Export ────────────────────────────────────────────── */}
+      {showExport && (
+        <ExportModal
+          title="Liste des utilisateurs TAXUP"
+          fields={EXPORT_FIELDS}
+          data={users as unknown as Record<string, unknown>[]}
+          filename="taxup_utilisateurs"
+          onClose={() => setShowExport(false)}
+        />
       )}
 
       {/* ── Modal Supprimer ─────────────────────────────────────────── */}
