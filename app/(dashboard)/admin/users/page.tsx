@@ -10,6 +10,7 @@ import {
 import { useAuth } from '@/lib/auth';
 import api from '@/lib/api';
 import ExportModal, { ExportField } from '@/components/ExportModal';
+import Pagination from '@/components/Pagination';
 
 interface User {
   id: string;
@@ -71,7 +72,7 @@ export default function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const PAGE_SIZE = 15;
+  const [PAGE_SIZE, setPAGE_SIZE] = useState(15);
 
   // Create / Edit modal
   const [showFormModal, setShowFormModal] = useState(false);
@@ -345,22 +346,12 @@ export default function AdminUsersPage() {
           </div>
         )}
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
-            <span>Page {page} sur {totalPages}</span>
-            <div className="flex gap-2">
-              <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-                className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-40 transition-colors">
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-40 transition-colors">
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        )}
+        <Pagination
+          page={page} total={total} pageSize={PAGE_SIZE}
+          onPageChange={setPage}
+          onPageSizeChange={size => { setPAGE_SIZE(size); setPage(1); }}
+          pageSizeOptions={[10, 15, 25, 50]}
+        />
       </div>
 
       {/* ── Modal Détails utilisateur (clic sur la ligne) ───────────── */}
