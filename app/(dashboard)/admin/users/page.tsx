@@ -40,7 +40,7 @@ const roleColors: Record<string, string> = {
   CITOYEN: 'bg-blue-100 text-blue-700',
   OPERATEUR_MOBILE: 'bg-purple-100 text-purple-700',
   AUDITEUR_FISCAL: 'bg-yellow-100 text-yellow-700',
-  AGENT_DGID: 'bg-green-100 text-green-700',
+  AGENT_DGID: 'bg-blue-100 text-blue-700',
   ADMIN: 'bg-red-100 text-red-700',
 };
 
@@ -191,14 +191,14 @@ export default function AdminUsersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <Users className="h-6 w-6 text-green-600" />
+            <Users className="h-6 w-6 text-blue-600" />
             Gestion des utilisateurs
           </h1>
           <p className="text-gray-500 text-sm mt-1">{total} utilisateur{total !== 1 ? 's' : ''} au total</p>
         </div>
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
         >
           <Plus className="h-4 w-4" />
           Nouvel utilisateur
@@ -214,13 +214,13 @@ export default function AdminUsersPage() {
             placeholder="Rechercher par nom, email, username..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
         <select
           value={roleFilter}
           onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
-          className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+          className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
         >
           <option value="">Tous les rôles</option>
           {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
@@ -231,7 +231,7 @@ export default function AdminUsersPage() {
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center h-48">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
           </div>
         ) : users.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-48 text-gray-400">
@@ -256,7 +256,7 @@ export default function AdminUsersPage() {
                   <tr key={u.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-sm flex-shrink-0">
+                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm flex-shrink-0">
                           {u.full_name?.[0]?.toUpperCase() || 'U'}
                         </div>
                         <div>
@@ -272,7 +272,7 @@ export default function AdminUsersPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${u.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${u.is_active ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-600'}`}>
                         {u.is_active ? 'Actif' : 'Inactif'}
                       </span>
                     </td>
@@ -282,9 +282,9 @@ export default function AdminUsersPage() {
                         <button
                           onClick={() => toggleActive(u)}
                           title={u.is_active ? 'Désactiver' : 'Activer'}
-                          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-green-600 transition-colors"
+                          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-blue-600 transition-colors"
                         >
-                          {u.is_active ? <ToggleRight className="h-4 w-4 text-green-600" /> : <ToggleLeft className="h-4 w-4" />}
+                          {u.is_active ? <ToggleRight className="h-4 w-4 text-blue-600" /> : <ToggleLeft className="h-4 w-4" />}
                         </button>
                         <button
                           onClick={() => openEdit(u)}
@@ -355,7 +355,7 @@ export default function AdminUsersPage() {
                     required
                     value={form.full_name}
                     onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Prénom Nom"
                   />
                 </div>
@@ -366,7 +366,7 @@ export default function AdminUsersPage() {
                     required
                     value={form.username}
                     onChange={e => setForm(f => ({ ...f, username: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="username"
                   />
                 </div>
@@ -377,7 +377,7 @@ export default function AdminUsersPage() {
                     required
                     value={form.email}
                     onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="email@exemple.com"
                   />
                 </div>
@@ -391,7 +391,7 @@ export default function AdminUsersPage() {
                       required={!editingUser}
                       value={form.password}
                       onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 pr-10"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
                       placeholder="••••••••"
                     />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -405,7 +405,7 @@ export default function AdminUsersPage() {
                     required
                     value={form.role}
                     onChange={e => setForm(f => ({ ...f, role: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                   >
                     {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
                   </select>
@@ -416,7 +416,7 @@ export default function AdminUsersPage() {
                     type="tel"
                     value={form.phone_number}
                     onChange={e => setForm(f => ({ ...f, phone_number: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="+224..."
                   />
                 </div>
@@ -426,7 +426,7 @@ export default function AdminUsersPage() {
                     type="text"
                     value={form.organization}
                     onChange={e => setForm(f => ({ ...f, organization: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Nom de l'organisation"
                   />
                 </div>
@@ -449,7 +449,7 @@ export default function AdminUsersPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white rounded-lg py-2.5 text-sm font-semibold transition-colors"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg py-2.5 text-sm font-semibold transition-colors"
                 >
                   {saving ? 'Enregistrement...' : (editingUser ? 'Modifier' : 'Créer')}
                 </button>

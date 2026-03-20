@@ -58,7 +58,7 @@ export default function DashboardDGID() {
       <div className="flex-1 flex flex-col">
         <Header title="Tableau de bord DGID" subtitle="Supervision globale de la plateforme" />
         <div className="flex-1 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600" />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
         </div>
       </div>
     );
@@ -113,7 +113,7 @@ export default function DashboardDGID() {
           {/* Bar chart transactions par type */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h2 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <Activity className="h-4 w-4 text-green-600" />
+              <Activity className="h-4 w-4 text-blue-600" />
               Transactions 24h par type
             </h2>
             {byTypeData.length === 0 ? (
@@ -134,7 +134,7 @@ export default function DashboardDGID() {
           {/* Pie chart par statut */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h2 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-green-600" />
+              <TrendingUp className="h-4 w-4 text-blue-600" />
               Répartition par statut (24h)
             </h2>
             {byStatusData.length === 0 ? (
@@ -162,7 +162,7 @@ export default function DashboardDGID() {
               <AlertTriangle className="h-4 w-4 text-red-500" />
               Alertes fraude récentes (24h)
             </h2>
-            <a href="/fraud" className="text-sm text-green-600 hover:text-green-700 font-medium">Voir tout →</a>
+            <a href="/fraud" className="text-sm text-blue-600 hover:text-blue-700 font-medium">Voir tout →</a>
           </div>
           {!realtime?.recent_fraud_alerts.length ? (
             <div className="text-center py-10 text-gray-400">
@@ -213,9 +213,9 @@ export default function DashboardDGID() {
               color === 'blue' ? 'bg-blue-50 border-blue-100 hover:bg-blue-100' :
               color === 'red' ? 'bg-red-50 border-red-100 hover:bg-red-100' :
               color === 'purple' ? 'bg-purple-50 border-purple-100 hover:bg-purple-100' :
-              'bg-green-50 border-green-100 hover:bg-green-100'
+              'bg-blue-50 border-green-100 hover:bg-blue-100'
             }`}>
-              <Icon className={`h-6 w-6 ${color === 'blue' ? 'text-blue-600' : color === 'red' ? 'text-red-600' : color === 'purple' ? 'text-purple-600' : 'text-green-600'}`} />
+              <Icon className={`h-6 w-6 ${color === 'blue' ? 'text-blue-600' : color === 'red' ? 'text-red-600' : color === 'purple' ? 'text-purple-600' : 'text-blue-600'}`} />
               <span className="text-sm font-medium text-gray-700">{label}</span>
             </a>
           ))}

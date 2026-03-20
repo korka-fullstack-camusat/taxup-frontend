@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -10,7 +11,6 @@ import {
   AlertTriangle,
   Bell,
   LogOut,
-  Shield,
   Users,
   Settings,
 } from 'lucide-react';
@@ -50,21 +50,18 @@ export default function Sidebar() {
   const isAdmin = user?.role === 'ADMIN';
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-green-700 text-white flex flex-col z-10">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-slate-800 text-white flex flex-col z-10">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-6 py-5 border-b border-green-600">
-        <div className="bg-green-500 p-2 rounded-lg">
-          <Shield className="h-6 w-6 text-white" />
-        </div>
+      <div className="flex items-center gap-3 px-5 py-5 border-b border-slate-700">
+        <Image src="/taxup-logo.svg" alt="TAXUP" width={36} height={36} className="flex-shrink-0" />
         <div>
-          <h1 className="text-lg font-bold tracking-wide">TAXUP</h1>
-          <p className="text-xs text-green-300">Surveillance fiscale</p>
+          <h1 className="text-lg font-bold tracking-wide text-white">TAXUP</h1>
+          <p className="text-xs text-blue-400">Surveillance fiscale</p>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
-        {/* Navigation principale */}
+      <nav className="flex-1 px-3 py-5 space-y-0.5 overflow-y-auto">
         {navItems.map(({ href, label, icon: Icon }) => {
           const active = pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
           return (
@@ -73,8 +70,8 @@ export default function Sidebar() {
               href={href}
               className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm ${
                 active
-                  ? 'bg-white/20 text-white font-semibold shadow-sm'
-                  : 'text-green-100 hover:bg-white/10'
+                  ? 'bg-blue-600 text-white font-semibold shadow-sm'
+                  : 'text-slate-300 hover:bg-slate-700 hover:text-white'
               }`}
             >
               <Icon className="h-4 w-4 flex-shrink-0" />
@@ -86,8 +83,8 @@ export default function Sidebar() {
         {/* Section Admin */}
         {isAdmin && (
           <>
-            <div className="pt-4 pb-1 px-4">
-              <p className="text-xs font-bold uppercase tracking-widest text-green-400">Administration</p>
+            <div className="pt-5 pb-1 px-4">
+              <p className="text-xs font-bold uppercase tracking-widest text-blue-400">Administration</p>
             </div>
             {adminNavItems.map(({ href, label, icon: Icon }) => {
               const active = pathname === href || (href !== '/admin' && pathname.startsWith(href));
@@ -97,8 +94,8 @@ export default function Sidebar() {
                   href={href}
                   className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm ${
                     active
-                      ? 'bg-white/20 text-white font-semibold shadow-sm'
-                      : 'text-green-100 hover:bg-white/10'
+                      ? 'bg-blue-600 text-white font-semibold shadow-sm'
+                      : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                   }`}
                 >
                   <Icon className="h-4 w-4 flex-shrink-0" />
@@ -111,19 +108,19 @@ export default function Sidebar() {
       </nav>
 
       {/* User info + logout */}
-      <div className="px-3 py-4 border-t border-green-600">
-        <div className="flex items-center gap-3 px-4 py-2 mb-2 rounded-lg bg-green-800">
-          <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center text-sm font-bold flex-shrink-0">
+      <div className="px-3 py-4 border-t border-slate-700">
+        <div className="flex items-center gap-3 px-4 py-2.5 mb-1 rounded-lg bg-slate-900">
+          <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-sm font-bold flex-shrink-0">
             {user?.full_name?.[0]?.toUpperCase() || 'U'}
           </div>
           <div className="overflow-hidden">
-            <p className="text-sm font-medium truncate">{user?.full_name || 'Utilisateur'}</p>
-            <p className="text-xs text-green-300 truncate">{user?.role ? roleLabel[user.role] : ''}</p>
+            <p className="text-sm font-medium text-white truncate">{user?.full_name || 'Utilisateur'}</p>
+            <p className="text-xs text-blue-400 truncate">{user?.role ? roleLabel[user.role] : ''}</p>
           </div>
         </div>
         <button
           onClick={logout}
-          className="flex items-center gap-3 w-full px-4 py-2.5 text-green-100 hover:bg-white/10 rounded-lg transition-colors text-sm"
+          className="flex items-center gap-3 w-full px-4 py-2.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors text-sm"
         >
           <LogOut className="h-4 w-4" />
           Déconnexion

@@ -18,7 +18,7 @@ interface Transaction {
 }
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  COMPLETED: { label: 'Complété', color: 'text-green-600 bg-green-50', icon: CheckCircle },
+  COMPLETED: { label: 'Complété', color: 'text-blue-600 bg-blue-50', icon: CheckCircle },
   PENDING: { label: 'En attente', color: 'text-yellow-600 bg-yellow-50', icon: Clock },
   FAILED: { label: 'Échoué', color: 'text-red-600 bg-red-50', icon: XCircle },
 };
@@ -70,7 +70,7 @@ export default function DashboardCitoyen() {
 
         {/* Quick actions */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <a href="/transactions" className="bg-green-600 hover:bg-green-700 text-white rounded-xl p-5 flex items-center gap-4 transition-colors group">
+          <a href="/transactions" className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl p-5 flex items-center gap-4 transition-colors group">
             <div className="bg-white/20 p-3 rounded-lg group-hover:bg-white/30 transition-colors">
               <ArrowLeftRight className="h-6 w-6" />
             </div>
@@ -80,8 +80,8 @@ export default function DashboardCitoyen() {
             </div>
           </a>
           <a href="/receipts" className="bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 rounded-xl p-5 flex items-center gap-4 transition-colors group">
-            <div className="bg-green-50 p-3 rounded-lg group-hover:bg-green-100 transition-colors">
-              <Receipt className="h-6 w-6 text-green-600" />
+            <div className="bg-blue-50 p-3 rounded-lg group-hover:bg-blue-100 transition-colors">
+              <Receipt className="h-6 w-6 text-blue-600" />
             </div>
             <div>
               <p className="font-semibold">Mes reçus fiscaux</p>
@@ -94,11 +94,11 @@ export default function DashboardCitoyen() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <h2 className="font-semibold text-gray-800">Transactions récentes</h2>
-            <a href="/transactions" className="text-sm text-green-600 hover:text-green-700 font-medium">Voir tout →</a>
+            <a href="/transactions" className="text-sm text-blue-600 hover:text-blue-700 font-medium">Voir tout →</a>
           </div>
           {loading ? (
             <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
             </div>
           ) : transactions.length === 0 ? (
             <div className="text-center py-12 text-gray-400">

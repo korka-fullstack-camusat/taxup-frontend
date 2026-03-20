@@ -73,7 +73,7 @@ export default function AdminSettingsPage() {
     <div className="p-6 space-y-6 max-w-2xl">
       <div>
         <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-          <Settings className="h-6 w-6 text-green-600" />
+          <Settings className="h-6 w-6 text-blue-600" />
           Paramètres de la plateforme
         </h1>
         <p className="text-gray-500 text-sm mt-1">Configurez les paramètres globaux de TAXUP</p>
@@ -81,7 +81,7 @@ export default function AdminSettingsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center h-48">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
         </div>
       ) : (
         <form onSubmit={handleSave} className="space-y-5">
@@ -100,11 +100,11 @@ export default function AdminSettingsPage() {
                 step="0.05"
                 value={settings.fraud_threshold}
                 onChange={e => setSettings(s => ({ ...s, fraud_threshold: parseFloat(e.target.value) }))}
-                className="w-full accent-green-600"
+                className="w-full accent-blue-600"
               />
               <div className="flex justify-between text-xs text-gray-400 mt-1">
                 <span>Sensible (0.0)</span>
-                <span className="font-semibold text-green-600">{settings.fraud_threshold}</span>
+                <span className="font-semibold text-blue-600">{settings.fraud_threshold}</span>
                 <span>Strict (1.0)</span>
               </div>
             </div>
@@ -118,7 +118,7 @@ export default function AdminSettingsPage() {
                 min="0"
                 value={settings.max_transaction_amount}
                 onChange={e => setSettings(s => ({ ...s, max_transaction_amount: parseInt(e.target.value) }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -132,7 +132,7 @@ export default function AdminSettingsPage() {
                 type="email"
                 value={settings.alert_email}
                 onChange={e => setSettings(s => ({ ...s, alert_email: e.target.value }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="admin@taxup.gov"
               />
             </div>
@@ -161,7 +161,7 @@ export default function AdminSettingsPage() {
               </div>
               <div
                 onClick={() => setSettings(s => ({ ...s, auto_audit_enabled: !s.auto_audit_enabled }))}
-                className={`relative w-11 h-6 rounded-full transition-colors ${settings.auto_audit_enabled ? 'bg-green-500' : 'bg-gray-300'}`}
+                className={`relative w-11 h-6 rounded-full transition-colors ${settings.auto_audit_enabled ? 'bg-blue-500' : 'bg-gray-300'}`}
               >
                 <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${settings.auto_audit_enabled ? 'translate-x-5' : ''}`} />
               </div>
@@ -169,7 +169,7 @@ export default function AdminSettingsPage() {
           </div>
 
           {success && (
-            <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg px-4 py-3 text-sm">
+            <div className="bg-blue-50 border border-blue-200 text-blue-700 rounded-lg px-4 py-3 text-sm">
               {success}
             </div>
           )}
@@ -191,7 +191,7 @@ export default function AdminSettingsPage() {
             <button
               type="submit"
               disabled={saving}
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white rounded-lg px-6 py-2.5 text-sm font-semibold transition-colors"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg px-6 py-2.5 text-sm font-semibold transition-colors"
             >
               <Save className="h-4 w-4" />
               {saving ? 'Enregistrement...' : 'Enregistrer'}

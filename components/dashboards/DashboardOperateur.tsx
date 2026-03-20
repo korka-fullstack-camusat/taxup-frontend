@@ -19,7 +19,7 @@ interface Transaction {
 }
 
 const statusConfig: Record<string, { label: string; color: string }> = {
-  COMPLETED: { label: 'Complété', color: 'text-green-600 bg-green-50' },
+  COMPLETED: { label: 'Complété', color: 'text-blue-600 bg-blue-50' },
   PENDING: { label: 'En attente', color: 'text-yellow-600 bg-yellow-50' },
   FAILED: { label: 'Échoué', color: 'text-red-600 bg-red-50' },
   FLAGGED: { label: 'Signalé', color: 'text-orange-600 bg-orange-50' },
@@ -92,7 +92,7 @@ export default function DashboardOperateur() {
 
         {/* Submit feedback */}
         {submitMsg && (
-          <div className={`rounded-lg px-4 py-3 text-sm ${submitMsg.includes('succès') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+          <div className={`rounded-lg px-4 py-3 text-sm ${submitMsg.includes('succès') ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
             {submitMsg}
           </div>
         )}
@@ -103,7 +103,7 @@ export default function DashboardOperateur() {
             <h2 className="font-semibold text-gray-800">Nouvelle transaction</h2>
             <button
               onClick={() => setShowForm(!showForm)}
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
             >
               <Plus className="h-4 w-4" />
               {showForm ? 'Annuler' : 'Créer'}
@@ -116,7 +116,7 @@ export default function DashboardOperateur() {
                 <select
                   value={form.transaction_type}
                   onChange={e => setForm({ ...form, transaction_type: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 >
                   {['TRANSFER', 'PAYMENT', 'DEPOSIT', 'WITHDRAWAL', 'MOBILE_PAYMENT'].map(t => (
                     <option key={t} value={t}>{typeLabel[t]}</option>
@@ -129,7 +129,7 @@ export default function DashboardOperateur() {
                   type="number"
                   value={form.amount}
                   onChange={e => setForm({ ...form, amount: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="10000"
                   required
                   min="1"
@@ -141,7 +141,7 @@ export default function DashboardOperateur() {
                   type="text"
                   value={form.sender_phone}
                   onChange={e => setForm({ ...form, sender_phone: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="+224600000000"
                   required
                 />
@@ -152,7 +152,7 @@ export default function DashboardOperateur() {
                   type="text"
                   value={form.recipient_phone}
                   onChange={e => setForm({ ...form, recipient_phone: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="+224600000001"
                   required
                 />
@@ -163,7 +163,7 @@ export default function DashboardOperateur() {
                   type="text"
                   value={form.description}
                   onChange={e => setForm({ ...form, description: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Paiement facture..."
                 />
               </div>
@@ -171,7 +171,7 @@ export default function DashboardOperateur() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="bg-green-600 hover:bg-green-700 disabled:bg-green-300 text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm"
+                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-green-300 text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm"
                 >
                   {submitting ? 'Envoi...' : 'Soumettre la transaction'}
                 </button>
@@ -184,11 +184,11 @@ export default function DashboardOperateur() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <h2 className="font-semibold text-gray-800">Transactions récentes</h2>
-            <a href="/transactions" className="text-sm text-green-600 hover:text-green-700 font-medium">Voir tout →</a>
+            <a href="/transactions" className="text-sm text-blue-600 hover:text-blue-700 font-medium">Voir tout →</a>
           </div>
           {loading ? (
             <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
             </div>
           ) : transactions.length === 0 ? (
             <div className="text-center py-12 text-gray-400">

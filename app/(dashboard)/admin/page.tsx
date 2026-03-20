@@ -29,7 +29,7 @@ const roleColor: Record<string, string> = {
   CITOYEN: 'bg-blue-100 text-blue-700',
   OPERATEUR_MOBILE: 'bg-purple-100 text-purple-700',
   AUDITEUR_FISCAL: 'bg-yellow-100 text-yellow-700',
-  AGENT_DGID: 'bg-green-100 text-green-700',
+  AGENT_DGID: 'bg-blue-100 text-blue-700',
   ADMIN: 'bg-red-100 text-red-700',
 };
 
@@ -98,7 +98,7 @@ export default function AdminPage() {
       {/* Stat cards */}
       {loading ? (
         <div className="flex items-center justify-center h-40">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-600" />
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
         </div>
       ) : (
         <>
@@ -115,7 +115,7 @@ export default function AdminPage() {
           {stats && Object.keys(stats.users_by_role).length > 0 && (
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <h2 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-green-600" />
+                <TrendingUp className="h-4 w-4 text-blue-600" />
                 Répartition des utilisateurs par rôle
               </h2>
               <div className="flex flex-wrap gap-3">
@@ -175,7 +175,7 @@ export default function AdminPage() {
 function StatCard({ icon: Icon, label, value, color }: { icon: React.ElementType; label: string; value: number; color: string }) {
   const colors: Record<string, string> = {
     blue: 'bg-blue-50 text-blue-600',
-    green: 'bg-green-50 text-green-600',
+    green: 'bg-green-50 text-blue-600',
     red: 'bg-red-50 text-red-600',
     purple: 'bg-purple-50 text-purple-600',
     orange: 'bg-orange-50 text-orange-600',

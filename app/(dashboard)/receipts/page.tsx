@@ -54,7 +54,7 @@ export default function ReceiptsPage() {
               placeholder="Numéro de reçu, période..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -62,7 +62,7 @@ export default function ReceiptsPage() {
         {/* Table */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           {loading ? (
-            <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-600" /></div>
+            <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" /></div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-16 text-gray-400">
               <Receipt className="h-12 w-12 mx-auto mb-3 opacity-30" />
@@ -90,7 +90,7 @@ export default function ReceiptsPage() {
                         <td className="px-6 py-4 font-mono text-xs text-gray-700 font-medium">{r.receipt_number}</td>
                         <td className="px-6 py-4 text-gray-600">{r.fiscal_period}</td>
                         <td className="px-6 py-4 text-right font-semibold text-gray-800">{formatXOF(r.total_amount)}</td>
-                        <td className="px-6 py-4 text-right text-green-700 font-medium">{formatXOF(r.tax_amount)}</td>
+                        <td className="px-6 py-4 text-right text-blue-700 font-medium">{formatXOF(r.tax_amount)}</td>
                         <td className="px-6 py-4 text-center">
                           <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full font-medium">
                             {(r.tax_rate * 100).toFixed(1)}%
@@ -102,14 +102,14 @@ export default function ReceiptsPage() {
                               <XCircle className="h-3 w-3" /> Annulé
                             </span>
                           ) : (
-                            <span className="text-xs text-green-600 bg-green-50 px-2.5 py-1 rounded-full font-medium">Valide</span>
+                            <span className="text-xs text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full font-medium">Valide</span>
                           )}
                         </td>
                         <td className="px-6 py-4 text-gray-400 text-xs">{new Date(r.issued_at).toLocaleDateString('fr-FR')}</td>
                         <td className="px-6 py-4 text-center">
                           <button
                             onClick={async () => { try { const res = await api.get(`/receipts/${r.id}/download`, { responseType: 'blob' }); const url = URL.createObjectURL(res.data); const a = document.createElement('a'); a.href = url; a.download = `recu-${r.receipt_number}.txt`; a.click(); URL.revokeObjectURL(url); } catch {} }}
-                            className="inline-flex items-center gap-1 text-xs text-green-600 hover:text-green-700 hover:bg-green-50 px-2.5 py-1.5 rounded-lg transition-colors"
+                            className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-2.5 py-1.5 rounded-lg transition-colors"
                           >
                             <Download className="h-3.5 w-3.5" /> PDF
                           </button>

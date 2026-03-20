@@ -20,7 +20,7 @@ interface Audit {
 const statusConfig: Record<string, { label: string; color: string; icon: React.ElementType }> = {
   OPEN: { label: 'Ouvert', color: 'text-blue-600 bg-blue-50', icon: AlertCircle },
   IN_PROGRESS: { label: 'En cours', color: 'text-yellow-600 bg-yellow-50', icon: Clock },
-  COMPLETED: { label: 'Terminé', color: 'text-green-600 bg-green-50', icon: CheckCircle },
+  COMPLETED: { label: 'Terminé', color: 'text-blue-600 bg-blue-50', icon: CheckCircle },
   CLOSED: { label: 'Fermé', color: 'text-gray-600 bg-gray-100', icon: CheckCircle },
 };
 
@@ -80,11 +80,11 @@ export default function AuditsPage() {
           <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input type="text" placeholder="Rechercher un audit..." value={search} onChange={e => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
           {canCreate && (
             <button onClick={() => setShowForm(!showForm)}
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors">
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors">
               <Plus className="h-4 w-4" />
               {showForm ? 'Annuler' : 'Nouvel audit'}
             </button>
@@ -99,27 +99,27 @@ export default function AuditsPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Titre *</label>
                 <input type="text" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Audit de conformité Q1 2026" required />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Priorité</label>
                   <select value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     {Object.entries(priorityConfig).map(([v, { label }]) => <option key={v} value={v}>{label}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                   <input type="text" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Description optionnelle" />
                 </div>
               </div>
               <div className="flex justify-end">
                 <button type="submit" disabled={submitting}
-                  className="bg-green-600 hover:bg-green-700 disabled:bg-green-300 text-white font-semibold px-6 py-2.5 rounded-lg text-sm transition-colors">
+                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-green-300 text-white font-semibold px-6 py-2.5 rounded-lg text-sm transition-colors">
                   {submitting ? 'Création...' : 'Créer l\'audit'}
                 </button>
               </div>
@@ -130,7 +130,7 @@ export default function AuditsPage() {
         {/* List */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           {loading ? (
-            <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-600" /></div>
+            <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" /></div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-16 text-gray-400">
               <ClipboardList className="h-12 w-12 mx-auto mb-3 opacity-30" />

@@ -19,7 +19,7 @@ interface Transaction {
 }
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  COMPLETED: { label: 'Complété', color: 'text-green-600 bg-green-50', icon: CheckCircle },
+  COMPLETED: { label: 'Complété', color: 'text-blue-600 bg-blue-50', icon: CheckCircle },
   PENDING: { label: 'En attente', color: 'text-yellow-600 bg-yellow-50', icon: Clock },
   FAILED: { label: 'Échoué', color: 'text-red-600 bg-red-50', icon: XCircle },
   FLAGGED: { label: 'Signalé', color: 'text-orange-600 bg-orange-50', icon: AlertTriangle },
@@ -74,13 +74,13 @@ export default function TransactionsPage() {
               placeholder="Rechercher par numéro, ID..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-gray-400" />
             <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
-              className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
+              className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="">Tous les statuts</option>
               <option value="COMPLETED">Complété</option>
               <option value="PENDING">En attente</option>
@@ -88,7 +88,7 @@ export default function TransactionsPage() {
               <option value="FLAGGED">Signalé</option>
             </select>
             <select value={typeFilter} onChange={e => { setTypeFilter(e.target.value); setPage(1); }}
-              className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
+              className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="">Tous les types</option>
               {Object.entries(typeLabel).map(([val, lbl]) => <option key={val} value={val}>{lbl}</option>)}
             </select>
@@ -98,7 +98,7 @@ export default function TransactionsPage() {
         {/* Table */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           {loading ? (
-            <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-600" /></div>
+            <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" /></div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-16 text-gray-400">
               <ArrowLeftRight className="h-12 w-12 mx-auto mb-3 opacity-30" />
@@ -138,7 +138,7 @@ export default function TransactionsPage() {
                             {tx.risk_score != null ? (
                               <span className={`text-xs font-bold px-2 py-1 rounded-full ${
                                 tx.risk_score >= 0.7 ? 'text-red-600 bg-red-50' :
-                                tx.risk_score >= 0.4 ? 'text-orange-600 bg-orange-50' : 'text-green-600 bg-green-50'
+                                tx.risk_score >= 0.4 ? 'text-orange-600 bg-orange-50' : 'text-blue-600 bg-blue-50'
                               }`}>{Math.round(tx.risk_score * 100)}%</span>
                             ) : <span className="text-gray-300">—</span>}
                           </td>

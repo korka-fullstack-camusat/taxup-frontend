@@ -18,11 +18,11 @@ export default function Header({ title, subtitle }: HeaderProps) {
         {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
       </div>
       <div className="flex items-center gap-4">
-        <button className="relative p-2 text-gray-500 hover:text-green-600 transition-colors hover:bg-green-50 rounded-lg">
+        <button className="relative p-2 text-gray-500 hover:text-blue-600 transition-colors hover:bg-blue-50 rounded-lg">
           <Bell className="h-5 w-5" />
         </button>
         <div className="flex items-center gap-2 border-l pl-4">
-          <div className="h-8 w-8 rounded-full bg-green-600 flex items-center justify-center text-white text-sm font-bold">
+          <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold">
             {user?.full_name?.[0]?.toUpperCase() || 'U'}
           </div>
           <div className="hidden sm:block">

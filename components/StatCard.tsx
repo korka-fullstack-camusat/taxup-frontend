@@ -17,7 +17,7 @@ const colorMap = {
   purple: { bg: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-100' },
 };
 
-export default function StatCard({ title, value, subtitle, icon: Icon, color = 'green', trend }: StatCardProps) {
+export default function StatCard({ title, value, subtitle, icon: Icon, color = 'blue', trend }: StatCardProps) {
   const c = colorMap[color];
   return (
     <div className={`bg-white rounded-xl shadow-sm border ${c.border} p-5 hover:shadow-md transition-shadow`}>
@@ -27,7 +27,7 @@ export default function StatCard({ title, value, subtitle, icon: Icon, color = '
         </div>
         {trend && (
           <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-            trend.value >= 0 ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+            trend.value >= 0 ? 'bg-blue-50 text-blue-600' : 'bg-red-50 text-red-600'
           }`}>
             {trend.value >= 0 ? '+' : ''}{trend.value}%
           </span>

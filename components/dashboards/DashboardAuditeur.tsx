@@ -26,7 +26,7 @@ interface FraudAlert {
 const auditStatusConfig: Record<string, { label: string; color: string }> = {
   OPEN: { label: 'Ouvert', color: 'text-blue-600 bg-blue-50' },
   IN_PROGRESS: { label: 'En cours', color: 'text-yellow-600 bg-yellow-50' },
-  COMPLETED: { label: 'Terminé', color: 'text-green-600 bg-green-50' },
+  COMPLETED: { label: 'Terminé', color: 'text-blue-600 bg-blue-50' },
   CLOSED: { label: 'Fermé', color: 'text-gray-600 bg-gray-100' },
 };
 
@@ -85,10 +85,10 @@ export default function DashboardAuditeur() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <h2 className="font-semibold text-gray-800">Audits récents</h2>
-              <a href="/audits" className="text-sm text-green-600 hover:text-green-700 font-medium">Voir tout →</a>
+              <a href="/audits" className="text-sm text-blue-600 hover:text-blue-700 font-medium">Voir tout →</a>
             </div>
             {loading ? (
-              <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600" /></div>
+              <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>
             ) : audits.length === 0 ? (
               <div className="text-center py-10 text-gray-400">
                 <ClipboardList className="h-10 w-10 mx-auto mb-2 opacity-30" />
@@ -121,10 +121,10 @@ export default function DashboardAuditeur() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <h2 className="font-semibold text-gray-800">Alertes fraude récentes</h2>
-              <a href="/fraud" className="text-sm text-green-600 hover:text-green-700 font-medium">Voir tout →</a>
+              <a href="/fraud" className="text-sm text-blue-600 hover:text-blue-700 font-medium">Voir tout →</a>
             </div>
             {loading ? (
-              <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600" /></div>
+              <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>
             ) : alerts.length === 0 ? (
               <div className="text-center py-10 text-gray-400">
                 <AlertTriangle className="h-10 w-10 mx-auto mb-2 opacity-30" />
