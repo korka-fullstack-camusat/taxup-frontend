@@ -151,7 +151,8 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
       margin: { top: 24, left: 14, right: 14 },
       didDrawPage: (hookData) => {
         // Pied de page
-        const pageCount = (doc as jsPDF & { internal: { getNumberOfPages: () => number } }).internal.getNumberOfPages();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const pageCount = (doc as any).internal.getNumberOfPages();
         doc.setFontSize(7);
         doc.setTextColor(148, 163, 184);
         const pW = doc.internal.pageSize.getWidth();
