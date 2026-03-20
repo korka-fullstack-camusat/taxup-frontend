@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ClipboardList, Search, Plus, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { ClipboardList, Search, Plus, Clock, CheckCircle, AlertCircle, Download } from 'lucide-react';
 import Header from '@/components/Header';
 import api from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import ExportModal, { ExportField } from '@/components/ExportModal';
 
 interface Audit {
   id: string;
@@ -31,6 +32,17 @@ const priorityConfig: Record<string, { label: string; color: string }> = {
   CRITICAL: { label: 'Critique', color: 'text-red-600 bg-red-50' },
 };
 
+const EXPORT_FIELDS: ExportField[] = [
+  { key: 'title',          label: 'Titre' },
+  { key: 'priority',       label: 'Priorité' },
+  { key: 'status',         label: 'Statut' },
+  { key: 'findings_count', label: 'Nb. de constatations', defaultSelected: false },
+  { key: 'description',    label: 'Description',          defaultSelected: false },
+  { key: 'created_at',     label: 'Créé le' },
+  { key: 'updated_at',     label: 'Mis à jour le',        defaultSelected: false },
+  { key: 'id',             label: 'ID',                   defaultSelected: false },
+];
+
 export default function AuditsPage() {
   const { user } = useAuth();
   const [audits, setAudits] = useState<Audit[]>([]);
@@ -39,6 +51,7 @@ export default function AuditsPage() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [showForm, setShowForm] = useState(false);
+  const [showExport, setShowExport] = useState(false);
   const [form, setForm] = useState({ title: '', description: '', priority: 'MEDIUM' });
   const [submitting, setSubmitting] = useState(false);
   const pageSize = 20;
@@ -82,13 +95,23 @@ export default function AuditsPage() {
             <input type="text" placeholder="Rechercher un audit..." value={search} onChange={e => setSearch(e.target.value)}
               className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
-          {canCreate && (
-            <button onClick={() => setShowForm(!showForm)}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors">
-              <Plus className="h-4 w-4" />
-              {showForm ? 'Annuler' : 'Nouvel audit'}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowExport(true)}
+              disabled={audits.length === 0}
+              className="flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-40"
+            >
+              <Download className="h-4 w-4" />
+              Exporter
             </button>
-          )}
+            {canCreate && (
+              <button onClick={() => setShowForm(!showForm)}
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors">
+                <Plus className="h-4 w-4" />
+                {showForm ? 'Annuler' : 'Nouvel audit'}
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Create form */}
@@ -178,6 +201,16 @@ export default function AuditsPage() {
           )}
         </div>
       </main>
+
+      {showExport && (
+        <ExportModal
+          title="Audits fiscaux TAXUP"
+          fields={EXPORT_FIELDS}
+          data={audits as unknown as Record<string, unknown>[]}
+          filename="taxup_audits"
+          onClose={() => setShowExport(false)}
+        />
+      )}
     </div>
   );
 }

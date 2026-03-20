@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Receipt, Search, Download, XCircle } from 'lucide-react';
 import Header from '@/components/Header';
 import api from '@/lib/api';
+import ExportModal, { ExportField } from '@/components/ExportModal';
 
 interface FiscalReceipt {
   id: string;
@@ -21,12 +22,25 @@ function formatXOF(n: number) {
   return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 }).format(n);
 }
 
+const EXPORT_FIELDS: ExportField[] = [
+  { key: 'receipt_number', label: 'N° Reçu' },
+  { key: 'fiscal_period',  label: 'Période fiscale' },
+  { key: 'total_amount',   label: 'Montant total (XOF)' },
+  { key: 'tax_amount',     label: 'Taxe (XOF)' },
+  { key: 'tax_rate',       label: 'Taux de taxe' },
+  { key: 'is_cancelled',   label: 'Annulé' },
+  { key: 'issued_at',      label: 'Émis le' },
+  { key: 'transaction_id', label: 'ID Transaction', defaultSelected: false },
+  { key: 'id',             label: 'ID Reçu',        defaultSelected: false },
+];
+
 export default function ReceiptsPage() {
   const [receipts, setReceipts] = useState<FiscalReceipt[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [showExport, setShowExport] = useState(false);
   const pageSize = 20;
 
   useEffect(() => {
@@ -45,9 +59,9 @@ export default function ReceiptsPage() {
     <div className="flex-1 flex flex-col">
       <Header title="Reçus fiscaux" subtitle={`${total} reçu${total > 1 ? 's' : ''} émis`} />
       <main className="flex-1 p-6 space-y-4">
-        {/* Search */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-          <div className="relative max-w-sm">
+        {/* Search + export */}
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-wrap gap-3 items-center">
+          <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
@@ -57,6 +71,14 @@ export default function ReceiptsPage() {
               className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+          <button
+            onClick={() => setShowExport(true)}
+            disabled={receipts.length === 0}
+            className="flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-40"
+          >
+            <Download className="h-4 w-4" />
+            Exporter
+          </button>
         </div>
 
         {/* Table */}
@@ -132,6 +154,16 @@ export default function ReceiptsPage() {
           )}
         </div>
       </main>
+
+      {showExport && (
+        <ExportModal
+          title="Reçus fiscaux TAXUP"
+          fields={EXPORT_FIELDS}
+          data={receipts as unknown as Record<string, unknown>[]}
+          filename="taxup_recus_fiscaux"
+          onClose={() => setShowExport(false)}
+        />
+      )}
     </div>
   );
 }

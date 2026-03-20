@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ArrowLeftRight, Search, Filter, CheckCircle, Clock, XCircle, AlertTriangle } from 'lucide-react';
+import { ArrowLeftRight, Search, Filter, CheckCircle, Clock, XCircle, AlertTriangle, Download } from 'lucide-react';
 import Header from '@/components/Header';
 import api from '@/lib/api';
+import ExportModal, { ExportField } from '@/components/ExportModal';
 
 interface Transaction {
   id: string;
@@ -34,6 +35,19 @@ function formatXOF(n: number) {
   return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 }).format(n);
 }
 
+const EXPORT_FIELDS: ExportField[] = [
+  { key: 'transaction_type', label: 'Type' },
+  { key: 'sender_phone',     label: 'Émetteur' },
+  { key: 'recipient_phone',  label: 'Destinataire' },
+  { key: 'amount',           label: 'Montant (XOF)' },
+  { key: 'currency',         label: 'Devise' },
+  { key: 'status',           label: 'Statut' },
+  { key: 'risk_score',       label: 'Score de risque', defaultSelected: false },
+  { key: 'description',      label: 'Description',     defaultSelected: false },
+  { key: 'created_at',       label: 'Date' },
+  { key: 'id',               label: 'ID',              defaultSelected: false },
+];
+
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,6 +56,7 @@ export default function TransactionsPage() {
   const [typeFilter, setTypeFilter] = useState('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [showExport, setShowExport] = useState(false);
   const pageSize = 20;
 
   const fetch = () => {
@@ -93,6 +108,14 @@ export default function TransactionsPage() {
               {Object.entries(typeLabel).map(([val, lbl]) => <option key={val} value={val}>{lbl}</option>)}
             </select>
           </div>
+          <button
+            onClick={() => setShowExport(true)}
+            disabled={transactions.length === 0}
+            className="flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-40"
+          >
+            <Download className="h-4 w-4" />
+            Exporter
+          </button>
         </div>
 
         {/* Table */}
@@ -167,6 +190,16 @@ export default function TransactionsPage() {
           )}
         </div>
       </main>
+
+      {showExport && (
+        <ExportModal
+          title="Transactions TAXUP"
+          fields={EXPORT_FIELDS}
+          data={transactions as unknown as Record<string, unknown>[]}
+          filename="taxup_transactions"
+          onClose={() => setShowExport(false)}
+        />
+      )}
     </div>
   );
 }

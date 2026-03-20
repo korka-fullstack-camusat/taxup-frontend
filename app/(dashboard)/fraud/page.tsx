@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Shield, Filter } from 'lucide-react';
+import { AlertTriangle, Shield, Filter, Download } from 'lucide-react';
 import Header from '@/components/Header';
 import api from '@/lib/api';
+import ExportModal, { ExportField } from '@/components/ExportModal';
 
 interface FraudAlert {
   id: string;
@@ -35,6 +36,15 @@ function riskLevel(score: number) {
   return { label: 'Faible', color: 'text-blue-600 bg-blue-50' };
 }
 
+const EXPORT_FIELDS: ExportField[] = [
+  { key: 'fraud_type',     label: 'Type de fraude' },
+  { key: 'risk_score',     label: 'Score de risque (%)' },
+  { key: 'status',         label: 'Statut' },
+  { key: 'transaction_id', label: 'ID Transaction' },
+  { key: 'detected_at',    label: 'Détecté le' },
+  { key: 'id',             label: 'ID Alerte', defaultSelected: false },
+];
+
 export default function FraudPage() {
   const [alerts, setAlerts] = useState<FraudAlert[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,6 +52,7 @@ export default function FraudPage() {
   const [minRisk, setMinRisk] = useState('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [showExport, setShowExport] = useState(false);
   const pageSize = 20;
 
   const fetch = () => {
@@ -56,6 +67,14 @@ export default function FraudPage() {
   };
 
   useEffect(() => { fetch(); }, [page, statusFilter, minRisk]);
+
+  // For export: normalize risk_score to percentage string
+  const exportData = alerts.map(a => ({
+    ...a,
+    fraud_type: fraudTypeLabel[a.fraud_type] || a.fraud_type,
+    risk_score: `${Math.round(a.risk_score * 100)}%`,
+    status: statusConfig[a.status]?.label || a.status,
+  }));
 
   return (
     <div className="flex-1 flex flex-col">
@@ -76,6 +95,14 @@ export default function FraudPage() {
             <option value="0.6">≥ 60% (Élevé+)</option>
             <option value="0.8">≥ 80% (Critique)</option>
           </select>
+          <button
+            onClick={() => setShowExport(true)}
+            disabled={alerts.length === 0}
+            className="ml-auto flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-40"
+          >
+            <Download className="h-4 w-4" />
+            Exporter
+          </button>
         </div>
 
         {/* Table */}
@@ -149,6 +176,16 @@ export default function FraudPage() {
           )}
         </div>
       </main>
+
+      {showExport && (
+        <ExportModal
+          title="Alertes de fraude TAXUP"
+          fields={EXPORT_FIELDS}
+          data={exportData as unknown as Record<string, unknown>[]}
+          filename="taxup_alertes_fraude"
+          onClose={() => setShowExport(false)}
+        />
+      )}
     </div>
   );
 }
