@@ -55,15 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (identifier: string, password: string) => {
-    // FastAPI OAuth2PasswordRequestForm exige application/x-www-form-urlencoded
-    const isEmail = identifier.includes('@');
-    const formData = new URLSearchParams();
-    formData.append('username', identifier); // FastAPI utilise toujours "username" comme champ
-    formData.append('password', password);
-    if (isEmail) formData.append('email', identifier);
-    const res = await api.post('/auth/login', formData, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    });
+    const res = await api.post('/auth/login', { username: identifier, password });
     localStorage.setItem('access_token', res.data.access_token);
     localStorage.setItem('refresh_token', res.data.refresh_token);
     const me = await api.get('/auth/me');
