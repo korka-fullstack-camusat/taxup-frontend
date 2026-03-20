@@ -2,7 +2,11 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Users, Plus, Search, Edit2, Trash2, ToggleLeft, ToggleRight, X, Eye, EyeOff, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Users, Plus, Search, Edit2, Trash2, X, Eye, EyeOff,
+  ChevronLeft, ChevronRight, Settings2, ToggleLeft, ToggleRight,
+  UserCheck, UserX, Mail, Phone, Building2,
+} from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import api from '@/lib/api';
 
@@ -39,8 +43,8 @@ const ROLES = [
 const roleColors: Record<string, string> = {
   CITOYEN: 'bg-blue-100 text-blue-700',
   OPERATEUR_MOBILE: 'bg-purple-100 text-purple-700',
-  AUDITEUR_FISCAL: 'bg-yellow-100 text-yellow-700',
-  AGENT_DGID: 'bg-blue-100 text-blue-700',
+  AUDITEUR_FISCAL: 'bg-amber-100 text-amber-700',
+  AGENT_DGID: 'bg-sky-100 text-sky-700',
   ADMIN: 'bg-red-100 text-red-700',
 };
 
@@ -54,6 +58,10 @@ const emptyForm: UserForm = {
   organization: '',
 };
 
+// ─── Input style ────────────────────────────────────────────────────────────
+const INPUT = 'w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500';
+const SELECT = 'w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500';
+
 export default function AdminUsersPage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -65,22 +73,24 @@ export default function AdminUsersPage() {
   const [total, setTotal] = useState(0);
   const PAGE_SIZE = 15;
 
-  // Modal state
-  const [showModal, setShowModal] = useState(false);
+  // Create / Edit modal
+  const [showFormModal, setShowFormModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [form, setForm] = useState<UserForm>(emptyForm);
   const [showPassword, setShowPassword] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
 
+  // "Gérer" modal
+  const [manageTarget, setManageTarget] = useState<User | null>(null);
+  const [toggling, setToggling] = useState(false);
+
   // Delete confirm
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    if (user && user.role !== 'ADMIN') {
-      router.replace('/dashboard');
-    }
+    if (user && user.role !== 'ADMIN') router.replace('/dashboard');
   }, [user, router]);
 
   const fetchUsers = useCallback(async () => {
@@ -106,18 +116,19 @@ export default function AdminUsersPage() {
     }
   }, [user, page, search, roleFilter]);
 
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+  useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
+  // ── Create ──────────────────────────────────────────────────────────────
   const openCreate = () => {
     setEditingUser(null);
     setForm(emptyForm);
     setFormError('');
-    setShowModal(true);
+    setShowFormModal(true);
   };
 
+  // ── Edit (from "Gérer" modal) ────────────────────────────────────────────
   const openEdit = (u: User) => {
+    setManageTarget(null);
     setEditingUser(u);
     setForm({
       username: u.username,
@@ -129,7 +140,7 @@ export default function AdminUsersPage() {
       organization: u.organization || '',
     });
     setFormError('');
-    setShowModal(true);
+    setShowFormModal(true);
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -144,7 +155,7 @@ export default function AdminUsersPage() {
       } else {
         await api.post('/users', form);
       }
-      setShowModal(false);
+      setShowFormModal(false);
       fetchUsers();
     } catch (err: unknown) {
       const e = err as { response?: { data?: { detail?: string } } };
@@ -154,17 +165,28 @@ export default function AdminUsersPage() {
     }
   };
 
+  // ── Toggle active (from "Gérer" modal) ──────────────────────────────────
   const toggleActive = async (u: User) => {
+    setToggling(true);
     try {
       if (u.is_active) {
         await api.patch(`/users/${u.id}/deactivate`);
       } else {
         await api.patch(`/users/${u.id}/activate`);
       }
+      setManageTarget(null);
       fetchUsers();
     } catch {
       // ignore
+    } finally {
+      setToggling(false);
     }
+  };
+
+  // ── Delete (from "Gérer" modal) ──────────────────────────────────────────
+  const openDelete = (u: User) => {
+    setManageTarget(null);
+    setDeleteTarget(u);
   };
 
   const confirmDelete = async () => {
@@ -182,12 +204,12 @@ export default function AdminUsersPage() {
   };
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
-
   if (!user || user.role !== 'ADMIN') return null;
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+
+      {/* ── Header ─────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
@@ -205,7 +227,7 @@ export default function AdminUsersPage() {
         </button>
       </div>
 
-      {/* Filters */}
+      {/* ── Filters ────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -214,20 +236,21 @@ export default function AdminUsersPage() {
             placeholder="Rechercher par nom, email, username..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`${INPUT} pl-9`}
           />
         </div>
         <select
           value={roleFilter}
           onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
-          className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className={SELECT}
+          style={{ maxWidth: 200 }}
         >
           <option value="">Tous les rôles</option>
           {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
         </select>
       </div>
 
-      {/* Table */}
+      {/* ── Table ──────────────────────────────────────────────────── */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center h-48">
@@ -241,19 +264,19 @@ export default function AdminUsersPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-blue-50 border-b border-blue-100">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Utilisateur</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Rôle</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Statut</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Organisation</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Utilisateur</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Email</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Rôle</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Statut</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Organisation</th>
+                  <th className="px-4 py-3 text-center text-xs font-semibold text-blue-700 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {users.map((u) => (
-                  <tr key={u.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={u.id} className="hover:bg-blue-50/40 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm flex-shrink-0">
@@ -272,35 +295,20 @@ export default function AdminUsersPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${u.is_active ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-600'}`}>
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${u.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${u.is_active ? 'bg-green-500' : 'bg-red-500'}`} />
                         {u.is_active ? 'Actif' : 'Inactif'}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-gray-500 text-xs">{u.organization || '—'}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => toggleActive(u)}
-                          title={u.is_active ? 'Désactiver' : 'Activer'}
-                          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-blue-600 transition-colors"
-                        >
-                          {u.is_active ? <ToggleRight className="h-4 w-4 text-blue-600" /> : <ToggleLeft className="h-4 w-4" />}
-                        </button>
-                        <button
-                          onClick={() => openEdit(u)}
-                          title="Modifier"
-                          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-blue-600 transition-colors"
-                        >
-                          <Edit2 className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => setDeleteTarget(u)}
-                          title="Supprimer"
-                          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-red-600 transition-colors"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
+                    <td className="px-4 py-3 text-center">
+                      <button
+                        onClick={() => setManageTarget(u)}
+                        className="inline-flex items-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                      >
+                        <Settings2 className="h-3.5 w-3.5" />
+                        Gérer
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -314,18 +322,12 @@ export default function AdminUsersPage() {
           <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
             <span>Page {page} sur {totalPages}</span>
             <div className="flex gap-2">
-              <button
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-40 transition-colors"
-              >
+              <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+                className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-40 transition-colors">
                 <ChevronLeft className="h-4 w-4" />
               </button>
-              <button
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-40 transition-colors"
-              >
+              <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+                className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-40 transition-colors">
                 <ChevronRight className="h-4 w-4" />
               </button>
             </div>
@@ -333,15 +335,106 @@ export default function AdminUsersPage() {
         )}
       </div>
 
-      {/* Modal Créer / Modifier */}
-      {showModal && (
+      {/* ── Modal "Gérer" ───────────────────────────────────────────── */}
+      {manageTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+
+            {/* Header user card */}
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-5">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-blue-200 text-xs font-medium uppercase tracking-wider">Gestion du compte</span>
+                <button onClick={() => setManageTarget(null)} className="text-white/70 hover:text-white">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg">
+                  {manageTarget.full_name?.[0]?.toUpperCase() || 'U'}
+                </div>
+                <div>
+                  <p className="font-bold text-white text-base">{manageTarget.full_name}</p>
+                  <p className="text-blue-200 text-xs">@{manageTarget.username}</p>
+                </div>
+                <div className="ml-auto">
+                  <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${manageTarget.is_active ? 'bg-green-400/20 text-green-100' : 'bg-red-400/20 text-red-200'}`}>
+                    {manageTarget.is_active ? 'Actif' : 'Inactif'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Info row */}
+            <div className="px-6 py-3 bg-blue-50 border-b border-blue-100 flex flex-wrap gap-4 text-xs text-gray-600">
+              <span className="flex items-center gap-1"><Mail className="h-3.5 w-3.5 text-blue-400" />{manageTarget.email}</span>
+              {manageTarget.phone_number && (
+                <span className="flex items-center gap-1"><Phone className="h-3.5 w-3.5 text-blue-400" />{manageTarget.phone_number}</span>
+              )}
+              {manageTarget.organization && (
+                <span className="flex items-center gap-1"><Building2 className="h-3.5 w-3.5 text-blue-400" />{manageTarget.organization}</span>
+              )}
+              <span className={`px-2 py-0.5 rounded-full font-medium ${roleColors[manageTarget.role] || 'bg-gray-100 text-gray-700'}`}>
+                {ROLES.find(r => r.value === manageTarget.role)?.label || manageTarget.role}
+              </span>
+            </div>
+
+            {/* Actions */}
+            <div className="px-6 py-5 space-y-3">
+
+              {/* Modifier */}
+              <button
+                onClick={() => openEdit(manageTarget)}
+                className="w-full flex items-center gap-3 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 rounded-xl px-4 py-3 text-sm font-semibold transition-colors"
+              >
+                <Edit2 className="h-4 w-4" />
+                Modifier les informations
+              </button>
+
+              {/* Activer / Désactiver */}
+              <button
+                onClick={() => toggleActive(manageTarget)}
+                disabled={toggling}
+                className={`w-full flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-colors border ${
+                  manageTarget.is_active
+                    ? 'bg-orange-50 hover:bg-orange-100 border-orange-200 text-orange-700'
+                    : 'bg-green-50 hover:bg-green-100 border-green-200 text-green-700'
+                } disabled:opacity-60`}
+              >
+                {manageTarget.is_active
+                  ? <><UserX className="h-4 w-4" />{toggling ? 'Désactivation...' : 'Désactiver le compte'}</>
+                  : <><UserCheck className="h-4 w-4" />{toggling ? 'Activation...' : 'Activer le compte'}</>
+                }
+              </button>
+
+              {/* Supprimer */}
+              <button
+                onClick={() => openDelete(manageTarget)}
+                className="w-full flex items-center gap-3 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm font-semibold transition-colors"
+              >
+                <Trash2 className="h-4 w-4" />
+                Supprimer le compte
+              </button>
+
+              <button
+                onClick={() => setManageTarget(null)}
+                className="w-full text-center text-gray-500 hover:text-gray-700 text-sm py-1 transition-colors"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal Créer / Modifier ──────────────────────────────────── */}
+      {showFormModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <h2 className="text-lg font-bold text-gray-800">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-blue-50">
+              <h2 className="text-lg font-bold text-blue-800">
                 {editingUser ? 'Modifier l\'utilisateur' : 'Nouvel utilisateur'}
               </h2>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setShowFormModal(false)} className="text-gray-400 hover:text-gray-600">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -350,107 +443,76 @@ export default function AdminUsersPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Nom complet *</label>
-                  <input
-                    type="text"
-                    required
-                    value={form.full_name}
+                  <input type="text" required value={form.full_name}
                     onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Prénom Nom"
-                  />
+                    className={INPUT} placeholder="Prénom Nom" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Nom d&apos;utilisateur *</label>
-                  <input
-                    type="text"
-                    required
-                    value={form.username}
+                  <input type="text" required value={form.username}
                     onChange={e => setForm(f => ({ ...f, username: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="username"
-                  />
+                    className={INPUT} placeholder="username" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Email *</label>
-                  <input
-                    type="email"
-                    required
-                    value={form.email}
+                  <input type="email" required value={form.email}
                     onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="email@exemple.com"
-                  />
+                    className={INPUT} placeholder="email@exemple.com" />
                 </div>
                 <div className="col-span-2">
                   <label className="block text-xs font-semibold text-gray-600 mb-1">
                     Mot de passe {editingUser ? '(laisser vide pour ne pas modifier)' : '*'}
                   </label>
                   <div className="relative">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      required={!editingUser}
+                    <input type={showPassword ? 'text' : 'password'} required={!editingUser}
                       value={form.password}
                       onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
-                      placeholder="••••••••"
-                    />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      className={INPUT} placeholder="••••••••" />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Rôle *</label>
-                  <select
-                    required
-                    value={form.role}
+                  <select required value={form.role}
                     onChange={e => setForm(f => ({ ...f, role: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                  >
+                    className={SELECT}>
                     {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Téléphone</label>
-                  <input
-                    type="tel"
-                    value={form.phone_number}
+                  <input type="tel" value={form.phone_number}
                     onChange={e => setForm(f => ({ ...f, phone_number: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="+224..."
-                  />
+                    className={INPUT} placeholder="+224..." />
                 </div>
                 <div className="col-span-2">
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Organisation</label>
-                  <input
-                    type="text"
-                    value={form.organization}
+                  <input type="text" value={form.organization}
                     onChange={e => setForm(f => ({ ...f, organization: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Nom de l'organisation"
-                  />
+                    className={INPUT} placeholder="Nom de l'organisation" />
                 </div>
               </div>
 
               {formError && (
-                <div className="bg-red-50 border border-red-200 text-red-600 rounded-lg px-4 py-3 text-sm">
-                  {formError}
+                <div className="bg-red-50 border border-red-200 text-red-600 rounded-lg px-4 py-3 text-sm">{formError}</div>
+              )}
+
+              {!editingUser && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-xs text-blue-700">
+                  Un email avec les identifiants de connexion sera envoyé automatiquement.
                 </div>
               )}
 
               <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="flex-1 border border-gray-300 text-gray-700 rounded-lg py-2.5 text-sm font-medium hover:bg-gray-50 transition-colors"
-                >
+                <button type="button" onClick={() => setShowFormModal(false)}
+                  className="flex-1 border border-gray-300 text-gray-700 rounded-lg py-2.5 text-sm font-medium hover:bg-gray-50 transition-colors">
                   Annuler
                 </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg py-2.5 text-sm font-semibold transition-colors"
-                >
+                <button type="submit" disabled={saving}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg py-2.5 text-sm font-semibold transition-colors">
                   {saving ? 'Enregistrement...' : (editingUser ? 'Modifier' : 'Créer')}
                 </button>
               </div>
@@ -459,7 +521,7 @@ export default function AdminUsersPage() {
         </div>
       )}
 
-      {/* Modal Supprimer */}
+      {/* ── Modal Supprimer ─────────────────────────────────────────── */}
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
@@ -468,25 +530,20 @@ export default function AdminUsersPage() {
                 <Trash2 className="h-5 w-5 text-red-600" />
               </div>
               <div>
-                <h2 className="font-bold text-gray-800">Supprimer l&apos;utilisateur</h2>
+                <h2 className="font-bold text-gray-800">Supprimer le compte</h2>
                 <p className="text-sm text-gray-500">Cette action est irréversible</p>
               </div>
             </div>
             <p className="text-sm text-gray-600 mb-5">
-              Êtes-vous sûr de vouloir supprimer <span className="font-semibold">{deleteTarget.full_name}</span> (@{deleteTarget.username}) ?
+              Supprimer <span className="font-semibold">{deleteTarget.full_name}</span> (@{deleteTarget.username}) définitivement ?
             </p>
             <div className="flex gap-3">
-              <button
-                onClick={() => setDeleteTarget(null)}
-                className="flex-1 border border-gray-300 text-gray-700 rounded-lg py-2.5 text-sm font-medium hover:bg-gray-50"
-              >
+              <button onClick={() => setDeleteTarget(null)}
+                className="flex-1 border border-gray-300 text-gray-700 rounded-lg py-2.5 text-sm font-medium hover:bg-gray-50">
                 Annuler
               </button>
-              <button
-                onClick={confirmDelete}
-                disabled={deleting}
-                className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white rounded-lg py-2.5 text-sm font-semibold"
-              >
+              <button onClick={confirmDelete} disabled={deleting}
+                className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white rounded-lg py-2.5 text-sm font-semibold">
                 {deleting ? 'Suppression...' : 'Supprimer'}
               </button>
             </div>
