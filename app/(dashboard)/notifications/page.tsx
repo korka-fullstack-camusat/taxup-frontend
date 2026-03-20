@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Bell, AlertTriangle, CheckCircle, Info, ArrowLeftRight } from 'lucide-react';
 import Header from '@/components/Header';
 import api from '@/lib/api';
+import Pagination from '@/components/Pagination';
 
 interface Notification {
   id: string;
@@ -28,7 +29,7 @@ export default function NotificationsPage() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [unreadOnly, setUnreadOnly] = useState(false);
-  const pageSize = 20;
+  const [pageSize, setPageSize] = useState(20);
 
   const fetch = () => {
     setLoading(true);
@@ -113,15 +114,11 @@ export default function NotificationsPage() {
                   );
                 })}
               </div>
-              <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
-                <p className="text-sm text-gray-500">Page {page} · {total} résultats</p>
-                <div className="flex gap-2">
-                  <button disabled={page === 1} onClick={() => setPage(p => p - 1)}
-                    className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50">Précédent</button>
-                  <button disabled={page * pageSize >= total} onClick={() => setPage(p => p + 1)}
-                    className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50">Suivant</button>
-                </div>
-              </div>
+              <Pagination
+                page={page} total={total} pageSize={pageSize}
+                onPageChange={setPage}
+                onPageSizeChange={size => { setPageSize(size); setPage(1); }}
+              />
             </>
           )}
         </div>

@@ -6,6 +6,7 @@ import Header from '@/components/Header';
 import api from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import ExportModal, { ExportField } from '@/components/ExportModal';
+import Pagination from '@/components/Pagination';
 
 interface Audit {
   id: string;
@@ -54,7 +55,7 @@ export default function AuditsPage() {
   const [showExport, setShowExport] = useState(false);
   const [form, setForm] = useState({ title: '', description: '', priority: 'MEDIUM' });
   const [submitting, setSubmitting] = useState(false);
-  const pageSize = 20;
+  const [pageSize, setPageSize] = useState(20);
 
   const canCreate = ['AGENT_DGID', 'AUDITEUR_FISCAL', 'ADMIN'].includes(user?.role || '');
 
@@ -188,15 +189,11 @@ export default function AuditsPage() {
                   );
                 })}
               </div>
-              <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
-                <p className="text-sm text-gray-500">Page {page} · {total} résultats</p>
-                <div className="flex gap-2">
-                  <button disabled={page === 1} onClick={() => setPage(p => p - 1)}
-                    className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50">Précédent</button>
-                  <button disabled={page * pageSize >= total} onClick={() => setPage(p => p + 1)}
-                    className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50">Suivant</button>
-                </div>
-              </div>
+              <Pagination
+                page={page} total={total} pageSize={pageSize}
+                onPageChange={setPage}
+                onPageSizeChange={size => { setPageSize(size); setPage(1); }}
+              />
             </>
           )}
         </div>
