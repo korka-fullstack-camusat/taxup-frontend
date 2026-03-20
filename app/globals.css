@@ -24,3 +24,11 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Force text to black in all form fields regardless of OS dark mode */
+input,
+select,
+textarea {
+  color: #111827;
+  background-color: #ffffff;
+}
