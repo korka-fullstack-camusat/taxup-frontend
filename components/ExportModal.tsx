@@ -30,7 +30,7 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
     setSelected(prev => {
       const next = new Set(prev);
       if (next.has(key)) {
-        if (next.size === 1) return prev; // garder au moins 1 champ
+        if (next.size === 1) return prev;
         next.delete(key);
       } else {
         next.add(key);
@@ -41,7 +41,7 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
 
   const toggleAll = () => {
     if (selected.size === fields.length) {
-      setSelected(new Set([fields[0].key])); // garder au moins 1
+      setSelected(new Set([fields[0].key]));
     } else {
       setSelected(new Set(fields.map(f => f.key)));
     }
@@ -49,122 +49,155 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
 
   const activeFields = fields.filter(f => selected.has(f.key));
 
-  const handleExport = async () => {
+  const handleExport = () => {
     if (activeFields.length === 0 || data.length === 0) return;
     setExporting(true);
-
     try {
-      if (format === 'excel') {
-        await exportExcel();
-      } else {
-        await exportPdf();
-      }
+      if (format === 'excel') exportExcel();
+      else exportPdf();
     } finally {
       setExporting(false);
       onClose();
     }
   };
 
-  const exportExcel = async () => {
-    const { utils, writeFile } = await import('xlsx');
+  // ── Excel via XML Spreadsheet 2003 (aucune dépendance) ──────────────────
+  const exportExcel = () => {
+    const esc = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-    const rows = data.map(row =>
-      Object.fromEntries(activeFields.map(f => [f.label, formatValue(row[f.key])]))
+    const headerRow = activeFields
+      .map(f => `<Cell ss:StyleID="header"><Data ss:Type="String">${esc(f.label)}</Data></Cell>`)
+      .join('');
+
+    const dataRows = data
+      .map(row =>
+        '<Row>' +
+        activeFields
+          .map(f => {
+            const val = formatValue(row[f.key]);
+            return `<Cell ss:StyleID="cell"><Data ss:Type="String">${esc(val)}</Data></Cell>`;
+          })
+          .join('') +
+        '</Row>'
+      )
+      .join('\n');
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office">
+  <Styles>
+    <Style ss:ID="header">
+      <Font ss:Bold="1" ss:Color="#FFFFFF" ss:Size="10"/>
+      <Interior ss:Color="#1E40AF" ss:Pattern="Solid"/>
+      <Alignment ss:Horizontal="Center"/>
+    </Style>
+    <Style ss:ID="cell">
+      <Font ss:Size="9"/>
+      <Alignment ss:WrapText="1"/>
+    </Style>
+  </Styles>
+  <Worksheet ss:Name="Données">
+    <Table>
+      <Row>${headerRow}</Row>
+      ${dataRows}
+    </Table>
+  </Worksheet>
+</Workbook>`;
+
+    downloadBlob(
+      new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8' }),
+      `${filename}_${today()}.xls`
     );
-
-    const ws = utils.json_to_sheet(rows);
-
-    // Largeur auto des colonnes
-    const colWidths = activeFields.map(f => ({
-      wch: Math.max(f.label.length, ...data.map(r => String(formatValue(r[f.key])).length)) + 2,
-    }));
-    ws['!cols'] = colWidths;
-
-    // Style en-tête (couleur de fond bleu)
-    const headerRange = utils.decode_range(ws['!ref'] || 'A1');
-    for (let c = headerRange.s.c; c <= headerRange.e.c; c++) {
-      const cellAddr = utils.encode_cell({ r: 0, c });
-      if (ws[cellAddr]) {
-        ws[cellAddr].s = {
-          fill: { fgColor: { rgb: '1E40AF' } },
-          font: { bold: true, color: { rgb: 'FFFFFF' } },
-          alignment: { horizontal: 'center' },
-        };
-      }
-    }
-
-    const wb = utils.book_new();
-    utils.book_append_sheet(wb, ws, 'Données');
-    writeFile(wb, `${filename}_${today()}.xlsx`);
   };
 
-  const exportPdf = async () => {
-    const { default: jsPDF } = await import('jspdf');
-    const { default: autoTable } = await import('jspdf-autotable');
+  // ── PDF via fenêtre d'impression stylisée (aucune dépendance) ───────────
+  const exportPdf = () => {
+    const esc = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-    const orientation = activeFields.length > 5 ? 'landscape' : 'portrait';
-    const doc = new jsPDF({ orientation, unit: 'mm', format: 'a4' });
+    const headerCells = activeFields.map(f => `<th>${esc(f.label)}</th>`).join('');
+    const bodyRows = data
+      .map(row =>
+        '<tr>' +
+        activeFields.map(f => `<td>${esc(formatValue(row[f.key]))}</td>`).join('') +
+        '</tr>'
+      )
+      .join('');
 
-    // En-tête du document
-    doc.setFillColor(30, 64, 175);
-    doc.rect(0, 0, doc.internal.pageSize.getWidth(), 18, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(13);
-    doc.setFont('helvetica', 'bold');
-    doc.text('TAXUP — Plateforme Fiscale', 14, 7);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.text(title, 14, 13);
-
-    // Date d'export
-    doc.setTextColor(200, 210, 255);
-    doc.setFontSize(8);
-    const pageW = doc.internal.pageSize.getWidth();
-    doc.text(`Exporté le ${new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}`, pageW - 14, 13, { align: 'right' });
-
-    // Tableau
-    autoTable(doc, {
-      startY: 24,
-      head: [activeFields.map(f => f.label)],
-      body: data.map(row => activeFields.map(f => String(formatValue(row[f.key])))),
-      headStyles: {
-        fillColor: [30, 64, 175],
-        textColor: [255, 255, 255],
-        fontStyle: 'bold',
-        fontSize: 9,
-        halign: 'center',
-      },
-      bodyStyles: {
-        fontSize: 8,
-        textColor: [30, 41, 59],
-      },
-      alternateRowStyles: {
-        fillColor: [239, 246, 255],
-      },
-      styles: {
-        cellPadding: 3,
-        overflow: 'linebreak',
-      },
-      columnStyles: Object.fromEntries(
-        activeFields.map((_, i) => [i, { halign: 'left' }])
-      ),
-      margin: { top: 24, left: 14, right: 14 },
-      didDrawPage: (hookData) => {
-        // Pied de page
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const pageCount = (doc as any).internal.getNumberOfPages();
-        doc.setFontSize(7);
-        doc.setTextColor(148, 163, 184);
-        const pW = doc.internal.pageSize.getWidth();
-        const pH = doc.internal.pageSize.getHeight();
-        doc.text(`Page ${hookData.pageNumber} / ${pageCount}`, pW / 2, pH - 6, { align: 'center' });
-        doc.text('© TAXUP — Document confidentiel', 14, pH - 6);
-      },
+    const dateStr = new Date().toLocaleDateString('fr-FR', {
+      day: '2-digit', month: 'long', year: 'numeric',
     });
 
-    doc.save(`${filename}_${today()}.pdf`);
+    const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <title>${esc(title)}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; font-size: 9pt; color: #1e293b; }
+    .page-header {
+      background: #1e40af; color: #fff; padding: 10px 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px;
+    }
+    .page-header h1 { font-size: 13pt; font-weight: bold; }
+    .page-header .sub { font-size: 8pt; color: #c7d2fe; margin-top: 2px; }
+    .page-header .date { font-size: 8pt; color: #c7d2fe; text-align: right; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #1e40af; color: #fff; }
+    thead th {
+      padding: 6px 8px; font-size: 8pt; font-weight: bold;
+      text-align: left; border: 1px solid #1e3a8a;
+    }
+    tbody tr:nth-child(even) { background: #eff6ff; }
+    tbody td {
+      padding: 5px 8px; font-size: 8pt; border: 1px solid #e2e8f0;
+      vertical-align: top; word-break: break-word;
+    }
+    .footer {
+      margin-top: 16px; font-size: 7pt; color: #94a3b8;
+      display: flex; justify-content: space-between;
+    }
+    @media print {
+      @page { margin: 12mm; size: ${activeFields.length > 5 ? 'A4 landscape' : 'A4 portrait'}; }
+      body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-header">
+    <div>
+      <h1>TAXUP — Plateforme Fiscale</h1>
+      <div class="sub">${esc(title)}</div>
+    </div>
+    <div class="date">Exporté le ${dateStr}<br/>${data.length} enregistrement${data.length !== 1 ? 's' : ''}</div>
+  </div>
+  <table>
+    <thead><tr>${headerCells}</tr></thead>
+    <tbody>${bodyRows}</tbody>
+  </table>
+  <div class="footer">
+    <span>© TAXUP — Document confidentiel</span>
+    <span>Généré le ${dateStr}</span>
+  </div>
+  <script>
+    window.onload = function () { window.print(); window.onafterprint = function () { window.close(); }; };
+  </script>
+</body>
+</html>`;
+
+    const win = window.open('', '_blank', 'width=900,height=700');
+    if (win) {
+      win.document.write(html);
+      win.document.close();
+    }
   };
 
+  // ── UI ──────────────────────────────────────────────────────────────────
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
@@ -197,7 +230,7 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
                 <FileSpreadsheet className={`h-6 w-6 ${format === 'excel' ? 'text-green-600' : 'text-gray-400'}`} />
                 <div className="text-left">
                   <p className={`text-sm font-semibold ${format === 'excel' ? 'text-green-700' : 'text-gray-600'}`}>Excel</p>
-                  <p className="text-xs text-gray-400">.xlsx</p>
+                  <p className="text-xs text-gray-400">.xls</p>
                 </div>
                 {format === 'excel' && (
                   <div className="ml-auto h-4 w-4 rounded-full bg-green-500 flex items-center justify-center">
@@ -228,12 +261,10 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
             </div>
           </div>
 
-          {/* Champs à inclure */}
+          {/* Colonnes */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Colonnes à inclure
-              </p>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Colonnes à inclure</p>
               <button
                 onClick={toggleAll}
                 className="text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors"
@@ -272,7 +303,7 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
               <span className="font-semibold text-gray-800">{selected.size}</span> colonne{selected.size !== 1 ? 's' : ''}
             </span>
             <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${format === 'excel' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-              {format === 'excel' ? '.xlsx' : '.pdf'}
+              {format === 'excel' ? '.xls' : '.pdf'}
             </span>
           </div>
 
@@ -301,11 +332,11 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
   );
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────────
+// ── Helpers ─────────────────────────────────────────────────────────────────
 function formatValue(val: unknown): string {
   if (val === null || val === undefined) return '—';
   if (typeof val === 'boolean') return val ? 'Oui' : 'Non';
-  if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}T/)) {
+  if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(val)) {
     return new Date(val).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
   }
   return String(val);
@@ -313,4 +344,13 @@ function formatValue(val: unknown): string {
 
 function today(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+function downloadBlob(blob: Blob, name: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(url);
 }
