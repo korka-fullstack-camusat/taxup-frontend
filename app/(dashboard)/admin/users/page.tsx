@@ -4,8 +4,9 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Users, Plus, Search, Edit2, Trash2, X, Eye, EyeOff,
-  ChevronLeft, ChevronRight, Settings2, Download,
+  Download,
   UserCheck, UserX, Mail, Phone, Building2, Calendar, KeyRound, ShieldCheck,
+  MoreHorizontal,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import api from '@/lib/api';
@@ -85,8 +86,8 @@ export default function AdminUsersPage() {
   // Detail modal (clic sur la ligne)
   const [viewTarget, setViewTarget] = useState<User | null>(null);
 
-  // "Gérer" modal (bouton Gérer)
-  const [manageTarget, setManageTarget] = useState<User | null>(null);
+  // Dropdown actions (bouton ⋯)
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [toggling, setToggling] = useState(false);
 
   // Delete confirm
@@ -137,6 +138,14 @@ export default function AdminUsersPage() {
 
   useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
+  // Ferme le menu dropdown si on clique ailleurs
+  useEffect(() => {
+    if (!openMenuId) return;
+    const close = () => setOpenMenuId(null);
+    window.addEventListener('click', close);
+    return () => window.removeEventListener('click', close);
+  }, [openMenuId]);
+
   const openCreate = () => {
     setEditingUser(null);
     setForm(emptyForm);
@@ -145,7 +154,7 @@ export default function AdminUsersPage() {
   };
 
   const openEdit = (u: User) => {
-    setManageTarget(null);
+    setOpenMenuId(null);
     setEditingUser(u);
     setForm({
       username: u.username,
@@ -190,7 +199,7 @@ export default function AdminUsersPage() {
       } else {
         await api.patch(`/users/${u.id}/activate`);
       }
-      setManageTarget(null);
+      setOpenMenuId(null);
       fetchUsers();
     } catch {
       // ignore
@@ -200,7 +209,7 @@ export default function AdminUsersPage() {
   };
 
   const openDelete = (u: User) => {
-    setManageTarget(null);
+    setOpenMenuId(null);
     setDeleteTarget(u);
   };
 
@@ -303,11 +312,14 @@ export default function AdminUsersPage() {
                 {users.map((u) => (
                   <tr
                     key={u.id}
-                    className="hover:bg-blue-50/40 transition-colors cursor-pointer"
-                    onClick={() => setViewTarget(u)}
+                    className="hover:bg-blue-50/40 transition-colors"
                   >
+                    {/* Utilisateur */}
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
+                      <button
+                        className="flex items-center gap-3 text-left w-full"
+                        onClick={() => setViewTarget(u)}
+                      >
                         <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm flex-shrink-0">
                           {u.full_name?.[0]?.toUpperCase() || 'U'}
                         </div>
@@ -315,9 +327,9 @@ export default function AdminUsersPage() {
                           <p className="font-medium text-gray-800">{u.full_name}</p>
                           <p className="text-xs text-gray-500">@{u.username}</p>
                         </div>
-                      </div>
+                      </button>
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{u.email}</td>
+                    <td className="px-4 py-3 text-gray-600 text-sm">{u.email}</td>
                     <td className="px-4 py-3">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${roleColors[u.role] || 'bg-gray-100 text-gray-700'}`}>
                         {ROLES.find(r => r.value === u.role)?.label || u.role}
@@ -330,14 +342,97 @@ export default function AdminUsersPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-gray-500 text-xs">{u.organization || '—'}</td>
-                    <td className="px-4 py-3 text-center">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setManageTarget(u); }}
-                        className="inline-flex items-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
-                      >
-                        <Settings2 className="h-3.5 w-3.5" />
-                        Gérer
-                      </button>
+
+                    {/* ── Actions ── */}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-center gap-1">
+
+                        {/* Voir détails */}
+                        <button
+                          title="Voir les détails"
+                          onClick={() => setViewTarget(u)}
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+
+                        {/* Modifier */}
+                        <button
+                          title="Modifier"
+                          onClick={() => openEdit(u)}
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </button>
+
+                        {/* Activer / Désactiver */}
+                        <button
+                          title={u.is_active ? 'Désactiver' : 'Activer'}
+                          onClick={() => toggleActive(u)}
+                          disabled={toggling}
+                          className={`p-1.5 rounded-lg transition-colors disabled:opacity-40 ${
+                            u.is_active
+                              ? 'text-gray-400 hover:text-orange-600 hover:bg-orange-50'
+                              : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
+                          }`}
+                        >
+                          {u.is_active ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
+                        </button>
+
+                        {/* Supprimer */}
+                        <button
+                          title="Supprimer"
+                          onClick={() => openDelete(u)}
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+
+                        {/* Menu ⋯ (plus d'options) */}
+                        <div className="relative">
+                          <button
+                            title="Plus d'actions"
+                            onClick={() => setOpenMenuId(openMenuId === u.id ? null : u.id)}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </button>
+                          {openMenuId === u.id && (
+                            <div className="absolute right-0 top-8 z-30 bg-white border border-gray-200 rounded-xl shadow-lg w-44 py-1.5 text-sm">
+                              <button
+                                onClick={() => { setViewTarget(u); setOpenMenuId(null); }}
+                                className="w-full flex items-center gap-2.5 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                              >
+                                <Eye className="h-4 w-4" /> Voir les détails
+                              </button>
+                              <button
+                                onClick={() => { openEdit(u); setOpenMenuId(null); }}
+                                className="w-full flex items-center gap-2.5 px-4 py-2 text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition-colors"
+                              >
+                                <Edit2 className="h-4 w-4" /> Modifier
+                              </button>
+                              <button
+                                onClick={() => toggleActive(u)}
+                                disabled={toggling}
+                                className={`w-full flex items-center gap-2.5 px-4 py-2 transition-colors disabled:opacity-40 ${
+                                  u.is_active
+                                    ? 'text-orange-700 hover:bg-orange-50'
+                                    : 'text-green-700 hover:bg-green-50'
+                                }`}
+                              >
+                                {u.is_active ? <><UserX className="h-4 w-4" /> Désactiver</> : <><UserCheck className="h-4 w-4" /> Activer</>}
+                              </button>
+                              <div className="border-t border-gray-100 my-1" />
+                              <button
+                                onClick={() => { openDelete(u); setOpenMenuId(null); }}
+                                className="w-full flex items-center gap-2.5 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors"
+                              >
+                                <Trash2 className="h-4 w-4" /> Supprimer
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -452,72 +547,6 @@ export default function AdminUsersPage() {
                 className="w-full text-center border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-xl py-2.5 text-sm font-medium transition-colors"
               >
                 Fermer
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Modal "Gérer" — actions uniquement ──────────────────────── */}
-      {manageTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xs overflow-hidden">
-
-            {/* Header compact */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <div className="flex items-center gap-2.5">
-                <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm flex-shrink-0">
-                  {manageTarget.full_name?.[0]?.toUpperCase() || 'U'}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-800 leading-tight">{manageTarget.full_name}</p>
-                  <p className="text-xs text-gray-400">@{manageTarget.username}</p>
-                </div>
-              </div>
-              <button onClick={() => setManageTarget(null)} className="text-gray-400 hover:text-gray-600 transition-colors">
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            {/* Actions */}
-            <div className="px-5 py-4 space-y-2.5">
-
-              <button
-                onClick={() => openEdit(manageTarget)}
-                className="w-full flex items-center gap-3 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 rounded-xl px-4 py-3 text-sm font-semibold transition-colors"
-              >
-                <Edit2 className="h-4 w-4" />
-                Modifier les informations
-              </button>
-
-              <button
-                onClick={() => toggleActive(manageTarget)}
-                disabled={toggling}
-                className={`w-full flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-colors border disabled:opacity-60 ${
-                  manageTarget.is_active
-                    ? 'bg-orange-50 hover:bg-orange-100 border-orange-200 text-orange-700'
-                    : 'bg-green-50 hover:bg-green-100 border-green-200 text-green-700'
-                }`}
-              >
-                {manageTarget.is_active
-                  ? <><UserX className="h-4 w-4" />{toggling ? 'Désactivation...' : 'Désactiver le compte'}</>
-                  : <><UserCheck className="h-4 w-4" />{toggling ? 'Activation...' : 'Activer le compte'}</>
-                }
-              </button>
-
-              <button
-                onClick={() => openDelete(manageTarget)}
-                className="w-full flex items-center gap-3 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm font-semibold transition-colors"
-              >
-                <Trash2 className="h-4 w-4" />
-                Supprimer le compte
-              </button>
-
-              <button
-                onClick={() => setManageTarget(null)}
-                className="w-full text-center text-gray-400 hover:text-gray-600 text-sm py-1.5 transition-colors"
-              >
-                Annuler
               </button>
             </div>
           </div>
