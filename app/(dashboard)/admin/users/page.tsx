@@ -476,7 +476,7 @@ export default function AdminUsersPage() {
                     <AlertTriangle className={`h-5 w-5 mt-0.5 flex-shrink-0 ${manageTarget.is_active ? 'text-orange-500' : 'text-green-500'}`} />
                     <div>
                       <p className={`font-semibold text-sm ${manageTarget.is_active ? 'text-orange-800' : 'text-green-800'}`}>
-                        {manageTarget.is_active ? 'Désactiver ce compte ?' : 'Réactiver ce compte ?'}
+                        {manageTarget.is_active ? 'Désactiver ce compte ?' : 'Activer ce compte ?'}
                       </p>
                       <p className={`text-xs mt-0.5 ${manageTarget.is_active ? 'text-orange-600' : 'text-green-600'}`}>
                         {manageTarget.is_active
@@ -583,12 +583,12 @@ export default function AdminUsersPage() {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-gray-800">
-                        {manageTarget.is_active ? 'Désactiver le compte' : 'Réactiver le compte'}
+                        {manageTarget.is_active ? 'Désactiver le compte' : 'Activer le compte'}
                       </p>
                       <p className="text-xs text-gray-400">
                         {manageTarget.is_active
                           ? 'Empêche la connexion sans supprimer le compte'
-                          : 'Restaure l\'accès à la plateforme'
+                          : 'Restaure l\'accès à la plateforme pour cet utilisateur'
                         }
                       </p>
                     </div>
