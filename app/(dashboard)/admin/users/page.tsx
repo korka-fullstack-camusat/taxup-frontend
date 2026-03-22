@@ -6,7 +6,7 @@ import {
   Users, Plus, Search, Edit2, Trash2, X, Eye, EyeOff,
   Download,
   UserCheck, UserX, Mail, Phone, Building2, Calendar, KeyRound, ShieldCheck,
-  MoreHorizontal,
+  Settings2, AlertTriangle, ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import api from '@/lib/api';
@@ -64,6 +64,8 @@ const emptyForm: UserForm = {
 const INPUT = 'w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500';
 const SELECT = 'w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500';
 
+type ManageAction = 'details' | 'deactivate_confirm' | 'delete_confirm' | null;
+
 export default function AdminUsersPage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -75,6 +77,12 @@ export default function AdminUsersPage() {
   const [total, setTotal] = useState(0);
   const [PAGE_SIZE, setPAGE_SIZE] = useState(15);
 
+  // Gérer modal
+  const [manageTarget, setManageTarget] = useState<User | null>(null);
+  const [manageAction, setManageAction] = useState<ManageAction>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionError, setActionError] = useState('');
+
   // Create / Edit modal
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -82,17 +90,6 @@ export default function AdminUsersPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
-
-  // Detail modal (clic sur la ligne)
-  const [viewTarget, setViewTarget] = useState<User | null>(null);
-
-  // Dropdown actions (bouton ⋯)
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const [toggling, setToggling] = useState(false);
-
-  // Delete confirm
-  const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
-  const [deleting, setDeleting] = useState(false);
 
   // Export
   const [showExport, setShowExport] = useState(false);
@@ -138,13 +135,55 @@ export default function AdminUsersPage() {
 
   useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
-  // Ferme le menu dropdown si on clique ailleurs
-  useEffect(() => {
-    if (!openMenuId) return;
-    const close = () => setOpenMenuId(null);
-    window.addEventListener('click', close);
-    return () => window.removeEventListener('click', close);
-  }, [openMenuId]);
+  // ── Gérer modal helpers ────────────────────────────────────────────────────
+
+  const openManage = (u: User) => {
+    setManageTarget(u);
+    setManageAction(null);
+    setActionError('');
+  };
+
+  const closeManage = () => {
+    setManageTarget(null);
+    setManageAction(null);
+    setActionError('');
+  };
+
+  const handleToggleActive = async () => {
+    if (!manageTarget) return;
+    setActionLoading(true);
+    setActionError('');
+    try {
+      if (manageTarget.is_active) {
+        await api.patch(`/users/${manageTarget.id}/deactivate`);
+      } else {
+        await api.patch(`/users/${manageTarget.id}/activate`);
+      }
+      closeManage();
+      fetchUsers();
+    } catch {
+      setActionError('Une erreur est survenue. Veuillez réessayer.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!manageTarget) return;
+    setActionLoading(true);
+    setActionError('');
+    try {
+      await api.delete(`/users/${manageTarget.id}`);
+      closeManage();
+      fetchUsers();
+    } catch {
+      setActionError('Une erreur est survenue. Veuillez réessayer.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // ── Form modal helpers ─────────────────────────────────────────────────────
 
   const openCreate = () => {
     setEditingUser(null);
@@ -154,7 +193,7 @@ export default function AdminUsersPage() {
   };
 
   const openEdit = (u: User) => {
-    setOpenMenuId(null);
+    closeManage();
     setEditingUser(u);
     setForm({
       username: u.username,
@@ -188,42 +227,6 @@ export default function AdminUsersPage() {
       setFormError(e.response?.data?.detail || 'Erreur lors de la sauvegarde');
     } finally {
       setSaving(false);
-    }
-  };
-
-  const toggleActive = async (u: User) => {
-    setToggling(true);
-    try {
-      if (u.is_active) {
-        await api.patch(`/users/${u.id}/deactivate`);
-      } else {
-        await api.patch(`/users/${u.id}/activate`);
-      }
-      setOpenMenuId(null);
-      fetchUsers();
-    } catch {
-      // ignore
-    } finally {
-      setToggling(false);
-    }
-  };
-
-  const openDelete = (u: User) => {
-    setOpenMenuId(null);
-    setDeleteTarget(u);
-  };
-
-  const confirmDelete = async () => {
-    if (!deleteTarget) return;
-    setDeleting(true);
-    try {
-      await api.delete(`/users/${deleteTarget.id}`);
-      setDeleteTarget(null);
-      fetchUsers();
-    } catch {
-      // ignore
-    } finally {
-      setDeleting(false);
     }
   };
 
@@ -310,129 +313,47 @@ export default function AdminUsersPage() {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {users.map((u) => (
-                  <tr
-                    key={u.id}
-                    className="hover:bg-blue-50/40 transition-colors"
-                  >
+                  <tr key={u.id} className="hover:bg-blue-50/40 transition-colors">
+
                     {/* Utilisateur */}
                     <td className="px-4 py-3">
-                      <button
-                        className="flex items-center gap-3 text-left w-full"
-                        onClick={() => setViewTarget(u)}
-                      >
-                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm flex-shrink-0">
+                      <div className="flex items-center gap-3">
+                        <div className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${u.is_active ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-400'}`}>
                           {u.full_name?.[0]?.toUpperCase() || 'U'}
                         </div>
                         <div>
-                          <p className="font-medium text-gray-800">{u.full_name}</p>
-                          <p className="text-xs text-gray-500">@{u.username}</p>
+                          <p className={`font-medium ${u.is_active ? 'text-gray-800' : 'text-gray-400'}`}>{u.full_name}</p>
+                          <p className="text-xs text-gray-400">@{u.username}</p>
                         </div>
-                      </button>
+                      </div>
                     </td>
+
                     <td className="px-4 py-3 text-gray-600 text-sm">{u.email}</td>
+
                     <td className="px-4 py-3">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${roleColors[u.role] || 'bg-gray-100 text-gray-700'}`}>
                         {ROLES.find(r => r.value === u.role)?.label || u.role}
                       </span>
                     </td>
+
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${u.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
                         <span className={`h-1.5 w-1.5 rounded-full ${u.is_active ? 'bg-green-500' : 'bg-red-500'}`} />
                         {u.is_active ? 'Actif' : 'Inactif'}
                       </span>
                     </td>
+
                     <td className="px-4 py-3 text-gray-500 text-xs">{u.organization || '—'}</td>
 
-                    {/* ── Actions ── */}
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-center gap-1">
-
-                        {/* Voir détails */}
-                        <button
-                          title="Voir les détails"
-                          onClick={() => setViewTarget(u)}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </button>
-
-                        {/* Modifier */}
-                        <button
-                          title="Modifier"
-                          onClick={() => openEdit(u)}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
-                        >
-                          <Edit2 className="h-4 w-4" />
-                        </button>
-
-                        {/* Activer / Désactiver */}
-                        <button
-                          title={u.is_active ? 'Désactiver' : 'Activer'}
-                          onClick={() => toggleActive(u)}
-                          disabled={toggling}
-                          className={`p-1.5 rounded-lg transition-colors disabled:opacity-40 ${
-                            u.is_active
-                              ? 'text-gray-400 hover:text-orange-600 hover:bg-orange-50'
-                              : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
-                          }`}
-                        >
-                          {u.is_active ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
-                        </button>
-
-                        {/* Supprimer */}
-                        <button
-                          title="Supprimer"
-                          onClick={() => openDelete(u)}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-
-                        {/* Menu ⋯ (plus d'options) */}
-                        <div className="relative">
-                          <button
-                            title="Plus d'actions"
-                            onClick={() => setOpenMenuId(openMenuId === u.id ? null : u.id)}
-                            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </button>
-                          {openMenuId === u.id && (
-                            <div className="absolute right-0 top-8 z-30 bg-white border border-gray-200 rounded-xl shadow-lg w-44 py-1.5 text-sm">
-                              <button
-                                onClick={() => { setViewTarget(u); setOpenMenuId(null); }}
-                                className="w-full flex items-center gap-2.5 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
-                              >
-                                <Eye className="h-4 w-4" /> Voir les détails
-                              </button>
-                              <button
-                                onClick={() => { openEdit(u); setOpenMenuId(null); }}
-                                className="w-full flex items-center gap-2.5 px-4 py-2 text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition-colors"
-                              >
-                                <Edit2 className="h-4 w-4" /> Modifier
-                              </button>
-                              <button
-                                onClick={() => toggleActive(u)}
-                                disabled={toggling}
-                                className={`w-full flex items-center gap-2.5 px-4 py-2 transition-colors disabled:opacity-40 ${
-                                  u.is_active
-                                    ? 'text-orange-700 hover:bg-orange-50'
-                                    : 'text-green-700 hover:bg-green-50'
-                                }`}
-                              >
-                                {u.is_active ? <><UserX className="h-4 w-4" /> Désactiver</> : <><UserCheck className="h-4 w-4" /> Activer</>}
-                              </button>
-                              <div className="border-t border-gray-100 my-1" />
-                              <button
-                                onClick={() => { openDelete(u); setOpenMenuId(null); }}
-                                className="w-full flex items-center gap-2.5 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors"
-                              >
-                                <Trash2 className="h-4 w-4" /> Supprimer
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                    {/* ── Bouton Gérer ── */}
+                    <td className="px-4 py-3 text-center">
+                      <button
+                        onClick={() => openManage(u)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors"
+                      >
+                        <Settings2 className="h-3.5 w-3.5" />
+                        Gérer
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -449,102 +370,251 @@ export default function AdminUsersPage() {
         />
       </div>
 
-      {/* ── Modal Détails utilisateur (clic sur la ligne) ───────────── */}
-      {viewTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      {/* ════════════════════════════════════════════════════════════
+          Modal GÉRER — toutes les actions dans un seul modal
+      ════════════════════════════════════════════════════════════ */}
+      {manageTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
 
-            {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-5">
+            {/* ── En-tête profil ── */}
+            <div className="bg-gradient-to-br from-blue-600 to-blue-800 px-6 py-5">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-blue-200 text-xs font-semibold uppercase tracking-wider">Détails du compte</span>
-                <button onClick={() => setViewTarget(null)} className="text-white/70 hover:text-white transition-colors">
+                <span className="text-blue-200 text-xs font-semibold uppercase tracking-wider">Gestion du compte</span>
+                <button onClick={closeManage} className="text-white/70 hover:text-white transition-colors">
                   <X className="h-5 w-5" />
                 </button>
               </div>
               <div className="flex items-center gap-4">
-                <div className="h-14 w-14 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
-                  {viewTarget.full_name?.[0]?.toUpperCase() || 'U'}
+                <div className={`h-14 w-14 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 ${manageTarget.is_active ? 'bg-white/20 text-white' : 'bg-white/10 text-white/50'}`}>
+                  {manageTarget.full_name?.[0]?.toUpperCase() || 'U'}
                 </div>
-                <div>
-                  <p className="font-bold text-white text-lg leading-tight">{viewTarget.full_name}</p>
-                  <p className="text-blue-200 text-sm">@{viewTarget.username}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-white text-lg leading-tight truncate">{manageTarget.full_name}</p>
+                  <p className="text-blue-200 text-sm">@{manageTarget.username}</p>
+                  <p className="text-blue-300 text-xs truncate">{manageTarget.email}</p>
                 </div>
-                <div className="ml-auto flex flex-col items-end gap-1.5">
-                  <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${viewTarget.is_active ? 'bg-green-400/20 text-green-100' : 'bg-red-400/20 text-red-200'}`}>
-                    {viewTarget.is_active ? 'Actif' : 'Inactif'}
+                <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                  <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${manageTarget.is_active ? 'bg-green-400/25 text-green-100' : 'bg-red-400/25 text-red-200'}`}>
+                    {manageTarget.is_active ? '● Actif' : '● Inactif'}
                   </span>
-                  <span className={`px-2.5 py-1 rounded-full text-xs font-bold bg-white/15 text-white`}>
-                    {ROLES.find(r => r.value === viewTarget.role)?.label || viewTarget.role}
+                  <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-white/15 text-white">
+                    {ROLES.find(r => r.value === manageTarget.role)?.label || manageTarget.role}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Info grid */}
-            <div className="px-6 py-5 space-y-4">
-              <div className="grid grid-cols-1 gap-3">
+            {/* ── Corps du modal ── */}
+            <div className="px-6 py-5 space-y-3">
 
-                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                  <Mail className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-xs text-gray-400 font-medium">Adresse email</p>
-                    <p className="text-sm text-gray-800 font-medium">{viewTarget.email}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                  <Phone className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-xs text-gray-400 font-medium">Téléphone</p>
-                    <p className="text-sm text-gray-800 font-medium">{viewTarget.phone_number || '—'}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                  <Building2 className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-xs text-gray-400 font-medium">Organisation</p>
-                    <p className="text-sm text-gray-800 font-medium">{viewTarget.organization || '—'}</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                    <ShieldCheck className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+              {/* Panneau de confirmation désactivation */}
+              {manageAction === 'deactivate_confirm' && (
+                <div className={`rounded-xl border p-4 ${manageTarget.is_active ? 'bg-orange-50 border-orange-200' : 'bg-green-50 border-green-200'}`}>
+                  <div className="flex items-start gap-3 mb-3">
+                    <AlertTriangle className={`h-5 w-5 mt-0.5 flex-shrink-0 ${manageTarget.is_active ? 'text-orange-500' : 'text-green-500'}`} />
                     <div>
-                      <p className="text-xs text-gray-400 font-medium">Rôle</p>
-                      <span className={`mt-1 inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${roleColors[viewTarget.role] || 'bg-gray-100 text-gray-700'}`}>
-                        {ROLES.find(r => r.value === viewTarget.role)?.label || viewTarget.role}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                    <Calendar className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="text-xs text-gray-400 font-medium">Créé le</p>
-                      <p className="text-sm text-gray-800 font-medium">
-                        {viewTarget.created_at
-                          ? new Date(viewTarget.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
-                          : '—'}
+                      <p className={`font-semibold text-sm ${manageTarget.is_active ? 'text-orange-800' : 'text-green-800'}`}>
+                        {manageTarget.is_active ? 'Désactiver ce compte ?' : 'Réactiver ce compte ?'}
+                      </p>
+                      <p className={`text-xs mt-0.5 ${manageTarget.is_active ? 'text-orange-600' : 'text-green-600'}`}>
+                        {manageTarget.is_active
+                          ? `${manageTarget.full_name} ne pourra plus se connecter à la plateforme.`
+                          : `${manageTarget.full_name} pourra de nouveau se connecter à la plateforme.`
+                        }
                       </p>
                     </div>
                   </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                  <KeyRound className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-xs text-gray-400 font-medium">Identifiant (ID)</p>
-                    <p className="text-xs text-gray-500 font-mono break-all">{viewTarget.id}</p>
+                  {actionError && (
+                    <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-3">{actionError}</p>
+                  )}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => { setManageAction(null); setActionError(''); }}
+                      className="flex-1 border border-gray-300 text-gray-700 text-sm font-medium py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      onClick={handleToggleActive}
+                      disabled={actionLoading}
+                      className={`flex-1 text-sm font-semibold py-2 rounded-lg transition-colors disabled:opacity-50 ${
+                        manageTarget.is_active
+                          ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                          : 'bg-green-600 hover:bg-green-700 text-white'
+                      }`}
+                    >
+                      {actionLoading ? 'Traitement...' : (manageTarget.is_active ? 'Désactiver' : 'Activer')}
+                    </button>
                   </div>
                 </div>
-              </div>
+              )}
 
+              {/* Panneau de confirmation suppression */}
+              {manageAction === 'delete_confirm' && (
+                <div className="rounded-xl border border-red-200 bg-red-50 p-4">
+                  <div className="flex items-start gap-3 mb-3">
+                    <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="font-semibold text-sm text-red-800">Supprimer définitivement ?</p>
+                      <p className="text-xs text-red-600 mt-0.5">
+                        Le compte de <span className="font-semibold">{manageTarget.full_name}</span> sera supprimé de façon irréversible. Toutes ses données seront perdues.
+                      </p>
+                    </div>
+                  </div>
+                  {actionError && (
+                    <p className="text-xs text-red-600 bg-white border border-red-200 rounded-lg px-3 py-2 mb-3">{actionError}</p>
+                  )}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => { setManageAction(null); setActionError(''); }}
+                      className="flex-1 border border-gray-300 text-gray-700 text-sm font-medium py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      disabled={actionLoading}
+                      className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-sm font-semibold py-2 rounded-lg transition-colors"
+                    >
+                      {actionLoading ? 'Suppression...' : 'Supprimer'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Actions principales (masquées pendant une confirmation) */}
+              {manageAction !== 'deactivate_confirm' && manageAction !== 'delete_confirm' && (
+                <>
+                  {/* Voir les détails */}
+                  <button
+                    onClick={() => setManageAction(manageAction === 'details' ? null : 'details')}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors text-left group"
+                  >
+                    <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
+                      <Eye className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-gray-800">Voir les détails</p>
+                      <p className="text-xs text-gray-400">Informations complètes du compte</p>
+                    </div>
+                    <ChevronRight className={`h-4 w-4 text-gray-400 transition-transform ${manageAction === 'details' ? 'rotate-90' : ''}`} />
+                  </button>
+
+                  {/* Détails expandables */}
+                  {manageAction === 'details' && (
+                    <div className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3 space-y-2.5 text-sm">
+                      <div className="flex items-center gap-2.5">
+                        <Mail className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
+                        <span className="text-gray-500 text-xs w-20 flex-shrink-0">Email</span>
+                        <span className="text-gray-800 font-medium text-xs truncate">{manageTarget.email}</span>
+                      </div>
+                      <div className="flex items-center gap-2.5">
+                        <Phone className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
+                        <span className="text-gray-500 text-xs w-20 flex-shrink-0">Téléphone</span>
+                        <span className="text-gray-800 font-medium text-xs">{manageTarget.phone_number || '—'}</span>
+                      </div>
+                      <div className="flex items-center gap-2.5">
+                        <Building2 className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
+                        <span className="text-gray-500 text-xs w-20 flex-shrink-0">Organisation</span>
+                        <span className="text-gray-800 font-medium text-xs">{manageTarget.organization || '—'}</span>
+                      </div>
+                      <div className="flex items-center gap-2.5">
+                        <ShieldCheck className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
+                        <span className="text-gray-500 text-xs w-20 flex-shrink-0">Rôle</span>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${roleColors[manageTarget.role] || 'bg-gray-100 text-gray-700'}`}>
+                          {ROLES.find(r => r.value === manageTarget.role)?.label || manageTarget.role}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2.5">
+                        <Calendar className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
+                        <span className="text-gray-500 text-xs w-20 flex-shrink-0">Créé le</span>
+                        <span className="text-gray-800 font-medium text-xs">
+                          {manageTarget.created_at
+                            ? new Date(manageTarget.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+                            : '—'}
+                        </span>
+                      </div>
+                      <div className="flex items-start gap-2.5 pt-1 border-t border-gray-200">
+                        <KeyRound className="h-3.5 w-3.5 text-blue-400 flex-shrink-0 mt-0.5" />
+                        <span className="text-gray-500 text-xs w-20 flex-shrink-0 mt-0.5">ID</span>
+                        <span className="text-gray-500 font-mono text-[10px] break-all">{manageTarget.id}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Modifier */}
+                  <button
+                    onClick={() => openEdit(manageTarget)}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200 hover:border-amber-300 hover:bg-amber-50 transition-colors text-left group"
+                  >
+                    <div className="p-2 bg-amber-100 rounded-lg group-hover:bg-amber-200 transition-colors">
+                      <Edit2 className="h-4 w-4 text-amber-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-gray-800">Modifier le compte</p>
+                      <p className="text-xs text-gray-400">Nom, email, rôle, mot de passe...</p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-gray-400" />
+                  </button>
+
+                  {/* Désactiver / Activer */}
+                  <button
+                    onClick={() => { setManageAction('deactivate_confirm'); setActionError(''); }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors text-left group ${
+                      manageTarget.is_active
+                        ? 'border-gray-200 hover:border-orange-300 hover:bg-orange-50'
+                        : 'border-gray-200 hover:border-green-300 hover:bg-green-50'
+                    }`}
+                  >
+                    <div className={`p-2 rounded-lg transition-colors ${
+                      manageTarget.is_active
+                        ? 'bg-orange-100 group-hover:bg-orange-200'
+                        : 'bg-green-100 group-hover:bg-green-200'
+                    }`}>
+                      {manageTarget.is_active
+                        ? <UserX className="h-4 w-4 text-orange-600" />
+                        : <UserCheck className="h-4 w-4 text-green-600" />
+                      }
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-gray-800">
+                        {manageTarget.is_active ? 'Désactiver le compte' : 'Réactiver le compte'}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {manageTarget.is_active
+                          ? 'Empêche la connexion sans supprimer le compte'
+                          : 'Restaure l\'accès à la plateforme'
+                        }
+                      </p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-gray-400" />
+                  </button>
+
+                  {/* Séparateur */}
+                  <div className="border-t border-gray-100" />
+
+                  {/* Supprimer */}
+                  <button
+                    onClick={() => { setManageAction('delete_confirm'); setActionError(''); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200 hover:border-red-300 hover:bg-red-50 transition-colors text-left group"
+                  >
+                    <div className="p-2 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors">
+                      <Trash2 className="h-4 w-4 text-red-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-red-700">Supprimer le compte</p>
+                      <p className="text-xs text-gray-400">Action irréversible — toutes les données seront perdues</p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-gray-400" />
+                  </button>
+                </>
+              )}
+
+              {/* Bouton fermer */}
               <button
-                onClick={() => setViewTarget(null)}
-                className="w-full text-center border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-xl py-2.5 text-sm font-medium transition-colors"
+                onClick={closeManage}
+                className="w-full text-center border border-gray-200 text-gray-500 hover:bg-gray-50 rounded-xl py-2.5 text-sm font-medium transition-colors"
               >
                 Fermer
               </button>
@@ -657,36 +727,6 @@ export default function AdminUsersPage() {
           filename="taxup_utilisateurs"
           onClose={() => setShowExport(false)}
         />
-      )}
-
-      {/* ── Modal Supprimer ─────────────────────────────────────────── */}
-      {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-3 bg-red-100 rounded-full">
-                <Trash2 className="h-5 w-5 text-red-600" />
-              </div>
-              <div>
-                <h2 className="font-bold text-gray-800">Supprimer le compte</h2>
-                <p className="text-sm text-gray-500">Cette action est irréversible</p>
-              </div>
-            </div>
-            <p className="text-sm text-gray-600 mb-5">
-              Supprimer <span className="font-semibold">{deleteTarget.full_name}</span> (@{deleteTarget.username}) définitivement ?
-            </p>
-            <div className="flex gap-3">
-              <button onClick={() => setDeleteTarget(null)}
-                className="flex-1 border border-gray-300 text-gray-700 rounded-lg py-2.5 text-sm font-medium hover:bg-gray-50">
-                Annuler
-              </button>
-              <button onClick={confirmDelete} disabled={deleting}
-                className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white rounded-lg py-2.5 text-sm font-semibold">
-                {deleting ? 'Suppression...' : 'Supprimer'}
-              </button>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );
