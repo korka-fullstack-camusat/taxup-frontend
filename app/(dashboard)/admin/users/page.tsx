@@ -375,38 +375,18 @@ export default function AdminUsersPage() {
       ════════════════════════════════════════════════════════════ */}
       {manageTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
 
-            {/* ── En-tête profil ── */}
-            <div className="bg-gradient-to-br from-blue-600 to-blue-800 px-6 py-5">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-blue-200 text-xs font-semibold uppercase tracking-wider">Gestion du compte</span>
-                <button onClick={closeManage} className="text-white/70 hover:text-white transition-colors">
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className={`h-14 w-14 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 ${manageTarget.is_active ? 'bg-white/20 text-white' : 'bg-white/10 text-white/50'}`}>
-                  {manageTarget.full_name?.[0]?.toUpperCase() || 'U'}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-white text-lg leading-tight truncate">{manageTarget.full_name}</p>
-                  <p className="text-blue-200 text-sm">@{manageTarget.username}</p>
-                  <p className="text-blue-300 text-xs truncate">{manageTarget.email}</p>
-                </div>
-                <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                  <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${manageTarget.is_active ? 'bg-green-400/25 text-green-100' : 'bg-red-400/25 text-red-200'}`}>
-                    {manageTarget.is_active ? '● Actif' : '● Inactif'}
-                  </span>
-                  <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-white/15 text-white">
-                    {ROLES.find(r => r.value === manageTarget.role)?.label || manageTarget.role}
-                  </span>
-                </div>
-              </div>
+            {/* ── En-tête minimaliste ── */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+              <h2 className="text-sm font-semibold text-gray-700">Actions — <span className="text-blue-600">{manageTarget.full_name}</span></h2>
+              <button onClick={closeManage} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <X className="h-4 w-4" />
+              </button>
             </div>
 
             {/* ── Corps du modal ── */}
-            <div className="px-6 py-5 space-y-3">
+            <div className="px-5 py-4 space-y-2">
 
               {/* Panneau de confirmation désactivation */}
               {manageAction === 'deactivate_confirm' && (
