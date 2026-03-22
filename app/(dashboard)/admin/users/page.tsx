@@ -64,7 +64,7 @@ const emptyForm: UserForm = {
 const INPUT = 'w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500';
 const SELECT = 'w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500';
 
-type ManageAction = 'details' | 'deactivate_confirm' | 'delete_confirm' | null;
+type ManageAction = 'deactivate_confirm' | 'delete_confirm' | null;
 
 export default function AdminUsersPage() {
   const { user } = useAuth();
@@ -76,6 +76,9 @@ export default function AdminUsersPage() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [PAGE_SIZE, setPAGE_SIZE] = useState(15);
+
+  // Détails (clic sur la ligne)
+  const [viewTarget, setViewTarget] = useState<User | null>(null);
 
   // Gérer modal
   const [manageTarget, setManageTarget] = useState<User | null>(null);
@@ -313,7 +316,11 @@ export default function AdminUsersPage() {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {users.map((u) => (
-                  <tr key={u.id} className="hover:bg-blue-50/40 transition-colors">
+                  <tr
+                    key={u.id}
+                    className="hover:bg-blue-50/40 transition-colors cursor-pointer"
+                    onClick={() => setViewTarget(u)}
+                  >
 
                     {/* Utilisateur */}
                     <td className="px-4 py-3">
@@ -346,7 +353,7 @@ export default function AdminUsersPage() {
                     <td className="px-4 py-3 text-gray-500 text-xs">{u.organization || '—'}</td>
 
                     {/* ── Bouton Gérer ── */}
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-4 py-3 text-center" onClick={e => e.stopPropagation()}>
                       <button
                         onClick={() => openManage(u)}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors"
@@ -369,6 +376,80 @@ export default function AdminUsersPage() {
           pageSizeOptions={[10, 15, 25, 50]}
         />
       </div>
+
+      {/* ── Modal Détails (clic sur la ligne) ───────────────────────── */}
+      {viewTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-5">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-blue-200 text-xs font-semibold uppercase tracking-wider">Détails du compte</span>
+                <button onClick={() => setViewTarget(null)} className="text-white/70 hover:text-white transition-colors">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="h-14 w-14 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
+                  {viewTarget.full_name?.[0]?.toUpperCase() || 'U'}
+                </div>
+                <div>
+                  <p className="font-bold text-white text-lg leading-tight">{viewTarget.full_name}</p>
+                  <p className="text-blue-200 text-sm">@{viewTarget.username}</p>
+                </div>
+                <div className="ml-auto flex flex-col items-end gap-1.5">
+                  <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${viewTarget.is_active ? 'bg-green-400/20 text-green-100' : 'bg-red-400/20 text-red-200'}`}>
+                    {viewTarget.is_active ? 'Actif' : 'Inactif'}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-white/15 text-white">
+                    {ROLES.find(r => r.value === viewTarget.role)?.label || viewTarget.role}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="px-6 py-5 space-y-3">
+              <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                <Mail className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <div><p className="text-xs text-gray-400 font-medium">Adresse email</p><p className="text-sm text-gray-800 font-medium">{viewTarget.email}</p></div>
+              </div>
+              <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                <Phone className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <div><p className="text-xs text-gray-400 font-medium">Téléphone</p><p className="text-sm text-gray-800 font-medium">{viewTarget.phone_number || '—'}</p></div>
+              </div>
+              <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                <Building2 className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <div><p className="text-xs text-gray-400 font-medium">Organisation</p><p className="text-sm text-gray-800 font-medium">{viewTarget.organization || '—'}</p></div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                  <ShieldCheck className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs text-gray-400 font-medium">Rôle</p>
+                    <span className={`mt-1 inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${roleColors[viewTarget.role] || 'bg-gray-100 text-gray-700'}`}>
+                      {ROLES.find(r => r.value === viewTarget.role)?.label || viewTarget.role}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                  <Calendar className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs text-gray-400 font-medium">Créé le</p>
+                    <p className="text-sm text-gray-800 font-medium">
+                      {viewTarget.created_at ? new Date(viewTarget.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                <KeyRound className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <div><p className="text-xs text-gray-400 font-medium">Identifiant (ID)</p><p className="text-xs text-gray-500 font-mono break-all">{viewTarget.id}</p></div>
+              </div>
+              <button onClick={() => setViewTarget(null)} className="w-full border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-xl py-2.5 text-sm font-medium transition-colors">
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ════════════════════════════════════════════════════════════
           Modal GÉRER — toutes les actions dans un seul modal
@@ -466,63 +547,6 @@ export default function AdminUsersPage() {
               {/* Actions principales (masquées pendant une confirmation) */}
               {manageAction !== 'deactivate_confirm' && manageAction !== 'delete_confirm' && (
                 <>
-                  {/* Voir les détails */}
-                  <button
-                    onClick={() => setManageAction(manageAction === 'details' ? null : 'details')}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors text-left group"
-                  >
-                    <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
-                      <Eye className="h-4 w-4 text-blue-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-gray-800">Voir les détails</p>
-                      <p className="text-xs text-gray-400">Informations complètes du compte</p>
-                    </div>
-                    <ChevronRight className={`h-4 w-4 text-gray-400 transition-transform ${manageAction === 'details' ? 'rotate-90' : ''}`} />
-                  </button>
-
-                  {/* Détails expandables */}
-                  {manageAction === 'details' && (
-                    <div className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3 space-y-2.5 text-sm">
-                      <div className="flex items-center gap-2.5">
-                        <Mail className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
-                        <span className="text-gray-500 text-xs w-20 flex-shrink-0">Email</span>
-                        <span className="text-gray-800 font-medium text-xs truncate">{manageTarget.email}</span>
-                      </div>
-                      <div className="flex items-center gap-2.5">
-                        <Phone className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
-                        <span className="text-gray-500 text-xs w-20 flex-shrink-0">Téléphone</span>
-                        <span className="text-gray-800 font-medium text-xs">{manageTarget.phone_number || '—'}</span>
-                      </div>
-                      <div className="flex items-center gap-2.5">
-                        <Building2 className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
-                        <span className="text-gray-500 text-xs w-20 flex-shrink-0">Organisation</span>
-                        <span className="text-gray-800 font-medium text-xs">{manageTarget.organization || '—'}</span>
-                      </div>
-                      <div className="flex items-center gap-2.5">
-                        <ShieldCheck className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
-                        <span className="text-gray-500 text-xs w-20 flex-shrink-0">Rôle</span>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${roleColors[manageTarget.role] || 'bg-gray-100 text-gray-700'}`}>
-                          {ROLES.find(r => r.value === manageTarget.role)?.label || manageTarget.role}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2.5">
-                        <Calendar className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
-                        <span className="text-gray-500 text-xs w-20 flex-shrink-0">Créé le</span>
-                        <span className="text-gray-800 font-medium text-xs">
-                          {manageTarget.created_at
-                            ? new Date(manageTarget.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
-                            : '—'}
-                        </span>
-                      </div>
-                      <div className="flex items-start gap-2.5 pt-1 border-t border-gray-200">
-                        <KeyRound className="h-3.5 w-3.5 text-blue-400 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-500 text-xs w-20 flex-shrink-0 mt-0.5">ID</span>
-                        <span className="text-gray-500 font-mono text-[10px] break-all">{manageTarget.id}</span>
-                      </div>
-                    </div>
-                  )}
-
                   {/* Modifier */}
                   <button
                     onClick={() => openEdit(manageTarget)}
