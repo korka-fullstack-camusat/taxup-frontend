@@ -131,7 +131,7 @@ export default function ReceiptsPage() {
                         <td className="px-6 py-4 text-gray-400 text-xs">{new Date(r.issued_at).toLocaleDateString('fr-FR')}</td>
                         <td className="px-6 py-4 text-center">
                           <button
-                            onClick={async () => { try { const res = await api.get(`/receipts/${r.id}/download`, { responseType: 'blob' }); const url = URL.createObjectURL(res.data); const a = document.createElement('a'); a.href = url; a.download = `recu-${r.receipt_number}.txt`; a.click(); URL.revokeObjectURL(url); } catch {} }}
+                            onClick={async () => { try { const res = await api.get(`/receipts/${r.id}/download`, { responseType: 'blob' }); const url = URL.createObjectURL(res.data); const a = document.createElement('a'); a.href = url; a.download = `recu-${r.receipt_number}.pdf`; a.click(); URL.revokeObjectURL(url); } catch {} }}
                             className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-2.5 py-1.5 rounded-lg transition-colors"
                           >
                             <Download className="h-3.5 w-3.5" /> PDF
