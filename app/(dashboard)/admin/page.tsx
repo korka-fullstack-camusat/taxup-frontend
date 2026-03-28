@@ -37,25 +37,32 @@ interface RealtimeData {
   by_status: { status: string; count: number }[];
 }
 
-const COLORS = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+// Palette unifiée en bleu uniquement
+const COLORS = ['#1d4ed8', '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe'];
+
 const roleLabel: Record<string, string> = {
-  CITOYEN: 'Citoyens', OPERATEUR_MOBILE: 'Op\u00e9rateurs',
+  CITOYEN: 'Citoyens', OPERATEUR_MOBILE: 'Opérateurs',
   AUDITEUR_FISCAL: 'Auditeurs', AGENT_DGID: 'Agents DGID', ADMIN: 'Admins',
 };
 const typeLabel: Record<string, string> = {
-  TRANSFER: 'Transfert', PAYMENT: 'Paiement', DEPOSIT: 'D\u00e9p\u00f4t',
+  TRANSFER: 'Transfert', PAYMENT: 'Paiement', DEPOSIT: 'Dépôt',
   WITHDRAWAL: 'Retrait', MOBILE_PAYMENT: 'Mobile', TRANSFERT: 'Transfert',
-  PAIEMENT: 'Paiement', RETRAIT: 'Retrait', DEPOT: 'D\u00e9p\u00f4t', REMBOURSEMENT: 'Remb.',
+  PAIEMENT: 'Paiement', RETRAIT: 'Retrait', DEPOT: 'Dépôt', REMBOURSEMENT: 'Remb.',
 };
+
+// Statuts en nuances de bleu
 const statusColors: Record<string, string> = {
-  COMPLETED: '#10b981', PENDING: '#f59e0b', FAILED: '#ef4444',
-  CANCELLED: '#6b7280', UNDER_REVIEW: '#f97316',
+  COMPLETED: '#1d4ed8',    // bleu foncé
+  PENDING: '#60a5fa',      // bleu moyen
+  FAILED: '#93c5fd',       // bleu clair
+  CANCELLED: '#bfdbfe',    // bleu très clair
+  UNDER_REVIEW: '#3b82f6', // bleu standard
 };
 
 type Section = 'all' | 'transactions' | 'fraud' | 'fiscal' | 'users' | 'audits';
 
 const sections: { id: Section; label: string; icon: React.ElementType }[] = [
-  { id: 'all', label: 'Vue g\u00e9n\u00e9rale', icon: BarChart3 },
+  { id: 'all', label: 'Vue générale', icon: BarChart3 },
   { id: 'transactions', label: 'Transactions', icon: ArrowLeftRight },
   { id: 'fraud', label: 'Fraude', icon: ShieldAlert },
   { id: 'fiscal', label: 'Revenus & TVA', icon: DollarSign },
@@ -114,7 +121,7 @@ export default function AdminDashboard() {
       { key: 'date', label: 'Date' },
       { key: 'transactions', label: 'Transactions' },
       { key: 'volume', label: 'Volume (XOF)' },
-      { key: 'tax_collected', label: 'TVA Collect\u00e9e' },
+      { key: 'tax_collected', label: 'TVA Collectée' },
       { key: 'fraud_alerts', label: 'Alertes Fraude' },
       { key: 'new_users', label: 'Nouveaux Utilisateurs' },
     ];
@@ -134,7 +141,7 @@ export default function AdminDashboard() {
   })) || [];
 
   const byStatusData = realtime?.by_status.map(d => ({
-    name: d.status, value: d.count, color: statusColors[d.status] || '#6b7280',
+    name: d.status, value: d.count, color: statusColors[d.status] || '#93c5fd',
   })) || [];
 
   const fraudByType = summary ? Object.entries(summary.fraud.by_type).map(([type, count], i) => ({
@@ -149,7 +156,7 @@ export default function AdminDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Tableau de Bord</h1>
-          <p className="text-gray-500 text-sm mt-1">Vue centralis\u00e9e de toutes les donn\u00e9es TAXUP</p>
+          <p className="text-gray-500 text-sm mt-1">Vue centralisée de toutes les données TAXUP</p>
         </div>
         <div className="flex items-center gap-3">
           <select value={period} onChange={e => setPeriod(Number(e.target.value))}
@@ -180,7 +187,7 @@ export default function AdminDashboard() {
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                 section === s.id
                   ? 'bg-blue-600 text-white shadow-sm'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                  : 'bg-white text-gray-600 border border-gray-200 hover:bg-blue-50'
               }`}>
               <Icon className="h-4 w-4" /> {s.label}
             </button>
@@ -194,43 +201,43 @@ export default function AdminDashboard() {
         </div>
       ) : (
         <>
-          {/* KPI Cards - always visible */}
+          {/* KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {show('users') && (
               <KPI icon={Users} bg="bg-blue-50" color="text-blue-600" label="Utilisateurs"
                 value={summary?.users.total ?? 0} sub={`${summary?.users.active ?? 0} actifs`} />
             )}
             {show('transactions') && (
-              <KPI icon={ArrowLeftRight} bg="bg-green-50" color="text-green-600" label="Transactions"
+              <KPI icon={ArrowLeftRight} bg="bg-blue-50" color="text-blue-600" label="Transactions"
                 value={summary?.transactions.total_transactions ?? 0} sub={`${summary?.transactions.today_transactions ?? 0} aujourd'hui`} />
             )}
             {show('fraud') && (
-              <KPI icon={ShieldAlert} bg="bg-red-50" color="text-red-600" label="Alertes Fraude"
+              <KPI icon={ShieldAlert} bg="bg-blue-50" color="text-blue-700" label="Alertes Fraude"
                 value={summary?.fraud.total_alerts ?? 0} sub={`${summary?.fraud.pending_alerts ?? 0} en attente`} />
             )}
             {show('fiscal') && (
-              <KPI icon={DollarSign} bg="bg-purple-50" color="text-purple-600" label="TVA ce mois"
+              <KPI icon={DollarSign} bg="bg-blue-50" color="text-blue-600" label="TVA ce mois"
                 value={`${formatXOF(summary?.fiscal.month_tax_collected_xof ?? 0)} XOF`}
-                sub={`${summary?.fiscal.total_receipts ?? 0} re\u00e7us`} />
+                sub={`${summary?.fiscal.total_receipts ?? 0} reçus`} />
             )}
             {show('audits') && (
-              <KPI icon={ClipboardList} bg="bg-yellow-50" color="text-yellow-600" label="Audits"
+              <KPI icon={ClipboardList} bg="bg-blue-50" color="text-blue-600" label="Audits"
                 value={summary?.audits.total ?? 0} sub={`${summary?.audits.open ?? 0} ouverts`} />
             )}
             {show('transactions') && (
-              <KPI icon={Activity} bg="bg-orange-50" color="text-orange-600" label="Volume ce mois"
+              <KPI icon={Activity} bg="bg-blue-100" color="text-blue-700" label="Volume ce mois"
                 value={`${formatXOF(summary?.transactions.month_volume ?? 0)} XOF`}
                 sub={`${summary?.transactions.pending_transactions ?? 0} en attente`} />
             )}
             {show('fiscal') && (
-              <KPI icon={Receipt} bg="bg-teal-50" color="text-teal-600" label="TVA totale"
+              <KPI icon={Receipt} bg="bg-blue-100" color="text-blue-700" label="TVA totale"
                 value={`${formatXOF(summary?.fiscal.total_tax_collected_xof ?? 0)} XOF`}
-                sub="Cumul\u00e9" />
+                sub="Cumulé" />
             )}
             {show('fiscal') && (
-              <KPI icon={TrendingUp} bg="bg-indigo-50" color="text-indigo-600" label="Volume total"
+              <KPI icon={TrendingUp} bg="bg-blue-100" color="text-blue-800" label="Volume total"
                 value={`${formatXOF(summary?.fiscal.total_volume_xof ?? 0)} XOF`}
-                sub="Toutes p\u00e9riodes" />
+                sub="Toutes périodes" />
             )}
           </div>
 
@@ -239,7 +246,7 @@ export default function AdminDashboard() {
 
             {/* Evolution Transactions */}
             {show('transactions') && (
-              <ChartCard title="\u00c9volution des transactions" icon={Activity}>
+              <ChartCard title="Évolution des transactions" icon={Activity}>
                 {evolution.length === 0 ? <Empty /> : (
                   <ResponsiveContainer width="100%" height={260}>
                     <AreaChart data={evolution}>
@@ -249,7 +256,7 @@ export default function AdminDashboard() {
                       <Tooltip />
                       <Legend />
                       <Area type="monotone" dataKey="transactions" stroke="#2563eb" fill="#2563eb20" name="Transactions" />
-                      <Area type="monotone" dataKey="receipts" stroke="#10b981" fill="#10b98120" name="Re\u00e7us" />
+                      <Area type="monotone" dataKey="receipts" stroke="#60a5fa" fill="#60a5fa20" name="Reçus" />
                     </AreaChart>
                   </ResponsiveContainer>
                 )}
@@ -273,7 +280,7 @@ export default function AdminDashboard() {
 
             {/* Statut distribution */}
             {show('transactions') && byStatusData.length > 0 && (
-              <ChartCard title="R\u00e9partition par statut (24h)" icon={TrendingUp}>
+              <ChartCard title="Répartition par statut (24h)" icon={TrendingUp}>
                 <ResponsiveContainer width="100%" height={260}>
                   <PieChart>
                     <Pie data={byStatusData} cx="50%" cy="50%" outerRadius={90} innerRadius={40} dataKey="value" nameKey="name"
@@ -289,7 +296,7 @@ export default function AdminDashboard() {
 
             {/* Revenue Evolution */}
             {show('fiscal') && (
-              <ChartCard title="\u00c9volution revenus & TVA" icon={DollarSign}>
+              <ChartCard title="Évolution revenus & TVA" icon={DollarSign}>
                 {evolution.length === 0 ? <Empty /> : (
                   <ResponsiveContainer width="100%" height={260}>
                     <BarChart data={evolution}>
@@ -299,7 +306,7 @@ export default function AdminDashboard() {
                       <Tooltip formatter={(value) => `${formatXOF(Number(value))} XOF`} />
                       <Legend />
                       <Bar dataKey="volume" fill="#2563eb" radius={[4, 4, 0, 0]} name="Volume" />
-                      <Bar dataKey="tax_collected" fill="#8b5cf6" radius={[4, 4, 0, 0]} name="TVA" />
+                      <Bar dataKey="tax_collected" fill="#60a5fa" radius={[4, 4, 0, 0]} name="TVA" />
                     </BarChart>
                   </ResponsiveContainer>
                 )}
@@ -316,7 +323,7 @@ export default function AdminDashboard() {
                       <XAxis dataKey="date" tick={{ fontSize: 10 }} />
                       <YAxis tickFormatter={fmtShort} tick={{ fontSize: 10 }} />
                       <Tooltip formatter={(value) => `${formatXOF(Number(value))} XOF`} />
-                      <Area type="monotone" dataKey="tax_collected" stroke="#8b5cf6" fill="#8b5cf630" name="TVA" />
+                      <Area type="monotone" dataKey="tax_collected" stroke="#3b82f6" fill="#3b82f630" name="TVA" />
                     </AreaChart>
                   </ResponsiveContainer>
                 )}
@@ -325,7 +332,7 @@ export default function AdminDashboard() {
 
             {/* Fraud Alerts Evolution */}
             {show('fraud') && (
-              <ChartCard title="\u00c9volution alertes fraude" icon={ShieldAlert}>
+              <ChartCard title="Évolution alertes fraude" icon={ShieldAlert}>
                 {evolution.length === 0 ? <Empty /> : (
                   <ResponsiveContainer width="100%" height={260}>
                     <LineChart data={evolution}>
@@ -333,7 +340,7 @@ export default function AdminDashboard() {
                       <XAxis dataKey="date" tick={{ fontSize: 10 }} />
                       <YAxis tick={{ fontSize: 10 }} />
                       <Tooltip />
-                      <Line type="monotone" dataKey="fraud_alerts" stroke="#ef4444" strokeWidth={2} dot={{ r: 3 }} name="Alertes" />
+                      <Line type="monotone" dataKey="fraud_alerts" stroke="#1d4ed8" strokeWidth={2} dot={{ r: 3 }} name="Alertes" />
                     </LineChart>
                   </ResponsiveContainer>
                 )}
@@ -357,7 +364,7 @@ export default function AdminDashboard() {
 
             {/* Users by Role */}
             {show('users') && roleData.length > 0 && (
-              <ChartCard title="Utilisateurs par r\u00f4le" icon={Users}>
+              <ChartCard title="Utilisateurs par rôle" icon={Users}>
                 <ResponsiveContainer width="100%" height={260}>
                   <PieChart>
                     <Pie data={roleData} cx="50%" cy="50%" outerRadius={90} innerRadius={40} dataKey="value" nameKey="name"
@@ -373,7 +380,7 @@ export default function AdminDashboard() {
 
             {/* New Users Evolution */}
             {show('users') && (
-              <ChartCard title="\u00c9volution nouveaux utilisateurs" icon={Users}>
+              <ChartCard title="Évolution nouveaux utilisateurs" icon={Users}>
                 {evolution.length === 0 ? <Empty /> : (
                   <ResponsiveContainer width="100%" height={260}>
                     <BarChart data={evolution}>
@@ -381,7 +388,7 @@ export default function AdminDashboard() {
                       <XAxis dataKey="date" tick={{ fontSize: 10 }} />
                       <YAxis tick={{ fontSize: 10 }} />
                       <Tooltip />
-                      <Bar dataKey="new_users" fill="#10b981" radius={[4, 4, 0, 0]} name="Nouveaux" />
+                      <Bar dataKey="new_users" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Nouveaux" />
                     </BarChart>
                   </ResponsiveContainer>
                 )}
@@ -390,20 +397,20 @@ export default function AdminDashboard() {
 
             {/* Audits stats */}
             {show('audits') && summary && (
-              <ChartCard title="R\u00e9partition des audits" icon={ClipboardList}>
+              <ChartCard title="Répartition des audits" icon={ClipboardList}>
                 <ResponsiveContainer width="100%" height={260}>
                   <PieChart>
                     <Pie
                       data={[
-                        { name: 'Ouverts', value: summary.audits.open, color: '#f59e0b' },
+                        { name: 'Ouverts', value: summary.audits.open, color: '#60a5fa' },
                         { name: 'En cours', value: summary.audits.in_progress, color: '#2563eb' },
-                        { name: 'Termin\u00e9s', value: summary.audits.completed, color: '#10b981' },
+                        { name: 'Terminés', value: summary.audits.completed, color: '#1d4ed8' },
                       ].filter(d => d.value > 0)}
                       cx="50%" cy="50%" outerRadius={90} innerRadius={40} dataKey="value" nameKey="name">
                       {[
-                        { name: 'Ouverts', value: summary.audits.open, color: '#f59e0b' },
+                        { name: 'Ouverts', value: summary.audits.open, color: '#60a5fa' },
                         { name: 'En cours', value: summary.audits.in_progress, color: '#2563eb' },
-                        { name: 'Termin\u00e9s', value: summary.audits.completed, color: '#10b981' },
+                        { name: 'Terminés', value: summary.audits.completed, color: '#1d4ed8' },
                       ].filter(d => d.value > 0).map(e => <Cell key={e.name} fill={e.color} />)}
                     </Pie>
                     <Tooltip />
@@ -447,5 +454,5 @@ function ChartCard({ title, icon: Icon, children }: { title: string; icon: React
 }
 
 function Empty() {
-  return <div className="h-48 flex items-center justify-center text-gray-400 text-sm">Aucune donn\u00e9e disponible</div>;
+  return <div className="h-48 flex items-center justify-center text-gray-400 text-sm">Aucune donnée disponible</div>;
 }
