@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { AlertTriangle, Shield, Filter } from 'lucide-react';
-import Header from '@/components/Header';
 import api from '@/lib/api';
 
 interface FraudAlert {
@@ -59,7 +58,6 @@ export default function FraudPage() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <Header title="Alertes de fraude" subtitle={`${total} alerte${total > 1 ? 's' : ''} détectée${total > 1 ? 's' : ''}`} />
       <main className="flex-1 p-6 space-y-4">
         {/* Filters */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-wrap gap-3 items-center">

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { ClipboardList, AlertTriangle, CheckCircle, Clock, TrendingUp } from 'lucide-react';
-import Header from '@/components/Header';
 import StatCard from '@/components/StatCard';
 import api from '@/lib/api';
 
@@ -71,7 +70,6 @@ export default function DashboardAuditeur() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <Header title="Tableau de bord Auditeur" subtitle="Supervision des audits et alertes fraude" />
       <main className="flex-1 p-6 space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard title="Total audits" value={stats.totalAudits} icon={ClipboardList} color="blue" />

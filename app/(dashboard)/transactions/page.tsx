@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { ArrowLeftRight, Search, Filter, CheckCircle, Clock, XCircle, AlertTriangle } from 'lucide-react';
-import Header from '@/components/Header';
 import api from '@/lib/api';
 
 interface Transaction {
@@ -63,7 +62,6 @@ export default function TransactionsPage() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <Header title="Transactions" subtitle={`${total} transaction${total > 1 ? 's' : ''} au total`} />
       <main className="flex-1 p-6 space-y-4">
         {/* Filters */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-wrap gap-3 items-center">

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { ClipboardList, Search, Plus, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import Header from '@/components/Header';
 import api from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 
@@ -73,7 +72,6 @@ export default function AuditsPage() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <Header title="Audits fiscaux" subtitle={`${total} audit${total > 1 ? 's' : ''}`} />
       <main className="flex-1 p-6 space-y-4">
         {/* Toolbar */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-wrap gap-3 items-center">

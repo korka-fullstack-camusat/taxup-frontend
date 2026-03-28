@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { ArrowLeftRight, TrendingUp, CheckCircle, AlertTriangle, Plus, Clock } from 'lucide-react';
-import Header from '@/components/Header';
 import StatCard from '@/components/StatCard';
 import api from '@/lib/api';
 
@@ -81,7 +80,6 @@ export default function DashboardOperateur() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <Header title="Tableau de bord Opérateur" subtitle="Gestion des transactions de votre réseau" />
       <main className="flex-1 p-6 space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard title="Total transactions" value={stats.total} icon={ArrowLeftRight} color="blue" />

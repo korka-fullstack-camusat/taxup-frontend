@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { Bell, AlertTriangle, CheckCircle, Info, ArrowLeftRight } from 'lucide-react';
-import Header from '@/components/Header';
 import api from '@/lib/api';
 
 interface Notification {
@@ -60,7 +59,6 @@ export default function NotificationsPage() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <Header title="Notifications" subtitle={unreadCount > 0 ? `${unreadCount} non lue${unreadCount > 1 ? 's' : ''}` : 'Tout est à jour'} />
       <main className="flex-1 p-6 space-y-4">
         {/* Toolbar */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-wrap gap-3 items-center justify-between">

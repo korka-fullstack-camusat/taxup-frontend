@@ -3,215 +3,218 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Users, ArrowLeftRight, ShieldAlert, ClipboardList, Settings, TrendingUp, UserCheck, UserX } from 'lucide-react';
+import {
+  Users, ArrowLeftRight, ShieldAlert, ClipboardList, Settings, TrendingUp,
+  UserCheck, DollarSign, Receipt, Activity, AlertTriangle, BarChart3,
+} from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import api from '@/lib/api';
+import {
+  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, PieChart, Pie, Cell, Legend,
+} from 'recharts';
 
-interface AdminStats {
-  total_users: number;
-  active_users: number;
-  inactive_users: number;
-  total_transactions: number;
-  total_fraud_alerts: number;
-  total_audits: number;
-  users_by_role: Record<string, number>;
+interface AdminSummary {
+  users: { total: number; active: number; by_role: Record<string, number> };
+  transactions: { total_transactions: number; today_transactions: number; month_volume: number; pending_transactions: number };
+  fraud: { total_alerts: number; confirmed_fraud: number; pending_alerts: number; by_type: Record<string, number> };
+  audits: { total: number; open: number; in_progress: number; completed: number; by_anomaly_type?: Record<string, number> };
+  fiscal: { total_receipts: number; month_tax_collected_xof: number; total_tax_collected_xof: number; total_volume_xof: number };
 }
 
+interface EvolutionPoint {
+  date: string;
+  transactions: number;
+  volume: number;
+  fraud_alerts: number;
+  tax_collected: number;
+}
+
+const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
 const roleLabel: Record<string, string> = {
-  CITOYEN: 'Citoyens',
-  OPERATEUR_MOBILE: 'Opérateurs',
-  AUDITEUR_FISCAL: 'Auditeurs',
-  AGENT_DGID: 'Agents DGID',
-  ADMIN: 'Admins',
+  CITOYEN: 'Citoyens', OPERATEUR_MOBILE: 'Op\u00e9rateurs',
+  AUDITEUR_FISCAL: 'Auditeurs', AGENT_DGID: 'Agents DGID', ADMIN: 'Admins',
 };
 
-const roleColor: Record<string, string> = {
-  CITOYEN: 'bg-blue-100 text-blue-700',
-  OPERATEUR_MOBILE: 'bg-purple-100 text-purple-700',
-  AUDITEUR_FISCAL: 'bg-yellow-100 text-yellow-700',
-  AGENT_DGID: 'bg-blue-100 text-blue-700',
-  ADMIN: 'bg-red-100 text-red-700',
-};
+function formatXOF(n: number): string {
+  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B`;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+  return n.toLocaleString('fr-FR');
+}
 
 export default function AdminPage() {
   const { user } = useAuth();
   const router = useRouter();
-  const [stats, setStats] = useState<AdminStats | null>(null);
+  const [summary, setSummary] = useState<AdminSummary | null>(null);
+  const [evolution, setEvolution] = useState<EvolutionPoint[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user && user.role !== 'ADMIN') {
-      router.replace('/dashboard');
-    }
+    if (user && user.role !== 'ADMIN') router.replace('/dashboard');
   }, [user, router]);
 
   useEffect(() => {
-    if (user?.role === 'ADMIN') {
-      fetchStats();
-    }
+    if (user?.role === 'ADMIN') fetchData();
   }, [user]);
 
-  const fetchStats = async () => {
+  const fetchData = async () => {
     try {
-      const [usersRes, txRes, fraudRes, auditsRes] = await Promise.allSettled([
-        api.get('/users?page_size=1000'),
-        api.get('/transactions?page_size=1'),
-        api.get('/fraud/alerts?page_size=1'),
-        api.get('/audits?page_size=1'),
+      const [summaryRes, evoRes] = await Promise.allSettled([
+        api.get('/dashboard/admin-summary'),
+        api.get('/dashboard/evolution?days=14'),
       ]);
-
-      let users: { role: string; is_active: boolean }[] = [];
-      if (usersRes.status === 'fulfilled') {
-        users = usersRes.value.data.items || usersRes.value.data || [];
-      }
-
-      const activeUsers = users.filter((u) => u.is_active).length;
-      const inactiveUsers = users.filter((u) => !u.is_active).length;
-      const byRole = users.reduce((acc: Record<string, number>, u) => {
-        acc[u.role] = (acc[u.role] || 0) + 1;
-        return acc;
-      }, {});
-
-      setStats({
-        total_users: users.length,
-        active_users: activeUsers,
-        inactive_users: inactiveUsers,
-        total_transactions: txRes.status === 'fulfilled' ? (txRes.value.data.total || 0) : 0,
-        total_fraud_alerts: fraudRes.status === 'fulfilled' ? (fraudRes.value.data.total || 0) : 0,
-        total_audits: auditsRes.status === 'fulfilled' ? (auditsRes.value.data.total || 0) : 0,
-        users_by_role: byRole,
-      });
-    } finally {
-      setLoading(false);
-    }
+      if (summaryRes.status === 'fulfilled') setSummary(summaryRes.value.data);
+      if (evoRes.status === 'fulfilled') setEvolution(evoRes.value.data.evolution || []);
+    } finally { setLoading(false); }
   };
 
   if (!user || user.role !== 'ADMIN') return null;
 
+  const roleData = summary ? Object.entries(summary.users.by_role).map(([role, count], i) => ({
+    name: roleLabel[role] || role, value: count, color: COLORS[i % COLORS.length],
+  })) : [];
+
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">Administration</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Tableau de Bord Administrateur</h1>
         <p className="text-gray-500 text-sm mt-1">Vue d&apos;ensemble de la plateforme TAXUP</p>
       </div>
 
-      {/* Stat cards */}
       {loading ? (
         <div className="flex items-center justify-center h-40">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-600" />
         </div>
       ) : (
         <>
+          {/* KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard icon={Users} label="Utilisateurs total" value={stats?.total_users ?? 0} color="blue" />
-            <StatCard icon={UserCheck} label="Utilisateurs actifs" value={stats?.active_users ?? 0} color="green" />
-            <StatCard icon={UserX} label="Utilisateurs inactifs" value={stats?.inactive_users ?? 0} color="red" />
-            <StatCard icon={ArrowLeftRight} label="Transactions" value={stats?.total_transactions ?? 0} color="purple" />
-            <StatCard icon={ShieldAlert} label="Alertes fraude" value={stats?.total_fraud_alerts ?? 0} color="orange" />
-            <StatCard icon={ClipboardList} label="Audits" value={stats?.total_audits ?? 0} color="yellow" />
+            <KPICard icon={Users} iconBg="bg-blue-50" iconColor="text-blue-600"
+              label="Utilisateurs" value={summary?.users.total ?? 0}
+              subtitle={`${summary?.users.active ?? 0} actifs`} />
+            <KPICard icon={ArrowLeftRight} iconBg="bg-emerald-50" iconColor="text-emerald-600"
+              label="Transactions" value={summary?.transactions.total_transactions ?? 0}
+              subtitle={`${summary?.transactions.today_transactions ?? 0} aujourd'hui`} />
+            <KPICard icon={ShieldAlert} iconBg="bg-red-50" iconColor="text-red-600"
+              label="Alertes Fraude" value={summary?.fraud.total_alerts ?? 0}
+              subtitle={`${summary?.fraud.pending_alerts ?? 0} en attente`} />
+            <KPICard icon={DollarSign} iconBg="bg-purple-50" iconColor="text-purple-600"
+              label="TVA ce mois" value={`${formatXOF(summary?.fiscal.month_tax_collected_xof ?? 0)} XOF`}
+              subtitle={`${summary?.fiscal.total_receipts ?? 0} re\u00e7us`} />
           </div>
 
-          {/* Répartition par rôle */}
-          {stats && Object.keys(stats.users_by_role).length > 0 && (
+          {/* Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Transaction Evolution */}
             <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h2 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-blue-600" />
-                Répartition des utilisateurs par rôle
+              <h2 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <Activity className="h-4 w-4 text-emerald-600" />
+                \u00c9volution des transactions (14 jours)
               </h2>
-              <div className="flex flex-wrap gap-3">
-                {Object.entries(stats.users_by_role).map(([role, count]) => (
-                  <div key={role} className={`px-4 py-2 rounded-full text-sm font-medium ${roleColor[role] || 'bg-gray-100 text-gray-700'}`}>
-                    {roleLabel[role] || role}: <span className="font-bold">{count}</span>
-                  </div>
-                ))}
-              </div>
+              {evolution.length === 0 ? (
+                <div className="h-56 flex items-center justify-center text-gray-400 text-sm">Aucune donn\u00e9e</div>
+              ) : (
+                <ResponsiveContainer width="100%" height={240}>
+                  <AreaChart data={evolution}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+                    <YAxis tick={{ fontSize: 10 }} />
+                    <Tooltip />
+                    <Area type="monotone" dataKey="transactions" stroke="#10b981" fill="#10b98130" name="Transactions" />
+                    <Area type="monotone" dataKey="fraud_alerts" stroke="#ef4444" fill="#ef444420" name="Alertes" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+
+            {/* Role Distribution */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6">
+              <h2 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <Users className="h-4 w-4 text-blue-600" />
+                R\u00e9partition par r\u00f4le
+              </h2>
+              {roleData.length === 0 ? (
+                <div className="h-56 flex items-center justify-center text-gray-400 text-sm">Aucune donn\u00e9e</div>
+              ) : (
+                <ResponsiveContainer width="100%" height={240}>
+                  <PieChart>
+                    <Pie data={roleData} cx="50%" cy="50%" outerRadius={85} innerRadius={45} dataKey="value" nameKey="name"
+                      label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}>
+                      {roleData.map((entry, i) => (
+                        <Cell key={entry.name} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </div>
+
+          {/* Revenue Evolution */}
+          {evolution.length > 0 && (
+            <div className="bg-white rounded-xl border border-gray-200 p-6">
+              <h2 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-emerald-600" />
+                \u00c9volution des revenus fiscaux
+              </h2>
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={evolution}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+                  <YAxis tickFormatter={formatXOF} tick={{ fontSize: 10 }} />
+                  <Tooltip formatter={(value) => `${formatXOF(Number(value))} XOF`} />
+                  <Bar dataKey="volume" fill="#10b981" radius={[4, 4, 0, 0]} name="Volume" />
+                  <Bar dataKey="tax_collected" fill="#8b5cf6" radius={[4, 4, 0, 0]} name="TVA" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           )}
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { href: '/admin/acces', icon: Users, title: 'Gestion des acc\u00e8s', desc: 'G\u00e9rer les utilisateurs et permissions', color: 'emerald' },
+              { href: '/admin/revenus', icon: TrendingUp, title: 'Analyse revenus', desc: 'Suivre les revenus fiscaux', color: 'blue' },
+              { href: '/admin/operateurs', icon: BarChart3, title: 'Op\u00e9rateurs', desc: 'G\u00e9rer les op\u00e9rateurs mobile money', color: 'purple' },
+              { href: '/admin/rapports', icon: Receipt, title: 'Rapports', desc: 'G\u00e9n\u00e9rer des rapports fiscaux', color: 'orange' },
+              { href: '/admin/carte-fiscale', icon: Activity, title: 'Carte Fiscale', desc: 'Visualisation g\u00e9ographique', color: 'teal' },
+              { href: '/admin/parametres', icon: Settings, title: 'Param\u00e8tres', desc: 'Configurer la plateforme', color: 'gray' },
+            ].map(item => (
+              <Link key={item.href} href={item.href}
+                className="group bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-all flex items-start gap-4">
+                <div className={`p-3 rounded-xl bg-${item.color === 'emerald' ? 'emerald' : item.color === 'blue' ? 'blue' : item.color === 'purple' ? 'purple' : item.color === 'orange' ? 'orange' : item.color === 'teal' ? 'teal' : 'gray'}-50`}>
+                  <item.icon className={`h-5 w-5 text-${item.color === 'emerald' ? 'emerald' : item.color === 'blue' ? 'blue' : item.color === 'purple' ? 'purple' : item.color === 'orange' ? 'orange' : item.color === 'teal' ? 'teal' : 'gray'}-600`} />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800 text-sm">{item.title}</h3>
+                  <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </>
       )}
-
-      {/* Actions rapides */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <QuickAction
-          href="/admin/users"
-          icon={Users}
-          title="Gestion des utilisateurs"
-          desc="Créer, modifier, désactiver des comptes utilisateurs"
-          color="blue"
-        />
-        <QuickAction
-          href="/transactions"
-          icon={ArrowLeftRight}
-          title="Toutes les transactions"
-          desc="Consulter et filtrer l'ensemble des transactions"
-          color="purple"
-        />
-        <QuickAction
-          href="/fraud"
-          icon={ShieldAlert}
-          title="Alertes fraude"
-          desc="Gérer toutes les alertes de fraude détectées"
-          color="red"
-        />
-        <QuickAction
-          href="/audits"
-          icon={ClipboardList}
-          title="Audits"
-          desc="Suivre et gérer tous les audits fiscaux"
-          color="yellow"
-        />
-        <QuickAction
-          href="/admin/settings"
-          icon={Settings}
-          title="Paramètres"
-          desc="Configurer les paramètres de la plateforme"
-          color="gray"
-        />
-      </div>
     </div>
   );
 }
 
-function StatCard({ icon: Icon, label, value, color }: { icon: React.ElementType; label: string; value: number; color: string }) {
-  const colors: Record<string, string> = {
-    blue: 'bg-blue-50 text-blue-600',
-    green: 'bg-green-50 text-blue-600',
-    red: 'bg-red-50 text-red-600',
-    purple: 'bg-purple-50 text-purple-600',
-    orange: 'bg-orange-50 text-orange-600',
-    yellow: 'bg-yellow-50 text-yellow-600',
-    gray: 'bg-gray-50 text-gray-600',
-  };
+function KPICard({ icon: Icon, iconBg, iconColor, label, value, subtitle }: {
+  icon: React.ElementType; iconBg: string; iconColor: string;
+  label: string; value: number | string; subtitle: string;
+}) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 flex items-center gap-4">
-      <div className={`p-3 rounded-xl ${colors[color]}`}>
-        <Icon className="h-5 w-5" />
+    <div className="bg-white rounded-xl border border-gray-200 p-5">
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-sm text-gray-500">{label}</p>
+        <div className={`p-2.5 rounded-xl ${iconBg}`}>
+          <Icon className={`h-5 w-5 ${iconColor}`} />
+        </div>
       </div>
-      <div>
-        <p className="text-2xl font-bold text-gray-800">{value.toLocaleString()}</p>
-        <p className="text-xs text-gray-500 mt-0.5">{label}</p>
-      </div>
+      <p className="text-2xl font-bold text-gray-900">{typeof value === 'number' ? value.toLocaleString('fr-FR') : value}</p>
+      <p className="text-xs text-gray-400 mt-1">{subtitle}</p>
     </div>
-  );
-}
-
-function QuickAction({ href, icon: Icon, title, desc, color }: { href: string; icon: React.ElementType; title: string; desc: string; color: string }) {
-  const colors: Record<string, string> = {
-    blue: 'bg-blue-50 text-blue-600 group-hover:bg-blue-100',
-    purple: 'bg-purple-50 text-purple-600 group-hover:bg-purple-100',
-    red: 'bg-red-50 text-red-600 group-hover:bg-red-100',
-    yellow: 'bg-yellow-50 text-yellow-600 group-hover:bg-yellow-100',
-    gray: 'bg-gray-50 text-gray-600 group-hover:bg-gray-100',
-  };
-  return (
-    <Link href={href} className="group bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-all flex items-start gap-4">
-      <div className={`p-3 rounded-xl transition-colors ${colors[color]}`}>
-        <Icon className="h-5 w-5" />
-      </div>
-      <div>
-        <h3 className="font-semibold text-gray-800 text-sm">{title}</h3>
-        <p className="text-xs text-gray-500 mt-1">{desc}</p>
-      </div>
-    </Link>
   );
 }

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { Receipt, Search, Download, XCircle } from 'lucide-react';
-import Header from '@/components/Header';
 import api from '@/lib/api';
 
 interface FiscalReceipt {
@@ -43,7 +42,6 @@ export default function ReceiptsPage() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <Header title="Reçus fiscaux" subtitle={`${total} reçu${total > 1 ? 's' : ''} émis`} />
       <main className="flex-1 p-6 space-y-4">
         {/* Search */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
