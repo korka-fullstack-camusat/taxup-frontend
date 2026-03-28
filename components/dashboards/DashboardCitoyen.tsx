@@ -1,8 +1,22 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ArrowLeftRight, Receipt, CheckCircle, Clock, XCircle, TrendingUp } from 'lucide-react';
-import StatCard from '@/components/StatCard';
+import { 
+  ArrowLeftRight, 
+  Receipt, 
+  CheckCircle, 
+  Clock, 
+  XCircle, 
+  TrendingUp,
+  Wallet,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Calendar,
+  FileText,
+  Bell,
+  ChevronRight
+} from 'lucide-react';
+import { useAuth } from '@/lib/auth';
 import api from '@/lib/api';
 
 interface Transaction {
@@ -16,123 +30,298 @@ interface Transaction {
   sender_phone?: string;
 }
 
-const statusConfig: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  COMPLETED: { label: 'Complété', color: 'text-blue-600 bg-blue-50', icon: CheckCircle },
-  PENDING: { label: 'En attente', color: 'text-yellow-600 bg-yellow-50', icon: Clock },
-  FAILED: { label: 'Échoué', color: 'text-red-600 bg-red-50', icon: XCircle },
+interface FiscalReceipt {
+  id: string;
+  receipt_number: string;
+  total_amount: number;
+  tax_amount: number;
+  fiscal_period: string;
+  issued_at: string;
+}
+
+const statusConfig: Record<string, { label: string; color: string; bgColor: string; icon: React.ElementType }> = {
+  COMPLETED: { label: 'Complete', color: 'text-emerald-600', bgColor: 'bg-emerald-50', icon: CheckCircle },
+  PENDING: { label: 'En attente', color: 'text-amber-600', bgColor: 'bg-amber-50', icon: Clock },
+  FAILED: { label: 'Echoue', color: 'text-red-600', bgColor: 'bg-red-50', icon: XCircle },
 };
 
-const typeLabel: Record<string, string> = {
-  TRANSFER: 'Transfert',
-  PAYMENT: 'Paiement',
-  DEPOSIT: 'Dépôt',
-  WITHDRAWAL: 'Retrait',
-  MOBILE_PAYMENT: 'Paiement mobile',
+const typeConfig: Record<string, { label: string; icon: React.ElementType; color: string }> = {
+  TRANSFER: { label: 'Transfert', icon: ArrowUpRight, color: 'text-blue-600' },
+  PAYMENT: { label: 'Paiement', icon: ArrowDownLeft, color: 'text-purple-600' },
+  DEPOSIT: { label: 'Depot', icon: ArrowDownLeft, color: 'text-emerald-600' },
+  WITHDRAWAL: { label: 'Retrait', icon: ArrowUpRight, color: 'text-orange-600' },
+  MOBILE_PAYMENT: { label: 'Paiement mobile', icon: Wallet, color: 'text-blue-600' },
 };
 
 function formatXOF(amount: number) {
   return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 }).format(amount);
 }
 
+function formatDate(date: string) {
+  return new Date(date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
 export default function DashboardCitoyen() {
+  const { user } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [receipts, setReceipts] = useState<FiscalReceipt[]>([]);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({ total: 0, completed: 0, pending: 0, volume: 0 });
+  const [stats, setStats] = useState({ 
+    total: 0, 
+    completed: 0, 
+    pending: 0, 
+    volume: 0,
+    totalTax: 0,
+    receiptsCount: 0
+  });
 
   useEffect(() => {
-    api.get('/transactions?page_size=10')
-      .then((res) => {
-        const items: Transaction[] = res.data.items || [];
+    Promise.all([
+      api.get('/transactions?page_size=8'),
+      api.get('/receipts?page_size=5'),
+    ])
+      .then(([txRes, rcptRes]) => {
+        const items: Transaction[] = txRes.data.items || [];
+        const rcpts: FiscalReceipt[] = rcptRes.data.items || [];
         setTransactions(items);
+        setReceipts(rcpts);
         setStats({
-          total: res.data.total || items.length,
+          total: txRes.data.total || items.length,
           completed: items.filter(t => t.status === 'COMPLETED').length,
           pending: items.filter(t => t.status === 'PENDING').length,
           volume: items.filter(t => t.status === 'COMPLETED').reduce((s, t) => s + t.amount, 0),
+          totalTax: rcpts.reduce((s, r) => s + r.tax_amount, 0),
+          receiptsCount: rcptRes.data.total || rcpts.length,
         });
       })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 flex flex-col">
       <main className="flex-1 p-6 space-y-6">
-        {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard title="Mes transactions" value={stats.total} icon={ArrowLeftRight} color="blue" />
-          <StatCard title="Complétées" value={stats.completed} icon={CheckCircle} color="green" />
-          <StatCard title="En attente" value={stats.pending} icon={Clock} color="yellow" />
-          <StatCard title="Volume total" value={formatXOF(stats.volume)} icon={TrendingUp} color="purple" />
-        </div>
-
-        {/* Quick actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <a href="/transactions" className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl p-5 flex items-center gap-4 transition-colors group">
-            <div className="bg-white/20 p-3 rounded-lg group-hover:bg-white/30 transition-colors">
-              <ArrowLeftRight className="h-6 w-6" />
-            </div>
+        {/* Welcome Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white shadow-lg">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="font-semibold">Mes transactions</p>
-              <p className="text-sm text-green-100">Consulter l&apos;historique complet</p>
+              <p className="text-blue-100 text-sm">Bienvenue,</p>
+              <h1 className="text-2xl font-bold mt-1">{user?.full_name || 'Utilisateur'}</h1>
+              <p className="text-blue-200 text-sm mt-2">Votre espace fiscal personnel TAXUP</p>
             </div>
-          </a>
-          <a href="/receipts" className="bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 rounded-xl p-5 flex items-center gap-4 transition-colors group">
-            <div className="bg-blue-50 p-3 rounded-lg group-hover:bg-blue-100 transition-colors">
-              <Receipt className="h-6 w-6 text-blue-600" />
+            <div className="hidden sm:flex items-center gap-3">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
+                <p className="text-3xl font-bold">{stats.total}</p>
+                <p className="text-xs text-blue-200 mt-1">Transactions</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
+                <p className="text-3xl font-bold">{stats.receiptsCount}</p>
+                <p className="text-xs text-blue-200 mt-1">Recus fiscaux</p>
+              </div>
             </div>
-            <div>
-              <p className="font-semibold">Mes reçus fiscaux</p>
-              <p className="text-sm text-gray-500">Télécharger vos justificatifs</p>
-            </div>
-          </a>
-        </div>
-
-        {/* Recent transactions */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-            <h2 className="font-semibold text-gray-800">Transactions récentes</h2>
-            <a href="/transactions" className="text-sm text-blue-600 hover:text-blue-700 font-medium">Voir tout →</a>
           </div>
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard 
+            icon={ArrowLeftRight} 
+            label="Mes transactions" 
+            value={stats.total} 
+            bgColor="bg-blue-50" 
+            iconColor="text-blue-600" 
+          />
+          <StatCard 
+            icon={CheckCircle} 
+            label="Completees" 
+            value={stats.completed} 
+            bgColor="bg-emerald-50" 
+            iconColor="text-emerald-600" 
+          />
+          <StatCard 
+            icon={Clock} 
+            label="En attente" 
+            value={stats.pending} 
+            bgColor="bg-amber-50" 
+            iconColor="text-amber-600" 
+          />
+          <StatCard 
+            icon={TrendingUp} 
+            label="Volume total" 
+            value={formatXOF(stats.volume)} 
+            bgColor="bg-purple-50" 
+            iconColor="text-purple-600" 
+            isLarge
+          />
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <a 
+            href="/transactions" 
+            className="group bg-white rounded-2xl border border-gray-100 p-5 flex items-center gap-4 hover:shadow-lg hover:border-blue-200 transition-all"
+          >
+            <div className="bg-blue-100 p-4 rounded-xl group-hover:bg-blue-600 transition-colors">
+              <ArrowLeftRight className="h-6 w-6 text-blue-600 group-hover:text-white transition-colors" />
             </div>
-          ) : transactions.length === 0 ? (
-            <div className="text-center py-12 text-gray-400">
-              <ArrowLeftRight className="h-12 w-12 mx-auto mb-3 opacity-30" />
-              <p>Aucune transaction pour le moment</p>
+            <div className="flex-1">
+              <p className="font-semibold text-gray-800">Mes transactions</p>
+              <p className="text-sm text-gray-500 mt-0.5">Consulter l&apos;historique complet</p>
             </div>
-          ) : (
-            <div className="divide-y divide-gray-50">
-              {transactions.map((tx) => {
-                const s = statusConfig[tx.status] || statusConfig.PENDING;
-                const StatusIcon = s.icon;
-                return (
-                  <div key={tx.id} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-full bg-blue-50 flex items-center justify-center">
-                        <ArrowLeftRight className="h-4 w-4 text-blue-600" />
+            <ChevronRight className="h-5 w-5 text-gray-300 group-hover:text-blue-600 transition-colors" />
+          </a>
+          <a 
+            href="/receipts" 
+            className="group bg-white rounded-2xl border border-gray-100 p-5 flex items-center gap-4 hover:shadow-lg hover:border-emerald-200 transition-all"
+          >
+            <div className="bg-emerald-100 p-4 rounded-xl group-hover:bg-emerald-600 transition-colors">
+              <Receipt className="h-6 w-6 text-emerald-600 group-hover:text-white transition-colors" />
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold text-gray-800">Mes recus fiscaux</p>
+              <p className="text-sm text-gray-500 mt-0.5">Telecharger vos justificatifs</p>
+            </div>
+            <ChevronRight className="h-5 w-5 text-gray-300 group-hover:text-emerald-600 transition-colors" />
+          </a>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Recent Transactions */}
+          <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-50 p-2 rounded-lg">
+                  <ArrowLeftRight className="h-4 w-4 text-blue-600" />
+                </div>
+                <h2 className="font-semibold text-gray-800">Transactions recentes</h2>
+              </div>
+              <a href="/transactions" className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+                Voir tout <ChevronRight className="h-4 w-4" />
+              </a>
+            </div>
+            {transactions.length === 0 ? (
+              <div className="text-center py-12 text-gray-400">
+                <ArrowLeftRight className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                <p>Aucune transaction pour le moment</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-50">
+                {transactions.slice(0, 6).map((tx) => {
+                  const s = statusConfig[tx.status] || statusConfig.PENDING;
+                  const t = typeConfig[tx.transaction_type] || typeConfig.TRANSFER;
+                  const TypeIcon = t.icon;
+                  return (
+                    <div key={tx.id} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50/50 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className={`h-10 w-10 rounded-xl ${t.color.replace('text-', 'bg-').replace('600', '100')} flex items-center justify-center`}>
+                          <TypeIcon className={`h-5 w-5 ${t.color}`} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-800">{t.label}</p>
+                          <p className="text-xs text-gray-400 flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {formatDate(tx.created_at)}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-800">{typeLabel[tx.transaction_type] || tx.transaction_type}</p>
-                        <p className="text-xs text-gray-400">{new Date(tx.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
+                      <div className="flex items-center gap-4">
+                        <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${s.bgColor} ${s.color}`}>
+                          {s.label}
+                        </span>
+                        <span className="text-sm font-semibold text-gray-800 min-w-[100px] text-right">
+                          {formatXOF(tx.amount)}
+                        </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${s.color}`}>
-                        <StatusIcon className="h-3 w-3" />
-                        {s.label}
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Recent Receipts */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="bg-emerald-50 p-2 rounded-lg">
+                  <FileText className="h-4 w-4 text-emerald-600" />
+                </div>
+                <h2 className="font-semibold text-gray-800">Recus fiscaux</h2>
+              </div>
+              <a href="/receipts" className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+                Voir tout <ChevronRight className="h-4 w-4" />
+              </a>
+            </div>
+            {receipts.length === 0 ? (
+              <div className="text-center py-12 text-gray-400">
+                <Receipt className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                <p className="text-sm">Aucun recu fiscal</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-50">
+                {receipts.slice(0, 5).map((r) => (
+                  <div key={r.id} className="px-6 py-4 hover:bg-gray-50/50 transition-colors">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-mono text-gray-500">{r.receipt_number}</span>
+                      <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full font-medium">
+                        {r.fiscal_period}
                       </span>
-                      <span className="text-sm font-semibold text-gray-800">{formatXOF(tx.amount)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-gray-800">{formatXOF(r.total_amount)}</span>
+                      <span className="text-xs text-gray-400">{formatDate(r.issued_at)}</span>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+            {stats.totalTax > 0 && (
+              <div className="px-6 py-4 bg-emerald-50 border-t border-emerald-100">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-emerald-700">Total taxes payees</span>
+                  <span className="text-sm font-bold text-emerald-700">{formatXOF(stats.totalTax)}</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </main>
+    </div>
+  );
+}
+
+function StatCard({ 
+  icon: Icon, 
+  label, 
+  value, 
+  bgColor, 
+  iconColor,
+  isLarge = false
+}: { 
+  icon: React.ElementType; 
+  label: string; 
+  value: string | number; 
+  bgColor: string; 
+  iconColor: string;
+  isLarge?: boolean;
+}) {
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md transition-shadow">
+      <div className="flex items-center gap-3 mb-3">
+        <div className={`${bgColor} p-2.5 rounded-xl`}>
+          <Icon className={`h-5 w-5 ${iconColor}`} />
+        </div>
+      </div>
+      <p className={`${isLarge ? 'text-lg' : 'text-2xl'} font-bold text-gray-800`}>{value}</p>
+      <p className="text-sm text-gray-500 mt-1">{label}</p>
     </div>
   );
 }
