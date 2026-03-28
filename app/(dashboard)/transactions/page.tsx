@@ -1,11 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ArrowLeftRight, Search, Filter, CheckCircle, Clock, XCircle, AlertTriangle, Download } from 'lucide-react';
-import Header from '@/components/Header';
+import { ArrowLeftRight, Search, Filter, CheckCircle, Clock, XCircle, AlertTriangle } from 'lucide-react';
 import api from '@/lib/api';
-import ExportModal, { ExportField } from '@/components/ExportModal';
-import Pagination from '@/components/Pagination';
 
 interface Transaction {
   id: string;
@@ -36,19 +33,6 @@ function formatXOF(n: number) {
   return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 }).format(n);
 }
 
-const EXPORT_FIELDS: ExportField[] = [
-  { key: 'transaction_type', label: 'Type' },
-  { key: 'sender_phone',     label: 'Émetteur' },
-  { key: 'recipient_phone',  label: 'Destinataire' },
-  { key: 'amount',           label: 'Montant (XOF)' },
-  { key: 'currency',         label: 'Devise' },
-  { key: 'status',           label: 'Statut' },
-  { key: 'risk_score',       label: 'Score de risque', defaultSelected: false },
-  { key: 'description',      label: 'Description',     defaultSelected: false },
-  { key: 'created_at',       label: 'Date' },
-  { key: 'id',               label: 'ID',              defaultSelected: false },
-];
-
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,8 +41,7 @@ export default function TransactionsPage() {
   const [typeFilter, setTypeFilter] = useState('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const [showExport, setShowExport] = useState(false);
-  const [pageSize, setPageSize] = useState(20);
+  const pageSize = 20;
 
   const fetch = () => {
     setLoading(true);
@@ -79,7 +62,6 @@ export default function TransactionsPage() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <Header title="Transactions" subtitle={`${total} transaction${total > 1 ? 's' : ''} au total`} />
       <main className="flex-1 p-6 space-y-4">
         {/* Filters */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-wrap gap-3 items-center">
@@ -109,14 +91,6 @@ export default function TransactionsPage() {
               {Object.entries(typeLabel).map(([val, lbl]) => <option key={val} value={val}>{lbl}</option>)}
             </select>
           </div>
-          <button
-            onClick={() => setShowExport(true)}
-            disabled={transactions.length === 0}
-            className="flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-40"
-          >
-            <Download className="h-4 w-4" />
-            Exporter
-          </button>
         </div>
 
         {/* Table */}
@@ -173,25 +147,24 @@ export default function TransactionsPage() {
                   </tbody>
                 </table>
               </div>
-              <Pagination
-                page={page} total={total} pageSize={pageSize}
-                onPageChange={setPage}
-                onPageSizeChange={size => { setPageSize(size); setPage(1); }}
-              />
+              {/* Pagination */}
+              <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+                <p className="text-sm text-gray-500">Page {page} · {total} résultats</p>
+                <div className="flex gap-2">
+                  <button disabled={page === 1} onClick={() => setPage(p => p - 1)}
+                    className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50">
+                    Précédent
+                  </button>
+                  <button disabled={page * pageSize >= total} onClick={() => setPage(p => p + 1)}
+                    className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50">
+                    Suivant
+                  </button>
+                </div>
+              </div>
             </>
           )}
         </div>
       </main>
-
-      {showExport && (
-        <ExportModal
-          title="Transactions TAXUP"
-          fields={EXPORT_FIELDS}
-          data={transactions as unknown as Record<string, unknown>[]}
-          filename="taxup_transactions"
-          onClose={() => setShowExport(false)}
-        />
-      )}
     </div>
   );
 }

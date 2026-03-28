@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { ArrowLeftRight, Receipt, CheckCircle, Clock, XCircle, TrendingUp } from 'lucide-react';
-import Header from '@/components/Header';
 import StatCard from '@/components/StatCard';
 import api from '@/lib/api';
 
@@ -58,7 +57,6 @@ export default function DashboardCitoyen() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <Header title="Mon Tableau de bord" subtitle="Bienvenue, consultez vos transactions et reçus" />
       <main className="flex-1 p-6 space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

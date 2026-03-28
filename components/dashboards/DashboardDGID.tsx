@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { ArrowLeftRight, AlertTriangle, ClipboardList, Receipt, TrendingUp, Shield, Activity, DollarSign } from 'lucide-react';
-import Header from '@/components/Header';
 import StatCard from '@/components/StatCard';
 import api from '@/lib/api';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
@@ -56,7 +55,6 @@ export default function DashboardDGID() {
   if (loading) {
     return (
       <div className="flex-1 flex flex-col">
-        <Header title="Tableau de bord DGID" subtitle="Supervision globale de la plateforme" />
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
         </div>
@@ -78,7 +76,6 @@ export default function DashboardDGID() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <Header title="Tableau de bord DGID" subtitle="Supervision globale — toutes les activités" />
       <main className="flex-1 p-6 space-y-6">
         {/* KPIs principaux */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

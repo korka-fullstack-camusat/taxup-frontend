@@ -1,12 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ClipboardList, Search, Plus, Clock, CheckCircle, AlertCircle, Download } from 'lucide-react';
-import Header from '@/components/Header';
+import { ClipboardList, Search, Plus, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import api from '@/lib/api';
 import { useAuth } from '@/lib/auth';
-import ExportModal, { ExportField } from '@/components/ExportModal';
-import Pagination from '@/components/Pagination';
 
 interface Audit {
   id: string;
@@ -33,17 +30,6 @@ const priorityConfig: Record<string, { label: string; color: string }> = {
   CRITICAL: { label: 'Critique', color: 'text-red-600 bg-red-50' },
 };
 
-const EXPORT_FIELDS: ExportField[] = [
-  { key: 'title',          label: 'Titre' },
-  { key: 'priority',       label: 'Priorité' },
-  { key: 'status',         label: 'Statut' },
-  { key: 'findings_count', label: 'Nb. de constatations', defaultSelected: false },
-  { key: 'description',    label: 'Description',          defaultSelected: false },
-  { key: 'created_at',     label: 'Créé le' },
-  { key: 'updated_at',     label: 'Mis à jour le',        defaultSelected: false },
-  { key: 'id',             label: 'ID',                   defaultSelected: false },
-];
-
 export default function AuditsPage() {
   const { user } = useAuth();
   const [audits, setAudits] = useState<Audit[]>([]);
@@ -52,10 +38,9 @@ export default function AuditsPage() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [showForm, setShowForm] = useState(false);
-  const [showExport, setShowExport] = useState(false);
   const [form, setForm] = useState({ title: '', description: '', priority: 'MEDIUM' });
   const [submitting, setSubmitting] = useState(false);
-  const [pageSize, setPageSize] = useState(20);
+  const pageSize = 20;
 
   const canCreate = ['AGENT_DGID', 'AUDITEUR_FISCAL', 'ADMIN'].includes(user?.role || '');
 
@@ -87,7 +72,6 @@ export default function AuditsPage() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <Header title="Audits fiscaux" subtitle={`${total} audit${total > 1 ? 's' : ''}`} />
       <main className="flex-1 p-6 space-y-4">
         {/* Toolbar */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-wrap gap-3 items-center">
@@ -96,23 +80,13 @@ export default function AuditsPage() {
             <input type="text" placeholder="Rechercher un audit..." value={search} onChange={e => setSearch(e.target.value)}
               className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowExport(true)}
-              disabled={audits.length === 0}
-              className="flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-40"
-            >
-              <Download className="h-4 w-4" />
-              Exporter
+          {canCreate && (
+            <button onClick={() => setShowForm(!showForm)}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors">
+              <Plus className="h-4 w-4" />
+              {showForm ? 'Annuler' : 'Nouvel audit'}
             </button>
-            {canCreate && (
-              <button onClick={() => setShowForm(!showForm)}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors">
-                <Plus className="h-4 w-4" />
-                {showForm ? 'Annuler' : 'Nouvel audit'}
-              </button>
-            )}
-          </div>
+          )}
         </div>
 
         {/* Create form */}
@@ -189,25 +163,19 @@ export default function AuditsPage() {
                   );
                 })}
               </div>
-              <Pagination
-                page={page} total={total} pageSize={pageSize}
-                onPageChange={setPage}
-                onPageSizeChange={size => { setPageSize(size); setPage(1); }}
-              />
+              <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+                <p className="text-sm text-gray-500">Page {page} · {total} résultats</p>
+                <div className="flex gap-2">
+                  <button disabled={page === 1} onClick={() => setPage(p => p - 1)}
+                    className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50">Précédent</button>
+                  <button disabled={page * pageSize >= total} onClick={() => setPage(p => p + 1)}
+                    className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50">Suivant</button>
+                </div>
+              </div>
             </>
           )}
         </div>
       </main>
-
-      {showExport && (
-        <ExportModal
-          title="Audits fiscaux TAXUP"
-          fields={EXPORT_FIELDS}
-          data={audits as unknown as Record<string, unknown>[]}
-          filename="taxup_audits"
-          onClose={() => setShowExport(false)}
-        />
-      )}
     </div>
   );
 }

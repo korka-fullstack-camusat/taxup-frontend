@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { Receipt, Search, Download, XCircle } from 'lucide-react';
-import Header from '@/components/Header';
 import api from '@/lib/api';
 import ExportModal, { ExportField } from '@/components/ExportModal';
 import Pagination from '@/components/Pagination';
@@ -58,7 +57,6 @@ export default function ReceiptsPage() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <Header title="Reçus fiscaux" subtitle={`${total} reçu${total > 1 ? 's' : ''} émis`} />
       <main className="flex-1 p-6 space-y-4">
         {/* Search + export */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-wrap gap-3 items-center">
