@@ -99,7 +99,7 @@ export default function RapportsPage() {
           <p className="text-gray-500 text-sm mt-1">Générer et exporter les rapports de la plateforme</p>
         </div>
         <select value={period} onChange={e => setPeriod(Number(e.target.value))}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+          className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
           <option value={7}>7 jours</option>
           <option value={30}>30 jours</option>
           <option value={90}>90 jours</option>
@@ -108,7 +108,7 @@ export default function RapportsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center h-48">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-700" />
         </div>
       ) : (
         <>
@@ -120,7 +120,7 @@ export default function RapportsPage() {
             </div>
             <div className="bg-white rounded-xl border border-gray-200 p-5">
               <p className="text-sm text-gray-500 mb-1">Volume ({period}j)</p>
-              <p className="text-2xl font-bold text-blue-600">{formatXOF(totalVol)}</p>
+              <p className="text-2xl font-bold text-green-700">{formatXOF(totalVol)}</p>
             </div>
             <div className="bg-white rounded-xl border border-gray-200 p-5">
               <p className="text-sm text-gray-500 mb-1">TVA collectée ({period}j)</p>
@@ -132,7 +132,7 @@ export default function RapportsPage() {
           <div className="bg-white rounded-xl border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <h2 className="font-semibold text-gray-800 flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-blue-600" />
+                <TrendingUp className="h-4 w-4 text-green-700" />
                 Rapport d&apos;évolution quotidienne
               </h2>
               <ExportMenu onExport={handleExportEvolution} />
@@ -174,7 +174,7 @@ export default function RapportsPage() {
             <div className="bg-white rounded-xl border border-gray-200">
               <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                 <h2 className="font-semibold text-gray-800 flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-blue-600" />
+                  <FileText className="h-4 w-4 text-green-700" />
                   Rapports par période fiscale
                 </h2>
                 <ExportMenu onExport={handleExportFiscal} />

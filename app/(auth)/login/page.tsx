@@ -37,18 +37,24 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-slate-900 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-700 via-green-800 to-slate-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
         
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="h-12 w-12 rounded-xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-              <span className="text-xl font-bold text-white">T</span>
+            <div className="h-12 w-12 rounded-xl overflow-hidden border border-white/20 shadow-lg flex-shrink-0 flex">
+              <div className="flex-1 bg-[#00853F] flex items-center justify-center">
+                <span className="text-sm font-black text-white">T</span>
+              </div>
+              <div className="flex-1 bg-[#FDEF42] flex items-center justify-center">
+                <span className="text-[10px] text-[#00853F] font-bold">★</span>
+              </div>
+              <div className="flex-1 bg-[#E31B23]" />
             </div>
             <div>
               <span className="text-2xl font-bold text-white">TAXUP</span>
-              <p className="text-sm text-blue-200">Systeme Fiscal Digital</p>
+              <p className="text-sm text-green-200">Systeme Fiscal Digital</p>
             </div>
           </Link>
           
@@ -59,7 +65,7 @@ export default function LoginPage() {
                 Plateforme Nationale<br />
                 d&apos;Audit Digital Fiscal
               </h1>
-              <p className="text-blue-100/80 text-lg max-w-md">
+              <p className="text-green-100/80 text-lg max-w-md">
                 Acces securise a la supervision des transactions Mobile Money et a la conformite fiscale.
               </p>
             </div>
@@ -72,7 +78,7 @@ export default function LoginPage() {
                 </div>
                 <div>
                   <p className="text-white font-medium">Securite renforcee</p>
-                  <p className="text-blue-200 text-sm">Chiffrement de bout en bout</p>
+                  <p className="text-green-200 text-sm">Chiffrement de bout en bout</p>
                 </div>
               </div>
               <div className="flex items-center gap-4 bg-white/10 backdrop-blur rounded-xl p-4 border border-white/10">
@@ -81,14 +87,14 @@ export default function LoginPage() {
                 </div>
                 <div>
                   <p className="text-white font-medium">Acces instantane</p>
-                  <p className="text-blue-200 text-sm">Connexion rapide et fiable</p>
+                  <p className="text-green-200 text-sm">Connexion rapide et fiable</p>
                 </div>
               </div>
             </div>
           </div>
           
           {/* Footer */}
-          <p className="text-blue-300/60 text-sm">
+          <p className="text-green-300/60 text-sm">
             {new Date().getFullYear()} TAXUP - Tous droits reserves
           </p>
         </div>
@@ -97,16 +103,28 @@ export default function LoginPage() {
       {/* Right Panel - Login Form */}
       <div className="flex-1 flex flex-col bg-gray-50">
         {/* Mobile header */}
-        <div className="lg:hidden bg-gradient-to-br from-blue-600 to-blue-800 px-4 py-6">
+        <div className="lg:hidden bg-gradient-to-br from-green-700 to-green-900 px-4 py-6">
           <Link href="/" className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center">
-              <span className="text-lg font-bold text-white">T</span>
+            <div className="h-10 w-10 rounded-xl overflow-hidden border border-white/20 shadow-lg flex-shrink-0 flex">
+              <div className="flex-1 bg-[#00853F] flex items-center justify-center">
+                <span className="text-xs font-black text-white">T</span>
+              </div>
+              <div className="flex-1 bg-[#FDEF42] flex items-center justify-center">
+                <span className="text-[8px] text-[#00853F] font-bold">★</span>
+              </div>
+              <div className="flex-1 bg-[#E31B23]" />
             </div>
             <div>
               <span className="text-xl font-bold text-white">TAXUP</span>
-              <p className="text-xs text-blue-200">Systeme Fiscal Digital</p>
+              <p className="text-xs text-green-200">Systeme Fiscal Digital</p>
             </div>
           </Link>
+        </div>
+        {/* Senegal flag accent bar */}
+        <div className="flex h-1">
+          <div className="flex-1 bg-[#00853F]" />
+          <div className="flex-1 bg-[#FDEF42]" />
+          <div className="flex-1 bg-[#E31B23]" />
         </div>
         
         {/* Form container */}
@@ -142,14 +160,14 @@ export default function LoginPage() {
                       type="text"
                       value={identifier}
                       onChange={(e) => setIdentifier(e.target.value)}
-                      className="w-full border border-gray-200 rounded-xl pl-12 pr-4 py-3.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition bg-gray-50 hover:bg-white focus:bg-white"
+                      className="w-full border border-gray-200 rounded-xl pl-12 pr-4 py-3.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition bg-gray-50 hover:bg-white focus:bg-white"
                       placeholder="email@exemple.com ou username"
                       autoComplete="username"
                       required
                     />
                   </div>
                   {identifier && (
-                    <p className="text-xs text-blue-600 mt-2 flex items-center gap-1">
+                    <p className="text-xs text-green-700 mt-2 flex items-center gap-1">
                       {isEmail ? (
                         <>
                           <AtSign className="h-3 w-3" />
@@ -175,7 +193,7 @@ export default function LoginPage() {
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition pr-12 bg-gray-50 hover:bg-white focus:bg-white"
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition pr-12 bg-gray-50 hover:bg-white focus:bg-white"
                       placeholder="Entrez votre mot de passe"
                       autoComplete="current-password"
                       required
@@ -204,7 +222,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-xl py-4 font-semibold transition-colors shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2"
+                  className="w-full bg-green-700 hover:bg-green-800 disabled:bg-green-400 text-white rounded-xl py-4 font-semibold transition-colors shadow-lg shadow-green-700/20 flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <>
@@ -219,27 +237,27 @@ export default function LoginPage() {
             </div>
 
             {/* Help section */}
-            <div className="mt-6 bg-blue-50 rounded-2xl p-5 border border-blue-100">
-              <p className="text-sm font-semibold text-blue-800 mb-3">Comment se connecter ?</p>
+            <div className="mt-6 bg-green-50 rounded-2xl p-5 border border-green-100">
+              <p className="text-sm font-semibold text-green-900 mb-3">Comment se connecter ?</p>
               <div className="space-y-2">
                 <div className="flex items-start gap-3 text-sm">
-                  <div className="h-6 w-6 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <AtSign className="h-3.5 w-3.5 text-blue-600" />
+                  <div className="h-6 w-6 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <AtSign className="h-3.5 w-3.5 text-green-700" />
                   </div>
                   <span className="text-gray-600">
                     Avec votre <span className="font-medium text-gray-900">adresse email</span>
                   </span>
                 </div>
                 <div className="flex items-start gap-3 text-sm">
-                  <div className="h-6 w-6 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <User className="h-3.5 w-3.5 text-blue-600" />
+                  <div className="h-6 w-6 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <User className="h-3.5 w-3.5 text-green-700" />
                   </div>
                   <span className="text-gray-600">
                     Ou votre <span className="font-medium text-gray-900">nom d&apos;utilisateur</span>
                   </span>
                 </div>
               </div>
-              <p className="text-xs text-gray-500 mt-4 pt-3 border-t border-blue-100">
+              <p className="text-xs text-gray-500 mt-4 pt-3 border-t border-green-100">
                 Acces reserve aux utilisateurs autorises. Contactez votre administrateur pour obtenir un compte.
               </p>
             </div>

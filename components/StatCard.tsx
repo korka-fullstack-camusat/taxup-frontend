@@ -11,7 +11,7 @@ interface StatCardProps {
 
 const colorMap = {
   green: { bg: 'bg-green-50', text: 'text-green-600', border: 'border-green-100' },
-  blue: { bg: 'bg-blue-50', text: 'text-blue-600', border: 'border-blue-100' },
+  blue: { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-100' },
   red: { bg: 'bg-red-50', text: 'text-red-600', border: 'border-red-100' },
   yellow: { bg: 'bg-yellow-50', text: 'text-yellow-600', border: 'border-yellow-100' },
   purple: { bg: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-100' },
@@ -27,7 +27,7 @@ export default function StatCard({ title, value, subtitle, icon: Icon, color = '
         </div>
         {trend && (
           <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-            trend.value >= 0 ? 'bg-blue-50 text-blue-600' : 'bg-red-50 text-red-600'
+            trend.value >= 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'
           }`}>
             {trend.value >= 0 ? '+' : ''}{trend.value}%
           </span>

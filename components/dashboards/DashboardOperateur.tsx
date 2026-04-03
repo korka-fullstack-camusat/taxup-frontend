@@ -47,7 +47,7 @@ const typeLabel: Record<string, string> = {
   WITHDRAWAL: 'Retrait', MOBILE_PAYMENT: 'Paiement mobile',
 };
 
-const COLORS = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+const COLORS = ['#00853F', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 function formatXOF(n: number) {
   return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 }).format(n);
@@ -144,7 +144,7 @@ export default function DashboardOperateur() {
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-700" />
       </div>
     );
   }
@@ -167,7 +167,7 @@ export default function DashboardOperateur() {
             </button>
             <button
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-blue-600/20"
+              className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-green-700/20"
             >
               <Plus className="h-4 w-4" /> Nouvelle transaction
             </button>
@@ -195,7 +195,7 @@ export default function DashboardOperateur() {
             label="Total transactions" 
             value={stats.total}
             subtitle={`${stats.todayCount} aujourd'hui`}
-            gradient="from-blue-500 to-blue-600"
+            gradient="from-green-600 to-green-700"
           />
           <StatCard 
             icon={CheckCircle} 
@@ -223,7 +223,7 @@ export default function DashboardOperateur() {
           {/* Status Distribution */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <Activity className="h-4 w-4 text-blue-600" />
+              <Activity className="h-4 w-4 text-green-700" />
               Repartition par statut
             </h3>
             {statusData.length === 0 ? (
@@ -273,7 +273,7 @@ export default function DashboardOperateur() {
                   <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
-                  <Bar dataKey="value" fill="#2563eb" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="value" fill="#00853F" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -288,16 +288,16 @@ export default function DashboardOperateur() {
             <div className="space-y-3">
               <button 
                 onClick={() => setShowForm(true)}
-                className="w-full flex items-center gap-3 p-4 rounded-xl border border-blue-100 bg-blue-50 hover:bg-blue-100 transition-colors text-left group"
+                className="w-full flex items-center gap-3 p-4 rounded-xl border border-green-100 bg-green-50 hover:bg-green-100 transition-colors text-left group"
               >
-                <div className="bg-blue-600 p-2 rounded-lg">
+                <div className="bg-green-700 p-2 rounded-lg">
                   <Plus className="h-4 w-4 text-white" />
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-gray-800">Creer une transaction</p>
                   <p className="text-xs text-gray-500">Transfert, paiement, depot...</p>
                 </div>
-                <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-blue-600 transition-colors" />
+                <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-green-700 transition-colors" />
               </button>
               <a 
                 href="/transactions"
@@ -333,12 +333,12 @@ export default function DashboardOperateur() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <div className="flex items-center gap-3">
-              <div className="bg-blue-50 p-2 rounded-lg">
-                <ArrowLeftRight className="h-4 w-4 text-blue-600" />
+              <div className="bg-green-50 p-2 rounded-lg">
+                <ArrowLeftRight className="h-4 w-4 text-green-700" />
               </div>
               <h2 className="font-semibold text-gray-800">Transactions recentes</h2>
             </div>
-            <a href="/transactions" className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+            <a href="/transactions" className="text-sm text-green-700 hover:text-green-800 font-medium flex items-center gap-1">
               Voir tout <ChevronRight className="h-4 w-4" />
             </a>
           </div>
@@ -409,8 +409,8 @@ export default function DashboardOperateur() {
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
               <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                 <div className="flex items-center gap-3">
-                  <div className="bg-blue-50 p-2 rounded-lg">
-                    <Plus className="h-4 w-4 text-blue-600" />
+                  <div className="bg-green-50 p-2 rounded-lg">
+                    <Plus className="h-4 w-4 text-green-700" />
                   </div>
                   <h3 className="font-semibold text-gray-800">Nouvelle transaction</h3>
                 </div>
@@ -425,7 +425,7 @@ export default function DashboardOperateur() {
                     <select
                       value={form.transaction_type}
                       onChange={e => setForm({ ...form, transaction_type: e.target.value })}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 bg-white"
                     >
                       {Object.entries(typeLabel).map(([k, v]) => (
                         <option key={k} value={k}>{v}</option>
@@ -438,7 +438,7 @@ export default function DashboardOperateur() {
                       type="number"
                       value={form.amount}
                       onChange={e => setForm({ ...form, amount: e.target.value })}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
                       placeholder="10000"
                       required
                       min="1"
@@ -454,7 +454,7 @@ export default function DashboardOperateur() {
                         type="text"
                         value={form.sender_phone}
                         onChange={e => setForm({ ...form, sender_phone: e.target.value })}
-                        className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
                         placeholder="+221 77 000 0000"
                         required
                       />
@@ -468,7 +468,7 @@ export default function DashboardOperateur() {
                         type="text"
                         value={form.recipient_phone}
                         onChange={e => setForm({ ...form, recipient_phone: e.target.value })}
-                        className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
                         placeholder="+221 77 000 0001"
                         required
                       />
@@ -481,7 +481,7 @@ export default function DashboardOperateur() {
                     type="text"
                     value={form.description}
                     onChange={e => setForm({ ...form, description: e.target.value })}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
                     placeholder="Paiement facture electricite..."
                   />
                 </div>
@@ -496,7 +496,7 @@ export default function DashboardOperateur() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors shadow-lg shadow-blue-600/20"
+                    className="flex-1 bg-green-700 hover:bg-green-800 disabled:bg-green-300 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors shadow-lg shadow-green-700/20"
                   >
                     {submitting ? 'Envoi...' : 'Creer la transaction'}
                   </button>

@@ -15,9 +15,9 @@ interface Notification {
 }
 
 const typeConfig: Record<string, { icon: React.ElementType; color: string; bg: string }> = {
-  TRANSACTION_ALERT: { icon: ArrowLeftRight, color: 'text-blue-600', bg: 'bg-blue-50' },
+  TRANSACTION_ALERT: { icon: ArrowLeftRight, color: 'text-green-700', bg: 'bg-green-50' },
   FRAUD_ALERT: { icon: AlertTriangle, color: 'text-red-600', bg: 'bg-red-50' },
-  AUDIT_UPDATE: { icon: CheckCircle, color: 'text-blue-600', bg: 'bg-blue-50' },
+  AUDIT_UPDATE: { icon: CheckCircle, color: 'text-green-700', bg: 'bg-green-50' },
   SYSTEM: { icon: Info, color: 'text-gray-600', bg: 'bg-gray-100' },
   TAX_REMINDER: { icon: Bell, color: 'text-yellow-600', bg: 'bg-yellow-50' },
 };
@@ -65,11 +65,11 @@ export default function NotificationsPage() {
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-wrap gap-3 items-center justify-between">
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={unreadOnly} onChange={e => { setUnreadOnly(e.target.checked); setPage(1); }}
-              className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+              className="w-4 h-4 text-green-700 rounded border-gray-300 focus:ring-green-600" />
             <span className="text-sm text-gray-700">Non lues uniquement</span>
           </label>
           {unreadCount > 0 && (
-            <button onClick={markAllRead} className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+            <button onClick={markAllRead} className="text-sm text-green-700 hover:text-green-800 font-medium">
               Tout marquer comme lu
             </button>
           )}
@@ -78,7 +78,7 @@ export default function NotificationsPage() {
         {/* List */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           {loading ? (
-            <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" /></div>
+            <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-700" /></div>
           ) : notifications.length === 0 ? (
             <div className="text-center py-16 text-gray-400">
               <Bell className="h-12 w-12 mx-auto mb-3 opacity-30" />
@@ -92,7 +92,7 @@ export default function NotificationsPage() {
                   const Icon = t.icon;
                   return (
                     <div key={notif.id}
-                      className={`px-6 py-4 flex items-start gap-4 hover:bg-gray-50 transition-colors cursor-pointer ${!notif.is_read ? 'bg-blue-50/30' : ''}`}
+                      className={`px-6 py-4 flex items-start gap-4 hover:bg-gray-50 transition-colors cursor-pointer ${!notif.is_read ? 'bg-green-50/30' : ''}`}
                       onClick={() => !notif.is_read && markRead(notif.id)}
                     >
                       <div className={`h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 ${t.bg}`}>
@@ -102,7 +102,7 @@ export default function NotificationsPage() {
                         <div className="flex items-start justify-between gap-2">
                           <p className={`text-sm font-medium text-gray-800 ${!notif.is_read ? 'font-semibold' : ''}`}>{notif.title}</p>
                           {!notif.is_read && (
-                            <span className="h-2.5 w-2.5 rounded-full bg-blue-500 flex-shrink-0 mt-1" />
+                            <span className="h-2.5 w-2.5 rounded-full bg-green-600 flex-shrink-0 mt-1" />
                           )}
                         </div>
                         <p className="text-sm text-gray-500 mt-0.5 line-clamp-2">{notif.message}</p>

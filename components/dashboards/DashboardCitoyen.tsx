@@ -46,11 +46,11 @@ const statusConfig: Record<string, { label: string; color: string; bgColor: stri
 };
 
 const typeConfig: Record<string, { label: string; icon: React.ElementType; color: string }> = {
-  TRANSFER: { label: 'Transfert', icon: ArrowUpRight, color: 'text-blue-600' },
+  TRANSFER: { label: 'Transfert', icon: ArrowUpRight, color: 'text-green-700' },
   PAYMENT: { label: 'Paiement', icon: ArrowDownLeft, color: 'text-purple-600' },
   DEPOSIT: { label: 'Depot', icon: ArrowDownLeft, color: 'text-emerald-600' },
   WITHDRAWAL: { label: 'Retrait', icon: ArrowUpRight, color: 'text-orange-600' },
-  MOBILE_PAYMENT: { label: 'Paiement mobile', icon: Wallet, color: 'text-blue-600' },
+  MOBILE_PAYMENT: { label: 'Paiement mobile', icon: Wallet, color: 'text-green-700' },
 };
 
 function formatXOF(amount: number) {
@@ -101,7 +101,7 @@ export default function DashboardCitoyen() {
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-700" />
       </div>
     );
   }
@@ -110,21 +110,21 @@ export default function DashboardCitoyen() {
     <div className="flex-1 flex flex-col">
       <main className="flex-1 p-6 space-y-6">
         {/* Welcome Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white shadow-lg">
+        <div className="bg-gradient-to-r from-green-700 to-green-800 rounded-2xl p-6 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-100 text-sm">Bienvenue,</p>
+              <p className="text-green-100 text-sm">Bienvenue,</p>
               <h1 className="text-2xl font-bold mt-1">{user?.full_name || 'Utilisateur'}</h1>
-              <p className="text-blue-200 text-sm mt-2">Votre espace fiscal personnel TAXUP</p>
+              <p className="text-green-200 text-sm mt-2">Votre espace fiscal personnel TAXUP</p>
             </div>
             <div className="hidden sm:flex items-center gap-3">
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
                 <p className="text-3xl font-bold">{stats.total}</p>
-                <p className="text-xs text-blue-200 mt-1">Transactions</p>
+                <p className="text-xs text-green-200 mt-1">Transactions</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
                 <p className="text-3xl font-bold">{stats.receiptsCount}</p>
-                <p className="text-xs text-blue-200 mt-1">Recus fiscaux</p>
+                <p className="text-xs text-green-200 mt-1">Recus fiscaux</p>
               </div>
             </div>
           </div>
@@ -136,8 +136,8 @@ export default function DashboardCitoyen() {
             icon={ArrowLeftRight} 
             label="Mes transactions" 
             value={stats.total} 
-            bgColor="bg-blue-50" 
-            iconColor="text-blue-600" 
+            bgColor="bg-green-50" 
+            iconColor="text-green-700" 
           />
           <StatCard 
             icon={CheckCircle} 
@@ -167,16 +167,16 @@ export default function DashboardCitoyen() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <a 
             href="/transactions" 
-            className="group bg-white rounded-2xl border border-gray-100 p-5 flex items-center gap-4 hover:shadow-lg hover:border-blue-200 transition-all"
+            className="group bg-white rounded-2xl border border-gray-100 p-5 flex items-center gap-4 hover:shadow-lg hover:border-green-200 transition-all"
           >
-            <div className="bg-blue-100 p-4 rounded-xl group-hover:bg-blue-600 transition-colors">
-              <ArrowLeftRight className="h-6 w-6 text-blue-600 group-hover:text-white transition-colors" />
+            <div className="bg-green-100 p-4 rounded-xl group-hover:bg-green-700 transition-colors">
+              <ArrowLeftRight className="h-6 w-6 text-green-700 group-hover:text-white transition-colors" />
             </div>
             <div className="flex-1">
               <p className="font-semibold text-gray-800">Mes transactions</p>
               <p className="text-sm text-gray-500 mt-0.5">Consulter l&apos;historique complet</p>
             </div>
-            <ChevronRight className="h-5 w-5 text-gray-300 group-hover:text-blue-600 transition-colors" />
+            <ChevronRight className="h-5 w-5 text-gray-300 group-hover:text-green-700 transition-colors" />
           </a>
           <a 
             href="/receipts" 
@@ -198,12 +198,12 @@ export default function DashboardCitoyen() {
           <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="bg-blue-50 p-2 rounded-lg">
-                  <ArrowLeftRight className="h-4 w-4 text-blue-600" />
+                <div className="bg-green-50 p-2 rounded-lg">
+                  <ArrowLeftRight className="h-4 w-4 text-green-700" />
                 </div>
                 <h2 className="font-semibold text-gray-800">Transactions recentes</h2>
               </div>
-              <a href="/transactions" className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+              <a href="/transactions" className="text-sm text-green-700 hover:text-green-800 font-medium flex items-center gap-1">
                 Voir tout <ChevronRight className="h-4 w-4" />
               </a>
             </div>
@@ -256,7 +256,7 @@ export default function DashboardCitoyen() {
                 </div>
                 <h2 className="font-semibold text-gray-800">Recus fiscaux</h2>
               </div>
-              <a href="/receipts" className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+              <a href="/receipts" className="text-sm text-green-700 hover:text-green-800 font-medium flex items-center gap-1">
                 Voir tout <ChevronRight className="h-4 w-4" />
               </a>
             </div>

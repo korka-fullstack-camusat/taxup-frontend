@@ -82,13 +82,13 @@ export default function AnalyseRevenusPage() {
 
       {loading ? (
         <div className="flex items-center justify-center h-48">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-700" />
         </div>
       ) : (
         <>
           {/* KPIs */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard label="TVA ce mois" value={formatXOF(overview.month_tax)} color="text-blue-600" />
+            <StatCard label="TVA ce mois" value={formatXOF(overview.month_tax)} color="text-green-700" />
             <StatCard label="TVA cumulée" value={formatXOF(overview.total_tax)} color="text-green-600" />
             <StatCard label="Volume total" value={formatXOF(overview.total_volume)} color="text-purple-600" />
             <StatCard label="Total reçus" value={overview.total_receipts.toLocaleString('fr-FR')} color="text-orange-600" />
@@ -97,7 +97,7 @@ export default function AnalyseRevenusPage() {
           {/* Table */}
           <div className="bg-white rounded-xl border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-blue-600" />
+              <Calendar className="h-4 w-4 text-green-700" />
               <h2 className="font-semibold text-gray-800">Détail par période fiscale</h2>
             </div>
             {reports.length === 0 ? (
@@ -149,7 +149,7 @@ function StatCard({ label, value, color }: { label: string; value: string; color
 function ExportMenu({ onExport }: { onExport: (f: 'csv' | 'excel' | 'pdf') => void }) {
   return (
     <div className="relative group">
-      <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+      <button className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
         <Download className="h-4 w-4" /> Exporter
       </button>
       <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 hidden group-hover:block z-20 min-w-[140px]">

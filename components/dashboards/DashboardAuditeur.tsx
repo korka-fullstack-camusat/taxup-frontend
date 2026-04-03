@@ -44,7 +44,7 @@ interface FraudAlert {
 }
 
 const auditStatusConfig: Record<string, { label: string; color: string; bgColor: string; icon: React.ElementType }> = {
-  OPEN: { label: 'Ouvert', color: 'text-blue-600', bgColor: 'bg-blue-50', icon: Clock },
+  OPEN: { label: 'Ouvert', color: 'text-green-700', bgColor: 'bg-green-50', icon: Clock },
   IN_PROGRESS: { label: 'En cours', color: 'text-amber-600', bgColor: 'bg-amber-50', icon: Activity },
   COMPLETED: { label: 'Termine', color: 'text-emerald-600', bgColor: 'bg-emerald-50', icon: CheckCircle },
   CLOSED: { label: 'Ferme', color: 'text-gray-600', bgColor: 'bg-gray-100', icon: CheckCircle },
@@ -52,7 +52,7 @@ const auditStatusConfig: Record<string, { label: string; color: string; bgColor:
 
 const priorityConfig: Record<string, { label: string; color: string; bgColor: string }> = {
   LOW: { label: 'Faible', color: 'text-gray-600', bgColor: 'bg-gray-100' },
-  MEDIUM: { label: 'Moyen', color: 'text-blue-600', bgColor: 'bg-blue-50' },
+  MEDIUM: { label: 'Moyen', color: 'text-green-700', bgColor: 'bg-green-50' },
   HIGH: { label: 'Eleve', color: 'text-orange-600', bgColor: 'bg-orange-50' },
   CRITICAL: { label: 'Critique', color: 'text-red-600', bgColor: 'bg-red-50' },
 };
@@ -72,7 +72,7 @@ function riskLevel(score: number): { label: string; color: string; bgColor: stri
   return { label: 'Faible', color: 'text-emerald-600', bgColor: 'bg-emerald-50' };
 }
 
-const COLORS = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+const COLORS = ['#00853F', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 export default function DashboardAuditeur() {
   const { user } = useAuth();
@@ -118,7 +118,7 @@ export default function DashboardAuditeur() {
 
   // Chart data
   const auditStatusData = [
-    { name: 'Ouverts', value: stats.open, color: '#3b82f6' },
+    { name: 'Ouverts', value: stats.open, color: '#00853F' },
     { name: 'En cours', value: stats.inProgress, color: '#f59e0b' },
     { name: 'Termines', value: stats.completed, color: '#10b981' },
   ].filter(d => d.value > 0);
@@ -141,7 +141,7 @@ export default function DashboardAuditeur() {
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-700" />
       </div>
     );
   }
@@ -164,7 +164,7 @@ export default function DashboardAuditeur() {
             </button>
             <a
               href="/audits"
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-blue-600/20"
+              className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-green-700/20"
             >
               <Plus className="h-4 w-4" /> Nouvel audit
             </a>
@@ -178,7 +178,7 @@ export default function DashboardAuditeur() {
             label="Total audits" 
             value={stats.totalAudits}
             subtitle={`${stats.open} ouverts`}
-            gradient="from-blue-500 to-blue-600"
+            gradient="from-green-600 to-green-700"
           />
           <StatCard 
             icon={Activity} 
@@ -206,7 +206,7 @@ export default function DashboardAuditeur() {
           {/* Audit Status Pie */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <ClipboardList className="h-4 w-4 text-blue-600" />
+              <ClipboardList className="h-4 w-4 text-green-700" />
               Statut des audits
             </h3>
             {auditStatusData.length === 0 ? (
@@ -311,12 +311,12 @@ export default function DashboardAuditeur() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="bg-blue-50 p-2 rounded-lg">
-                  <ClipboardList className="h-4 w-4 text-blue-600" />
+                <div className="bg-green-50 p-2 rounded-lg">
+                  <ClipboardList className="h-4 w-4 text-green-700" />
                 </div>
                 <h2 className="font-semibold text-gray-800">Audits recents</h2>
               </div>
-              <a href="/audits" className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+              <a href="/audits" className="text-sm text-green-700 hover:text-green-800 font-medium flex items-center gap-1">
                 Voir tout <ChevronRight className="h-4 w-4" />
               </a>
             </div>
@@ -368,7 +368,7 @@ export default function DashboardAuditeur() {
                 </div>
                 <h2 className="font-semibold text-gray-800">Alertes fraude recentes</h2>
               </div>
-              <a href="/fraud" className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+              <a href="/fraud" className="text-sm text-green-700 hover:text-green-800 font-medium flex items-center gap-1">
                 Voir tout <ChevronRight className="h-4 w-4" />
               </a>
             </div>
@@ -425,10 +425,10 @@ export default function DashboardAuditeur() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <a 
             href="/audits" 
-            className="group bg-white rounded-2xl border border-gray-100 p-5 flex flex-col items-center gap-3 hover:shadow-lg hover:border-blue-200 transition-all text-center"
+            className="group bg-white rounded-2xl border border-gray-100 p-5 flex flex-col items-center gap-3 hover:shadow-lg hover:border-green-200 transition-all text-center"
           >
-            <div className="bg-blue-100 p-4 rounded-xl group-hover:bg-blue-600 transition-colors">
-              <ClipboardList className="h-6 w-6 text-blue-600 group-hover:text-white transition-colors" />
+            <div className="bg-green-100 p-4 rounded-xl group-hover:bg-green-700 transition-colors">
+              <ClipboardList className="h-6 w-6 text-green-700 group-hover:text-white transition-colors" />
             </div>
             <div>
               <p className="font-semibold text-gray-800 text-sm">Gerer les audits</p>

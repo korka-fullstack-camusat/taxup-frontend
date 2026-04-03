@@ -77,7 +77,7 @@ export default function Pagination({
               aria-current={p === page ? 'page' : undefined}
               className={`min-w-[36px] px-2.5 py-1.5 text-sm rounded-lg border transition-colors ${
                 p === page
-                  ? 'bg-blue-600 border-blue-600 text-white font-semibold shadow-sm'
+                  ? 'bg-green-700 border-green-700 text-white font-semibold shadow-sm'
                   : 'border-gray-200 text-gray-600 hover:bg-gray-50'
               }`}
             >
@@ -105,7 +105,7 @@ export default function Pagination({
           <select
             value={pageSize}
             onChange={e => { onPageSizeChange(Number(e.target.value)); onPageChange(1); }}
-            className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-600"
           >
             {pageSizeOptions.map(s => (
               <option key={s} value={s}>{s}</option>

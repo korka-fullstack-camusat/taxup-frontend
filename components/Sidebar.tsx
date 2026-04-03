@@ -96,12 +96,18 @@ export default function Sidebar() {
     <aside className="fixed left-0 top-0 h-screen w-64 bg-gradient-to-b from-slate-900 to-slate-800 text-white flex flex-col z-20 shadow-xl">
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-5 border-b border-slate-700/50">
-        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-          <span className="text-lg font-bold text-white">T</span>
+        <div className="h-10 w-10 rounded-xl overflow-hidden shadow-lg flex-shrink-0 flex">
+          <div className="flex-1 bg-[#00853F] flex items-center justify-center">
+            <span className="text-xs font-black text-white">T</span>
+          </div>
+          <div className="flex-1 bg-[#FDEF42] flex items-center justify-center">
+            <span className="text-[9px] text-[#00853F] font-bold">★</span>
+          </div>
+          <div className="flex-1 bg-[#E31B23]" />
         </div>
         <div>
           <h1 className="text-lg font-bold tracking-wide text-white">TAXUP</h1>
-          <p className="text-xs text-blue-400">Systeme Fiscal Digital</p>
+          <p className="text-xs text-green-400">Systeme Fiscal Digital</p>
         </div>
       </div>
 
@@ -119,7 +125,7 @@ export default function Sidebar() {
               href={href}
               className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all text-sm ${
                 active
-                  ? 'bg-blue-600 text-white font-semibold shadow-lg shadow-blue-600/30'
+                  ? 'bg-green-700 text-white font-semibold shadow-lg shadow-green-700/30'
                   : 'text-slate-300 hover:bg-slate-700/70 hover:text-white'
               }`}
             >
@@ -136,12 +142,12 @@ export default function Sidebar() {
           onClick={() => setShowLogoutModal(true)}
           className="w-full flex items-center gap-3 px-3 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:bg-slate-700/50 transition-colors cursor-pointer"
         >
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-sm font-bold flex-shrink-0 shadow-lg">
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-green-600 to-green-700 flex items-center justify-center text-sm font-bold flex-shrink-0 shadow-lg">
             {user?.full_name?.[0]?.toUpperCase() || 'U'}
           </div>
           <div className="overflow-hidden flex-1 text-left">
             <p className="text-sm font-medium text-white truncate">{user?.full_name || 'Utilisateur'}</p>
-            <p className="text-xs text-blue-400 truncate">{user?.role ? roleLabel[user.role] : ''}</p>
+            <p className="text-xs text-green-400 truncate">{user?.role ? roleLabel[user.role] : ''}</p>
           </div>
           <LogOut className="h-4 w-4 text-slate-400" />
         </button>

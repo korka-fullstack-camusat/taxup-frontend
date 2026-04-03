@@ -32,10 +32,10 @@ interface UserForm {
 }
 
 const ROLES = [
-  { value: 'ADMIN',            label: 'Administrateur',  color: 'bg-blue-100 text-blue-800' },
-  { value: 'AGENT_DGID',       label: 'Analyste Senior', color: 'bg-blue-100 text-blue-700' },
-  { value: 'AUDITEUR_FISCAL',  label: 'Auditeur',        color: 'bg-blue-50  text-blue-600' },
-  { value: 'OPERATEUR_MOBILE', label: 'Opérateur',       color: 'bg-blue-50  text-blue-500' },
+  { value: 'ADMIN',            label: 'Administrateur',  color: 'bg-green-100 text-green-900' },
+  { value: 'AGENT_DGID',       label: 'Analyste Senior', color: 'bg-green-100 text-green-800' },
+  { value: 'AUDITEUR_FISCAL',  label: 'Auditeur',        color: 'bg-green-50  text-green-700' },
+  { value: 'OPERATEUR_MOBILE', label: 'Opérateur',       color: 'bg-green-50  text-green-600' },
   { value: 'CITOYEN',          label: 'Superviseur',     color: 'bg-slate-100 text-slate-500' },
 ];
 
@@ -139,7 +139,7 @@ export default function GestionAccesPage() {
         <h1 className="text-2xl font-bold text-gray-900">Gestion des Accès et Permissions</h1>
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+          className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
         >
           <Plus className="h-4 w-4" />
           Nouvel Utilisateur
@@ -148,10 +148,10 @@ export default function GestionAccesPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={UserCheck}     iconBg="bg-blue-50"  iconColor="text-blue-600"  label="Utilisateurs Actifs"    value={activeUsers.toString()}           subtitle={`+${Math.min(activeUsers, 2)} ce mois`}  subtitleColor="text-blue-600" />
-        <StatCard icon={Shield}        iconBg="bg-blue-50"  iconColor="text-blue-700"  label="Rôles Définis"          value={ROLES.length.toString()}          subtitle="Système sécurisé"                          subtitleColor="text-blue-700" />
-        <StatCard icon={Users}         iconBg="bg-blue-100" iconColor="text-blue-600"  label="Sessions Actives"       value={Math.min(total, 12).toString()}   subtitle="En temps réel"                             subtitleColor="text-blue-600" />
-        <StatCard icon={AlertTriangle} iconBg="bg-blue-100" iconColor="text-blue-800"  label="Tentatives Échouées"    value="3"                                subtitle="Dernières 24h"                             subtitleColor="text-blue-800" />
+        <StatCard icon={UserCheck}     iconBg="bg-green-50"  iconColor="text-green-700"  label="Utilisateurs Actifs"    value={activeUsers.toString()}           subtitle={`+${Math.min(activeUsers, 2)} ce mois`}  subtitleColor="text-green-700" />
+        <StatCard icon={Shield}        iconBg="bg-green-50"  iconColor="text-green-800"  label="Rôles Définis"          value={ROLES.length.toString()}          subtitle="Système sécurisé"                          subtitleColor="text-green-800" />
+        <StatCard icon={Users}         iconBg="bg-green-100" iconColor="text-green-700"  label="Sessions Actives"       value={Math.min(total, 12).toString()}   subtitle="En temps réel"                             subtitleColor="text-green-700" />
+        <StatCard icon={AlertTriangle} iconBg="bg-green-100" iconColor="text-green-900"  label="Tentatives Échouées"    value="3"                                subtitle="Dernières 24h"                             subtitleColor="text-green-900" />
       </div>
 
       {/* Tabs */}
@@ -163,7 +163,7 @@ export default function GestionAccesPage() {
               onClick={() => setActiveTab(t.id)}
               className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === t.id
-                  ? 'border-blue-600 text-blue-600'
+                  ? 'border-green-700 text-green-700'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -183,14 +183,14 @@ export default function GestionAccesPage() {
               placeholder="Rechercher par nom, email ou département..."
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(1); }}
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-600 bg-white"
             />
           </div>
 
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             {loading ? (
               <div className="flex items-center justify-center h-48">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-700" />
               </div>
             ) : users.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-48 text-gray-400">
@@ -211,7 +211,7 @@ export default function GestionAccesPage() {
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {users.map(u => (
-                      <tr key={u.id} className="hover:bg-blue-50 transition-colors">
+                      <tr key={u.id} className="hover:bg-green-50 transition-colors">
                         <td className="px-6 py-4">
                           <div>
                             <p className="font-medium text-gray-800">{u.full_name}</p>
@@ -225,7 +225,7 @@ export default function GestionAccesPage() {
                         </td>
                         <td className="px-6 py-4 text-gray-600 text-sm">{u.organization || 'DGID - Direction Générale'}</td>
                         <td className="px-6 py-4 text-center">
-                          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${u.is_active ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500'}`}>
+                          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${u.is_active ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-500'}`}>
                             {u.is_active ? 'Actif' : 'Inactif'}
                           </span>
                         </td>
@@ -235,11 +235,11 @@ export default function GestionAccesPage() {
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-center gap-1.5">
                             <button onClick={() => setViewUser(u)} title="Voir"
-                              className="p-1.5 rounded-lg hover:bg-blue-100 text-gray-400 hover:text-blue-600 transition-colors">
+                              className="p-1.5 rounded-lg hover:bg-green-100 text-gray-400 hover:text-green-700 transition-colors">
                               <Eye className="h-4 w-4" />
                             </button>
                             <button onClick={() => openEdit(u)} title="Modifier"
-                              className="p-1.5 rounded-lg hover:bg-blue-100 text-gray-400 hover:text-blue-700 transition-colors">
+                              className="p-1.5 rounded-lg hover:bg-green-100 text-gray-400 hover:text-green-800 transition-colors">
                               <Edit2 className="h-4 w-4" />
                             </button>
                             <button onClick={() => setDeleteTarget(u)} title="Supprimer"
@@ -260,11 +260,11 @@ export default function GestionAccesPage() {
                 <span>Page {page} sur {totalPages}</span>
                 <div className="flex gap-2">
                   <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-                    className="p-1.5 rounded-lg hover:bg-blue-50 disabled:opacity-40">
+                    className="p-1.5 rounded-lg hover:bg-green-50 disabled:opacity-40">
                     <ChevronLeft className="h-4 w-4" />
                   </button>
                   <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                    className="p-1.5 rounded-lg hover:bg-blue-50 disabled:opacity-40">
+                    className="p-1.5 rounded-lg hover:bg-green-50 disabled:opacity-40">
                     <ChevronRight className="h-4 w-4" />
                   </button>
                 </div>
@@ -280,17 +280,17 @@ export default function GestionAccesPage() {
           <h2 className="font-semibold text-gray-800 mb-4">Rôles et Permissions du Système</h2>
           <div className="space-y-4">
             {ROLES.map(r => (
-              <div key={r.value} className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-blue-50 transition-colors">
+              <div key={r.value} className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-green-50 transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-blue-100">
-                    <Key className="h-4 w-4 text-blue-600" />
+                  <div className="p-2 rounded-lg bg-green-100">
+                    <Key className="h-4 w-4 text-green-700" />
                   </div>
                   <div>
                     <p className="font-medium text-gray-800">{r.label}</p>
                     <p className="text-xs text-gray-400">{r.value}</p>
                   </div>
                 </div>
-                <span className="text-xs text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full font-medium">
+                <span className="text-xs text-green-700 bg-green-50 px-2.5 py-1 rounded-full font-medium">
                   {users.filter(u => u.role === r.value).length} utilisateur(s)
                 </span>
               </div>
@@ -311,11 +311,11 @@ export default function GestionAccesPage() {
               { action: 'Tentative de connexion échouée', user: 'inconnu@email.com', time: '12:30', type: 'error'   },
               { action: 'Export de données',            user: 'analyste@taxup.sn',    time: '11:20', type: 'info'    },
             ].map((log, i) => (
-              <div key={i} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100 hover:bg-blue-50 transition-colors">
+              <div key={i} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100 hover:bg-green-50 transition-colors">
                 <div className={`h-2.5 w-2.5 rounded-full flex-shrink-0 ${
-                  log.type === 'info'    ? 'bg-blue-400'  :
-                  log.type === 'warning' ? 'bg-blue-600'  :
-                  log.type === 'success' ? 'bg-blue-700'  : 'bg-blue-900'
+                  log.type === 'info'    ? 'bg-green-400'  :
+                  log.type === 'warning' ? 'bg-green-700'  :
+                  log.type === 'success' ? 'bg-green-800'  : 'bg-green-950'
                 }`} />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-800">{log.action}</p>
@@ -346,21 +346,21 @@ export default function GestionAccesPage() {
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Nom complet *</label>
                   <input type="text" required value={form.full_name}
                     onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
                     placeholder="Prénom Nom" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Nom d&apos;utilisateur *</label>
                   <input type="text" required value={form.username}
                     onChange={e => setForm(f => ({ ...f, username: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
                     placeholder="username" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Email *</label>
                   <input type="email" required value={form.email}
                     onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
                     placeholder="email@exemple.com" />
                 </div>
                 <div className="col-span-2">
@@ -373,7 +373,7 @@ export default function GestionAccesPage() {
                       required={!editingUser}
                       value={form.password}
                       onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 pr-10"
                       placeholder="••••••••"
                     />
                     <button type="button" onClick={() => setShowPassword(!showPassword)}
@@ -386,7 +386,7 @@ export default function GestionAccesPage() {
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Rôle *</label>
                   <select required value={form.role}
                     onChange={e => setForm(f => ({ ...f, role: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 bg-white">
                     {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
                   </select>
                 </div>
@@ -394,14 +394,14 @@ export default function GestionAccesPage() {
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Téléphone</label>
                   <input type="tel" value={form.phone_number}
                     onChange={e => setForm(f => ({ ...f, phone_number: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
                     placeholder="+221..." />
                 </div>
                 <div className="col-span-2">
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Département / Organisation</label>
                   <input type="text" value={form.organization}
                     onChange={e => setForm(f => ({ ...f, organization: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
                     placeholder="DGID - Direction Générale" />
                 </div>
               </div>
@@ -414,7 +414,7 @@ export default function GestionAccesPage() {
                   Annuler
                 </button>
                 <button type="submit" disabled={saving}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg py-2.5 text-sm font-semibold transition-colors">
+                  className="flex-1 bg-green-700 hover:bg-green-800 disabled:bg-green-400 text-white rounded-lg py-2.5 text-sm font-semibold transition-colors">
                   {saving ? 'Enregistrement...' : (editingUser ? 'Modifier' : 'Créer')}
                 </button>
               </div>
@@ -434,7 +434,7 @@ export default function GestionAccesPage() {
               </button>
             </div>
             <div className="flex items-center gap-4 mb-6">
-              <div className="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xl font-bold">
+              <div className="h-14 w-14 rounded-full bg-green-100 flex items-center justify-center text-green-800 text-xl font-bold">
                 {viewUser.full_name?.[0]?.toUpperCase() || 'U'}
               </div>
               <div>
@@ -451,7 +451,7 @@ export default function GestionAccesPage() {
               <InfoRow label="Créé le"     value={viewUser.created_at ? new Date(viewUser.created_at).toLocaleDateString('fr-FR') : '-'} />
             </div>
             <button onClick={() => setViewUser(null)}
-              className="w-full mt-6 border border-gray-200 text-gray-700 rounded-lg py-2.5 text-sm font-medium hover:bg-blue-50 transition-colors">
+              className="w-full mt-6 border border-gray-200 text-gray-700 rounded-lg py-2.5 text-sm font-medium hover:bg-green-50 transition-colors">
               Fermer
             </button>
           </div>

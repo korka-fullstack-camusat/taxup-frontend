@@ -49,7 +49,7 @@ interface EvolutionPoint {
   tax_collected: number;
 }
 
-const TYPE_COLORS = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+const TYPE_COLORS = ['#00853F', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 const STATUS_COLORS: Record<string, string> = {
   COMPLETED: '#10b981', PENDING: '#f59e0b', FAILED: '#ef4444', FLAGGED: '#f97316',
 };
@@ -121,7 +121,7 @@ export default function DashboardDGID() {
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-700" />
       </div>
     );
   }
@@ -153,7 +153,7 @@ export default function DashboardDGID() {
             <select 
               value={period} 
               onChange={e => setPeriod(Number(e.target.value))}
-              className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-600"
             >
               <option value={7}>7 jours</option>
               <option value={14}>14 jours</option>
@@ -169,7 +169,7 @@ export default function DashboardDGID() {
             <button
               onClick={handleExport}
               disabled={evolution.length === 0}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-blue-600/20"
+              className="flex items-center gap-2 bg-green-700 hover:bg-green-800 disabled:bg-green-300 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-green-700/20"
             >
               <Download className="h-4 w-4" /> Exporter
             </button>
@@ -183,7 +183,7 @@ export default function DashboardDGID() {
             label="Total transactions" 
             value={overview?.transactions.total ?? 0}
             subtitle={formatXOF(overview?.transactions.total_volume ?? 0)}
-            gradient="from-blue-500 to-blue-600"
+            gradient="from-green-600 to-green-700"
           />
           <StatCard 
             icon={AlertTriangle} 
@@ -213,7 +213,7 @@ export default function DashboardDGID() {
           {/* Evolution Chart */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <Activity className="h-4 w-4 text-blue-600" />
+              <Activity className="h-4 w-4 text-green-700" />
               Evolution des transactions ({period}j)
             </h3>
             {evolution.length === 0 ? (
@@ -226,7 +226,7 @@ export default function DashboardDGID() {
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
                   <Legend />
-                  <Area type="monotone" dataKey="transactions" stroke="#2563eb" fill="#2563eb20" name="Transactions" />
+                  <Area type="monotone" dataKey="transactions" stroke="#00853F" fill="#00853F20" name="Transactions" />
                 </AreaChart>
               </ResponsiveContainer>
             )}
@@ -259,7 +259,7 @@ export default function DashboardDGID() {
           {/* Bar chart transactions par type */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <BarChart3 className="h-4 w-4 text-blue-600" />
+              <BarChart3 className="h-4 w-4 text-green-700" />
               Transactions 24h par type
             </h3>
             {byTypeData.length === 0 ? (
@@ -271,7 +271,7 @@ export default function DashboardDGID() {
                   <XAxis dataKey="name" tick={{ fontSize: 9 }} />
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
-                  <Bar dataKey="transactions" fill="#2563eb" radius={[4, 4, 0, 0]} name="Transactions" />
+                  <Bar dataKey="transactions" fill="#00853F" radius={[4, 4, 0, 0]} name="Transactions" />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -340,7 +340,7 @@ export default function DashboardDGID() {
               </div>
               <h2 className="font-semibold text-gray-800">Alertes fraude recentes (24h)</h2>
             </div>
-            <a href="/fraud" className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+            <a href="/fraud" className="text-sm text-green-700 hover:text-green-800 font-medium flex items-center gap-1">
               Voir tout <ChevronRight className="h-4 w-4" />
             </a>
           </div>

@@ -16,7 +16,7 @@ interface FraudAlert {
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   PENDING: { label: 'En attente', color: 'text-yellow-600 bg-yellow-50' },
-  UNDER_REVIEW: { label: 'En révision', color: 'text-blue-600 bg-blue-50' },
+  UNDER_REVIEW: { label: 'En révision', color: 'text-green-700 bg-green-50' },
   CONFIRMED: { label: 'Confirmé', color: 'text-red-600 bg-red-50' },
   DISMISSED: { label: 'Rejeté', color: 'text-gray-600 bg-gray-100' },
 };
@@ -31,7 +31,7 @@ function riskLevel(score: number) {
   if (score >= 0.8) return { label: 'Critique', color: 'text-red-700 bg-red-100' };
   if (score >= 0.6) return { label: 'Élevé', color: 'text-orange-600 bg-orange-50' };
   if (score >= 0.4) return { label: 'Moyen', color: 'text-yellow-600 bg-yellow-50' };
-  return { label: 'Faible', color: 'text-blue-600 bg-blue-50' };
+  return { label: 'Faible', color: 'text-green-700 bg-green-50' };
 }
 
 export default function FraudPage() {
@@ -63,12 +63,12 @@ export default function FraudPage() {
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-wrap gap-3 items-center">
           <Filter className="h-4 w-4 text-gray-400" />
           <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
-            className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
             <option value="">Tous les statuts</option>
             {Object.entries(statusConfig).map(([v, { label }]) => <option key={v} value={v}>{label}</option>)}
           </select>
           <select value={minRisk} onChange={e => { setMinRisk(e.target.value); setPage(1); }}
-            className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
             <option value="">Tout niveau de risque</option>
             <option value="0.4">≥ 40% (Moyen+)</option>
             <option value="0.6">≥ 60% (Élevé+)</option>
@@ -79,7 +79,7 @@ export default function FraudPage() {
         {/* Table */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           {loading ? (
-            <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" /></div>
+            <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-700" /></div>
           ) : alerts.length === 0 ? (
             <div className="text-center py-16 text-gray-400">
               <Shield className="h-12 w-12 mx-auto mb-3 opacity-30" />

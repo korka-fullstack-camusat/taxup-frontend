@@ -20,12 +20,12 @@ export interface RegionData {
 
 const LEVEL_COLOR: Record<string, string> = {
   high:   '#1d4ed8',
-  medium: '#3b82f6',
+  medium: '#00853F',
   low:    '#93c5fd',
 };
 const LEVEL_BORDER: Record<string, string> = {
-  high:   '#1e3a8a',
-  medium: '#2563eb',
+  high:   '#005f2e',
+  medium: '#00853F',
   low:    '#60a5fa',
 };
 
@@ -128,7 +128,7 @@ export default function SenegalMap({ regions, selected, onSelect }: Props) {
                 ].map(([label, val]) => (
                   <div key={label} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                     <span style={{ color: '#6b7280' }}>{label}</span>
-                    <span style={{ fontWeight: 600, color: label === 'Croissance' ? '#2563eb' : '#111827' }}>{val}</span>
+                    <span style={{ fontWeight: 600, color: label === 'Croissance' ? '#00853F' : '#111827' }}>{val}</span>
                   </div>
                 ))}
               </div>

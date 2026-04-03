@@ -38,7 +38,7 @@ interface RealtimeData {
 }
 
 // Palette unifiée en bleu uniquement
-const COLORS = ['#1d4ed8', '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe'];
+const COLORS = ['#1d4ed8', '#00853F', '#00853F', '#60a5fa', '#93c5fd', '#bfdbfe'];
 
 const roleLabel: Record<string, string> = {
   CITOYEN: 'Citoyens', OPERATEUR_MOBILE: 'Opérateurs',
@@ -56,7 +56,7 @@ const statusColors: Record<string, string> = {
   PENDING: '#60a5fa',      // bleu moyen
   FAILED: '#93c5fd',       // bleu clair
   CANCELLED: '#bfdbfe',    // bleu très clair
-  UNDER_REVIEW: '#3b82f6', // bleu standard
+  UNDER_REVIEW: '#00853F', // bleu standard
 };
 
 type Section = 'all' | 'transactions' | 'fraud' | 'fiscal' | 'users' | 'audits';
@@ -160,14 +160,14 @@ export default function AdminDashboard() {
         </div>
         <div className="flex items-center gap-3">
           <select value={period} onChange={e => setPeriod(Number(e.target.value))}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
             <option value={7}>7 jours</option>
             <option value={14}>14 jours</option>
             <option value={30}>30 jours</option>
             <option value={90}>90 jours</option>
           </select>
           <div className="relative group">
-            <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            <button className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
               <Download className="h-4 w-4" /> Exporter
             </button>
             <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 hidden group-hover:block z-20 min-w-[140px]">
@@ -186,8 +186,8 @@ export default function AdminDashboard() {
             <button key={s.id} onClick={() => setSection(s.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                 section === s.id
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:bg-blue-50'
+                  ? 'bg-green-700 text-white shadow-sm'
+                  : 'bg-white text-gray-600 border border-gray-200 hover:bg-green-50'
               }`}>
               <Icon className="h-4 w-4" /> {s.label}
             </button>
@@ -197,45 +197,45 @@ export default function AdminDashboard() {
 
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-700" />
         </div>
       ) : (
         <>
           {/* KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {show('users') && (
-              <KPI icon={Users} bg="bg-blue-50" color="text-blue-600" label="Utilisateurs"
+              <KPI icon={Users} bg="bg-green-50" color="text-green-700" label="Utilisateurs"
                 value={summary?.users.total ?? 0} sub={`${summary?.users.active ?? 0} actifs`} />
             )}
             {show('transactions') && (
-              <KPI icon={ArrowLeftRight} bg="bg-blue-50" color="text-blue-600" label="Transactions"
+              <KPI icon={ArrowLeftRight} bg="bg-green-50" color="text-green-700" label="Transactions"
                 value={summary?.transactions.total_transactions ?? 0} sub={`${summary?.transactions.today_transactions ?? 0} aujourd'hui`} />
             )}
             {show('fraud') && (
-              <KPI icon={ShieldAlert} bg="bg-blue-50" color="text-blue-700" label="Alertes Fraude"
+              <KPI icon={ShieldAlert} bg="bg-green-50" color="text-green-800" label="Alertes Fraude"
                 value={summary?.fraud.total_alerts ?? 0} sub={`${summary?.fraud.pending_alerts ?? 0} en attente`} />
             )}
             {show('fiscal') && (
-              <KPI icon={DollarSign} bg="bg-blue-50" color="text-blue-600" label="TVA ce mois"
+              <KPI icon={DollarSign} bg="bg-green-50" color="text-green-700" label="TVA ce mois"
                 value={`${formatXOF(summary?.fiscal.month_tax_collected_xof ?? 0)} XOF`}
                 sub={`${summary?.fiscal.total_receipts ?? 0} reçus`} />
             )}
             {show('audits') && (
-              <KPI icon={ClipboardList} bg="bg-blue-50" color="text-blue-600" label="Audits"
+              <KPI icon={ClipboardList} bg="bg-green-50" color="text-green-700" label="Audits"
                 value={summary?.audits.total ?? 0} sub={`${summary?.audits.open ?? 0} ouverts`} />
             )}
             {show('transactions') && (
-              <KPI icon={Activity} bg="bg-blue-100" color="text-blue-700" label="Volume ce mois"
+              <KPI icon={Activity} bg="bg-green-100" color="text-green-800" label="Volume ce mois"
                 value={`${formatXOF(summary?.transactions.month_volume ?? 0)} XOF`}
                 sub={`${summary?.transactions.pending_transactions ?? 0} en attente`} />
             )}
             {show('fiscal') && (
-              <KPI icon={Receipt} bg="bg-blue-100" color="text-blue-700" label="TVA totale"
+              <KPI icon={Receipt} bg="bg-green-100" color="text-green-800" label="TVA totale"
                 value={`${formatXOF(summary?.fiscal.total_tax_collected_xof ?? 0)} XOF`}
                 sub="Cumulé" />
             )}
             {show('fiscal') && (
-              <KPI icon={TrendingUp} bg="bg-blue-100" color="text-blue-800" label="Volume total"
+              <KPI icon={TrendingUp} bg="bg-green-100" color="text-green-900" label="Volume total"
                 value={`${formatXOF(summary?.fiscal.total_volume_xof ?? 0)} XOF`}
                 sub="Toutes périodes" />
             )}
@@ -255,7 +255,7 @@ export default function AdminDashboard() {
                       <YAxis tick={{ fontSize: 10 }} />
                       <Tooltip />
                       <Legend />
-                      <Area type="monotone" dataKey="transactions" stroke="#2563eb" fill="#2563eb20" name="Transactions" />
+                      <Area type="monotone" dataKey="transactions" stroke="#00853F" fill="#00853F20" name="Transactions" />
                       <Area type="monotone" dataKey="receipts" stroke="#60a5fa" fill="#60a5fa20" name="Reçus" />
                     </AreaChart>
                   </ResponsiveContainer>
@@ -272,7 +272,7 @@ export default function AdminDashboard() {
                     <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                     <YAxis tick={{ fontSize: 10 }} />
                     <Tooltip />
-                    <Bar dataKey="transactions" fill="#2563eb" radius={[4, 4, 0, 0]} name="Transactions" />
+                    <Bar dataKey="transactions" fill="#00853F" radius={[4, 4, 0, 0]} name="Transactions" />
                   </BarChart>
                 </ResponsiveContainer>
               </ChartCard>
@@ -305,7 +305,7 @@ export default function AdminDashboard() {
                       <YAxis tickFormatter={fmtShort} tick={{ fontSize: 10 }} />
                       <Tooltip formatter={(value) => `${formatXOF(Number(value))} XOF`} />
                       <Legend />
-                      <Bar dataKey="volume" fill="#2563eb" radius={[4, 4, 0, 0]} name="Volume" />
+                      <Bar dataKey="volume" fill="#00853F" radius={[4, 4, 0, 0]} name="Volume" />
                       <Bar dataKey="tax_collected" fill="#60a5fa" radius={[4, 4, 0, 0]} name="TVA" />
                     </BarChart>
                   </ResponsiveContainer>
@@ -323,7 +323,7 @@ export default function AdminDashboard() {
                       <XAxis dataKey="date" tick={{ fontSize: 10 }} />
                       <YAxis tickFormatter={fmtShort} tick={{ fontSize: 10 }} />
                       <Tooltip formatter={(value) => `${formatXOF(Number(value))} XOF`} />
-                      <Area type="monotone" dataKey="tax_collected" stroke="#3b82f6" fill="#3b82f630" name="TVA" />
+                      <Area type="monotone" dataKey="tax_collected" stroke="#00853F" fill="#00853F30" name="TVA" />
                     </AreaChart>
                   </ResponsiveContainer>
                 )}
@@ -388,7 +388,7 @@ export default function AdminDashboard() {
                       <XAxis dataKey="date" tick={{ fontSize: 10 }} />
                       <YAxis tick={{ fontSize: 10 }} />
                       <Tooltip />
-                      <Bar dataKey="new_users" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Nouveaux" />
+                      <Bar dataKey="new_users" fill="#00853F" radius={[4, 4, 0, 0]} name="Nouveaux" />
                     </BarChart>
                   </ResponsiveContainer>
                 )}
@@ -403,13 +403,13 @@ export default function AdminDashboard() {
                     <Pie
                       data={[
                         { name: 'Ouverts', value: summary.audits.open, color: '#60a5fa' },
-                        { name: 'En cours', value: summary.audits.in_progress, color: '#2563eb' },
+                        { name: 'En cours', value: summary.audits.in_progress, color: '#00853F' },
                         { name: 'Terminés', value: summary.audits.completed, color: '#1d4ed8' },
                       ].filter(d => d.value > 0)}
                       cx="50%" cy="50%" outerRadius={90} innerRadius={40} dataKey="value" nameKey="name">
                       {[
                         { name: 'Ouverts', value: summary.audits.open, color: '#60a5fa' },
-                        { name: 'En cours', value: summary.audits.in_progress, color: '#2563eb' },
+                        { name: 'En cours', value: summary.audits.in_progress, color: '#00853F' },
                         { name: 'Terminés', value: summary.audits.completed, color: '#1d4ed8' },
                       ].filter(d => d.value > 0).map(e => <Cell key={e.name} fill={e.color} />)}
                     </Pie>
@@ -446,7 +446,7 @@ function ChartCard({ title, icon: Icon, children }: { title: string; icon: React
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6">
       <h2 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-        <Icon className="h-4 w-4 text-blue-600" /> {title}
+        <Icon className="h-4 w-4 text-green-700" /> {title}
       </h2>
       {children}
     </div>

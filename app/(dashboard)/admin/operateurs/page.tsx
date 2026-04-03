@@ -86,7 +86,7 @@ export default function OperateursPage() {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={Building2} bg="bg-blue-50" color="text-blue-600" label="Total Opérateurs" value={totalOps.toString()} />
+        <StatCard icon={Building2} bg="bg-green-50" color="text-green-700" label="Total Opérateurs" value={totalOps.toString()} />
         <StatCard icon={TrendingUp} bg="bg-green-50" color="text-green-600" label="Volume Total" value={formatXOF(totalVolume)} />
         <StatCard icon={DollarSign} bg="bg-yellow-50" color="text-yellow-600" label="Valeur Totale" value={formatXOF(totalValue)} />
         <StatCard icon={Globe} bg="bg-purple-50" color="text-purple-600" label="Actifs" value={operators.filter(o => o.is_active).length.toString()} />
@@ -96,7 +96,7 @@ export default function OperateursPage() {
       <div className="bg-white rounded-xl border border-gray-200">
         {loading ? (
           <div className="flex items-center justify-center h-48">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-700" />
           </div>
         ) : operators.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-48 text-gray-400">
@@ -121,7 +121,7 @@ export default function OperateursPage() {
                   <tr key={op.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm flex-shrink-0">
+                        <div className="h-9 w-9 rounded-full bg-green-100 flex items-center justify-center text-green-800 font-bold text-sm flex-shrink-0">
                           {(op.organization || op.full_name)?.[0]?.toUpperCase() || 'O'}
                         </div>
                         <div>
@@ -131,7 +131,7 @@ export default function OperateursPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full">Mobile Money</span>
+                      <span className="px-2.5 py-1 bg-green-50 text-green-800 text-xs font-medium rounded-full">Mobile Money</span>
                     </td>
                     <td className="px-6 py-4 text-right font-medium text-gray-800">{formatXOF(op.tx_count || 0)}</td>
                     <td className="px-6 py-4 text-right text-gray-600">{(op.tx_volume || 0).toLocaleString('fr-FR')} F CFA</td>
@@ -174,7 +174,7 @@ function StatCard({ icon: Icon, bg, color, label, value }: {
 function ExportMenu({ onExport }: { onExport: (f: 'csv' | 'excel' | 'pdf') => void }) {
   return (
     <div className="relative group">
-      <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+      <button className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
         <Download className="h-4 w-4" /> Exporter
       </button>
       <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 hidden group-hover:block z-20 min-w-[130px]">

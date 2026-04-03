@@ -132,15 +132,15 @@ export default function ParametresPage() {
   if (!user || user.role !== 'ADMIN') return null;
 
   // Shared input class
-  const inp = 'w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white';
+  const inp = 'w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 bg-white';
 
   return (
     <div className="p-6 space-y-6">
 
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="p-2.5 bg-blue-50 rounded-xl">
-          <Settings className="h-6 w-6 text-blue-600" />
+        <div className="p-2.5 bg-green-50 rounded-xl">
+          <Settings className="h-6 w-6 text-green-700" />
         </div>
         <h1 className="text-2xl font-bold text-gray-900">Paramètres du tableau de bord TAXUP</h1>
       </div>
@@ -156,8 +156,8 @@ export default function ParametresPage() {
                 onClick={() => setActiveTab(t.id)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === t.id
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-blue-50'
+                    ? 'border-green-700 text-green-700'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-green-50'
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -174,7 +174,7 @@ export default function ParametresPage() {
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-800">Gestion des utilisateurs et des rôles</h2>
             <button onClick={openCreate}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors">
+              className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors">
               <Plus className="h-4 w-4" /> Nouvel Utilisateur
             </button>
           </div>
@@ -182,7 +182,7 @@ export default function ParametresPage() {
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             {usersLoading ? (
               <div className="flex items-center justify-center h-48">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-700" />
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -198,10 +198,10 @@ export default function ParametresPage() {
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {users.map(u => (
-                      <tr key={u.id} className="hover:bg-blue-50 transition-colors">
+                      <tr key={u.id} className="hover:bg-green-50 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm">
+                            <div className="h-9 w-9 rounded-full bg-green-100 flex items-center justify-center text-green-800 font-bold text-sm">
                               {u.full_name?.[0]?.toUpperCase() || 'U'}
                             </div>
                             <div>
@@ -213,7 +213,7 @@ export default function ParametresPage() {
                         <td className="px-6 py-4 text-gray-600">{roleLabelMap[u.role] || u.role}</td>
                         <td className="px-6 py-4 text-gray-500">{u.organization || 'Direction Générale'}</td>
                         <td className="px-6 py-4 text-center">
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${u.is_active ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500'}`}>
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${u.is_active ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-500'}`}>
                             {u.is_active ? 'Actif' : 'Inactif'}
                           </span>
                         </td>
@@ -223,7 +223,7 @@ export default function ParametresPage() {
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-center gap-1">
                             <button onClick={() => openEdit(u)}
-                              className="p-1.5 rounded hover:bg-blue-100 text-gray-400 hover:text-blue-600 transition-colors">
+                              className="p-1.5 rounded hover:bg-green-100 text-gray-400 hover:text-green-700 transition-colors">
                               <Edit2 className="h-4 w-4" />
                             </button>
                             <button onClick={() => setDeleteTarget(u)}
@@ -244,19 +244,19 @@ export default function ParametresPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <h3 className="font-semibold text-gray-800 flex items-center gap-2 mb-3">
-                <Key className="h-4 w-4 text-blue-600" /> Authentification Forte (MFA)
+                <Key className="h-4 w-4 text-green-700" /> Authentification Forte (MFA)
               </h3>
               <p className="text-sm text-gray-500 mb-4">Activez l&apos;authentification à deux facteurs pour renforcer la sécurité des comptes.</p>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-700">MFA activé pour les admins</span>
-                <div className="relative w-11 h-6 rounded-full bg-blue-600 cursor-pointer">
+                <div className="relative w-11 h-6 rounded-full bg-green-700 cursor-pointer">
                   <span className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow translate-x-5 transition-transform" />
                 </div>
               </div>
             </div>
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <h3 className="font-semibold text-gray-800 flex items-center gap-2 mb-3">
-                <FileText className="h-4 w-4 text-blue-600" /> Journal d&apos;Audit
+                <FileText className="h-4 w-4 text-green-700" /> Journal d&apos;Audit
               </h3>
               <p className="text-sm text-gray-500 mb-4">Consultez l&apos;historique des actions effectuées sur la plateforme.</p>
               <div className="space-y-2">
@@ -314,12 +314,12 @@ export default function ParametresPage() {
               { name: 'Registre Commerce', status: 'déconnecté',  type: 'API SOAP',  level: 'low'    },
             ].map(src => {
               const colors = {
-                high:   { icon: 'text-blue-600',  badge: 'bg-blue-100 text-blue-700'   },
-                medium: { icon: 'text-blue-400',  badge: 'bg-blue-50 text-blue-500'    },
+                high:   { icon: 'text-green-700',  badge: 'bg-green-100 text-green-800'   },
+                medium: { icon: 'text-green-400',  badge: 'bg-green-50 text-green-600'    },
                 low:    { icon: 'text-slate-400', badge: 'bg-slate-100 text-slate-500' },
               }[src.level];
               return (
-                <div key={src.name} className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-blue-50 transition-colors">
+                <div key={src.name} className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-green-50 transition-colors">
                   <div className="flex items-center gap-3">
                     <Database className={`h-5 w-5 ${colors.icon}`} />
                     <div>
@@ -349,10 +349,10 @@ export default function ParametresPage() {
               </label>
               <input type="range" min="0" max="1" step="0.05" value={settings.fraud_threshold}
                 onChange={e => setSettings(s => ({ ...s, fraud_threshold: parseFloat(e.target.value) }))}
-                className="w-full accent-blue-600" />
+                className="w-full accent-green-700" />
               <div className="flex justify-between text-xs text-gray-400 mt-1">
                 <span>Sensible (0.0)</span>
-                <span className="font-semibold text-blue-600">{settings.fraud_threshold}</span>
+                <span className="font-semibold text-green-700">{settings.fraud_threshold}</span>
                 <span>Strict (1.0)</span>
               </div>
             </div>
@@ -388,17 +388,17 @@ export default function ParametresPage() {
           </div>
 
           {settingsMsg && (
-            <div className={`rounded-lg px-4 py-3 text-sm ${settingsMsg.includes('succ') ? 'bg-blue-50 border border-blue-200 text-blue-700' : 'bg-red-50 border border-red-200 text-red-600'}`}>
+            <div className={`rounded-lg px-4 py-3 text-sm ${settingsMsg.includes('succ') ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-600'}`}>
               {settingsMsg}
             </div>
           )}
           <div className="flex gap-3">
             <button type="button" onClick={fetchSettings}
-              className="flex items-center gap-2 border border-gray-200 text-gray-700 rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-blue-50 transition-colors">
+              className="flex items-center gap-2 border border-gray-200 text-gray-700 rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-green-50 transition-colors">
               <RefreshCw className="h-4 w-4" /> Réinitialiser
             </button>
             <button type="submit" disabled={settingsSaving}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg px-6 py-2.5 text-sm font-semibold transition-colors">
+              className="flex items-center gap-2 bg-green-700 hover:bg-green-800 disabled:bg-green-400 text-white rounded-lg px-6 py-2.5 text-sm font-semibold transition-colors">
               <Save className="h-4 w-4" /> {settingsSaving ? 'Enregistrement...' : 'Enregistrer'}
             </button>
           </div>
@@ -437,13 +437,13 @@ export default function ParametresPage() {
             <ToggleRow label="Envoi par email" desc="Envoyer les rapports par email aux administrateurs" active={false} onToggle={() => {}} />
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Fréquence des rapports</label>
-              <select className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
                 <option>Quotidien</option><option>Hebdomadaire</option><option>Mensuel</option>
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Format d&apos;export par défaut</label>
-              <select className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
                 <option>PDF</option><option>Excel (XLSX)</option><option>CSV</option>
               </select>
             </div>
@@ -470,19 +470,19 @@ export default function ParametresPage() {
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Nom complet *</label>
                   <input type="text" required value={form.full_name}
                     onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Username *</label>
                   <input type="text" required value={form.username}
                     onChange={e => setForm(f => ({ ...f, username: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Email *</label>
                   <input type="email" required value={form.email}
                     onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600" />
                 </div>
                 <div className="col-span-2">
                   <label className="block text-xs font-semibold text-gray-600 mb-1">
@@ -492,7 +492,7 @@ export default function ParametresPage() {
                     <input type={showPassword ? 'text' : 'password'} required={!editingUser}
                       value={form.password}
                       onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10" />
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 pr-10" />
                     <button type="button" onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -503,7 +503,7 @@ export default function ParametresPage() {
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Rôle *</label>
                   <select required value={form.role}
                     onChange={e => setForm(f => ({ ...f, role: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
                     {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
                   </select>
                 </div>
@@ -511,13 +511,13 @@ export default function ParametresPage() {
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Téléphone</label>
                   <input type="tel" value={form.phone_number}
                     onChange={e => setForm(f => ({ ...f, phone_number: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600" />
                 </div>
                 <div className="col-span-2">
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Département</label>
                   <input type="text" value={form.organization}
                     onChange={e => setForm(f => ({ ...f, organization: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600" />
                 </div>
               </div>
               {formError && (
@@ -529,7 +529,7 @@ export default function ParametresPage() {
                   Annuler
                 </button>
                 <button type="submit" disabled={saving}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg py-2.5 text-sm font-semibold transition-colors">
+                  className="flex-1 bg-green-700 hover:bg-green-800 disabled:bg-green-400 text-white rounded-lg py-2.5 text-sm font-semibold transition-colors">
                   {saving ? 'Enregistrement...' : (editingUser ? 'Modifier' : 'Créer')}
                 </button>
               </div>
@@ -577,7 +577,7 @@ function SaveBtn() {
   return (
     <button
       type="button"
-      className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+      className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
     >
       <Save className="h-4 w-4" /> Enregistrer
     </button>
@@ -594,7 +594,7 @@ function ToggleRow({ label, desc, active, danger = false, onToggle }: {
         <p className="text-xs text-gray-400">{desc}</p>
       </div>
       <div className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ml-4 ${
-        active ? (danger ? 'bg-red-500' : 'bg-blue-600') : 'bg-gray-300'
+        active ? (danger ? 'bg-red-500' : 'bg-green-700') : 'bg-gray-300'
       }`}>
         <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${active ? 'translate-x-5' : ''}`} />
       </div>

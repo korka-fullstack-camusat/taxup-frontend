@@ -91,7 +91,7 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
   <Styles>
     <Style ss:ID="header">
       <Font ss:Bold="1" ss:Color="#FFFFFF" ss:Size="10"/>
-      <Interior ss:Color="#1E40AF" ss:Pattern="Solid"/>
+      <Interior ss:Color="#00853F" ss:Pattern="Solid"/>
       <Alignment ss:Horizontal="Center"/>
     </Style>
     <Style ss:ID="cell">
@@ -140,20 +140,20 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; font-size: 9pt; color: #1e293b; }
     .page-header {
-      background: #1e40af; color: #fff; padding: 10px 16px;
+      background: #00853F; color: #fff; padding: 10px 16px;
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 14px;
     }
     .page-header h1 { font-size: 13pt; font-weight: bold; }
-    .page-header .sub { font-size: 8pt; color: #c7d2fe; margin-top: 2px; }
-    .page-header .date { font-size: 8pt; color: #c7d2fe; text-align: right; }
+    .page-header .sub { font-size: 8pt; color: #86efac; margin-top: 2px; }
+    .page-header .date { font-size: 8pt; color: #86efac; text-align: right; }
     table { width: 100%; border-collapse: collapse; }
-    thead tr { background: #1e40af; color: #fff; }
+    thead tr { background: #00853F; color: #fff; }
     thead th {
       padding: 6px 8px; font-size: 8pt; font-weight: bold;
-      text-align: left; border: 1px solid #1e3a8a;
+      text-align: left; border: 1px solid #005f2e;
     }
-    tbody tr:nth-child(even) { background: #eff6ff; }
+    tbody tr:nth-child(even) { background: #f0fdf4; }
     tbody td {
       padding: 5px 8px; font-size: 8pt; border: 1px solid #e2e8f0;
       vertical-align: top; word-break: break-word;
@@ -203,10 +203,10 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-blue-50 border-b border-blue-100">
+        <div className="flex items-center justify-between px-6 py-4 bg-green-50 border-b border-green-100">
           <div className="flex items-center gap-2">
-            <Download className="h-5 w-5 text-blue-600" />
-            <h2 className="text-base font-bold text-blue-800">Exporter les données</h2>
+            <Download className="h-5 w-5 text-green-700" />
+            <h2 className="text-base font-bold text-green-900">Exporter les données</h2>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <X className="h-5 w-5" />
@@ -267,7 +267,7 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Colonnes à inclure</p>
               <button
                 onClick={toggleAll}
-                className="text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                className="text-xs text-green-700 hover:text-green-900 font-medium transition-colors"
               >
                 {selected.size === fields.length ? 'Tout désélectionner' : 'Tout sélectionner'}
               </button>
@@ -281,12 +281,12 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
                     onClick={() => toggleField(f.key)}
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all text-left ${
                       isSelected
-                        ? 'border-blue-400 bg-blue-50 text-blue-700'
+                        ? 'border-green-400 bg-green-50 text-green-800'
                         : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
                     }`}
                   >
                     {isSelected
-                      ? <CheckSquare className="h-4 w-4 flex-shrink-0 text-blue-500" />
+                      ? <CheckSquare className="h-4 w-4 flex-shrink-0 text-green-600" />
                       : <Square className="h-4 w-4 flex-shrink-0 text-gray-300" />
                     }
                     <span className="truncate">{f.label}</span>

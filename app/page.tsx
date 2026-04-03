@@ -70,7 +70,7 @@ const profiles = [
     icon: Smartphone,
     name: 'Operateur Mobile',
     description: 'Gerez les transactions et assurez la conformite',
-    color: 'from-blue-500 to-blue-600'
+    color: 'from-green-600 to-green-700'
   },
   { 
     icon: Receipt,
@@ -102,7 +102,7 @@ export default function LandingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-blue-600 flex items-center justify-center">
+      <div className="min-h-screen bg-green-700 flex items-center justify-center">
         <div className="h-12 w-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -111,11 +111,11 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 min-h-screen flex flex-col">
+      <section className="relative bg-gradient-to-br from-green-700 via-green-800 to-green-900 min-h-screen flex flex-col">
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/30 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 -left-20 w-60 h-60 bg-blue-400/20 rounded-full blur-3xl" />
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-green-600/30 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 -left-20 w-60 h-60 bg-green-400/20 rounded-full blur-3xl" />
           <div className="absolute bottom-20 right-1/4 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
         </div>
 
@@ -125,20 +125,20 @@ export default function LandingPage() {
             <div className="flex items-center justify-between h-20">
               <div className="flex items-center gap-3">
                 <div className="h-11 w-11 rounded-xl bg-white flex items-center justify-center shadow-lg">
-                  <span className="text-xl font-bold text-blue-600">T</span>
+                  <span className="text-xl font-bold text-green-700">T</span>
                 </div>
                 <span className="text-2xl font-bold text-white">TAXUP</span>
               </div>
               
               <div className="hidden md:flex items-center gap-8">
-                <a href="#fonctionnalites" className="text-sm text-blue-100 hover:text-white transition-colors">Fonctionnalites</a>
-                <a href="#profils" className="text-sm text-blue-100 hover:text-white transition-colors">Profils</a>
-                <a href="#contact" className="text-sm text-blue-100 hover:text-white transition-colors">Contact</a>
+                <a href="#fonctionnalites" className="text-sm text-green-100 hover:text-white transition-colors">Fonctionnalites</a>
+                <a href="#profils" className="text-sm text-green-100 hover:text-white transition-colors">Profils</a>
+                <a href="#contact" className="text-sm text-green-100 hover:text-white transition-colors">Contact</a>
               </div>
               
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 bg-white hover:bg-blue-50 text-blue-600 font-semibold px-6 py-2.5 rounded-full transition-colors shadow-lg"
+                className="inline-flex items-center gap-2 bg-white hover:bg-green-50 text-green-700 font-semibold px-6 py-2.5 rounded-full transition-colors shadow-lg"
               >
                 Connexion
                 <ArrowRight className="h-4 w-4" />
@@ -160,26 +160,26 @@ export default function LandingPage() {
                 
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
                   Audit fiscal des transactions{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-200 to-white">
                     Mobile Money
                   </span>
                 </h1>
                 
-                <p className="text-lg text-blue-100 mb-8 max-w-xl leading-relaxed">
+                <p className="text-lg text-green-100 mb-8 max-w-xl leading-relaxed">
                   Surveillez, auditez et securisez les transactions financieres electroniques au Senegal avec une plateforme moderne et fiable.
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-4 mb-12">
                   <Link
                     href="/login"
-                    className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 font-semibold px-8 py-4 rounded-full hover:bg-blue-50 transition-colors shadow-xl"
+                    className="inline-flex items-center justify-center gap-2 bg-white text-green-700 font-semibold px-8 py-4 rounded-full hover:bg-green-50 transition-colors shadow-xl"
                   >
                     Acceder a la plateforme
                     <ArrowRight className="h-5 w-5" />
                   </Link>
                   <Link
                     href="/register"
-                    className="inline-flex items-center justify-center gap-2 bg-blue-500/30 backdrop-blur-sm text-white font-semibold px-8 py-4 rounded-full hover:bg-blue-500/40 transition-colors border border-white/20"
+                    className="inline-flex items-center justify-center gap-2 bg-green-600/30 backdrop-blur-sm text-white font-semibold px-8 py-4 rounded-full hover:bg-green-600/40 transition-colors border border-white/20"
                   >
                     Creer un compte
                   </Link>
@@ -188,7 +188,7 @@ export default function LandingPage() {
                 {/* Trust indicators */}
                 <div className="flex flex-wrap items-center gap-6">
                   {['Orange Money', 'Wave', 'Free Money'].map((name) => (
-                    <div key={name} className="text-blue-200/80 text-sm font-medium">
+                    <div key={name} className="text-green-200/80 text-sm font-medium">
                       {name}
                     </div>
                   ))}
@@ -203,7 +203,7 @@ export default function LandingPage() {
                     className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-colors"
                   >
                     <div className="text-3xl sm:text-4xl font-bold text-white mb-1">{value}</div>
-                    <div className="text-sm text-blue-200">{label}</div>
+                    <div className="text-sm text-green-200">{label}</div>
                   </div>
                 ))}
               </div>
@@ -214,9 +214,9 @@ export default function LandingPage() {
         {/* Scroll indicator */}
         <div className="relative z-10 pb-8 flex justify-center">
           <div className="flex flex-col items-center gap-2">
-            <span className="text-xs text-blue-200">Defiler</span>
-            <div className="w-6 h-10 rounded-full border-2 border-blue-200/50 flex justify-center pt-2">
-              <div className="w-1.5 h-3 bg-blue-200 rounded-full" />
+            <span className="text-xs text-green-200">Defiler</span>
+            <div className="w-6 h-10 rounded-full border-2 border-green-200/50 flex justify-center pt-2">
+              <div className="w-1.5 h-3 bg-green-200 rounded-full" />
             </div>
           </div>
         </div>
@@ -226,7 +226,7 @@ export default function LandingPage() {
       <section id="fonctionnalites" className="py-24 px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="inline-flex items-center gap-2 bg-blue-100 text-blue-600 rounded-full px-4 py-2 text-sm font-medium mb-4">
+            <span className="inline-flex items-center gap-2 bg-green-100 text-green-700 rounded-full px-4 py-2 text-sm font-medium mb-4">
               <Zap className="h-4 w-4" />
               Fonctionnalites
             </span>
@@ -242,9 +242,9 @@ export default function LandingPage() {
             {features.map(({ icon: Icon, title, description }) => (
               <div
                 key={title}
-                className="group bg-white rounded-2xl p-8 border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all"
+                className="group bg-white rounded-2xl p-8 border border-gray-100 hover:border-green-200 hover:shadow-xl transition-all"
               >
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-6 shadow-lg">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-600 to-green-700 flex items-center justify-center mb-6 shadow-lg">
                   <Icon className="h-7 w-7 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{title}</h3>
@@ -259,7 +259,7 @@ export default function LandingPage() {
       <section id="profils" className="py-24 px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="inline-flex items-center gap-2 bg-blue-100 text-blue-600 rounded-full px-4 py-2 text-sm font-medium mb-4">
+            <span className="inline-flex items-center gap-2 bg-green-100 text-green-700 rounded-full px-4 py-2 text-sm font-medium mb-4">
               <Users className="h-4 w-4" />
               Profils
             </span>
@@ -289,30 +289,30 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section id="contact" className="py-24 px-6 lg:px-8 bg-gradient-to-br from-blue-600 to-blue-800 relative overflow-hidden">
+      <section id="contact" className="py-24 px-6 lg:px-8 bg-gradient-to-br from-green-700 to-green-900 relative overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-64 h-64 bg-blue-500/30 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-blue-400/20 rounded-full blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-64 h-64 bg-green-600/30 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-green-400/20 rounded-full blur-3xl" />
         </div>
         
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
             Pret a moderniser la fiscalite de votre organisation ?
           </h2>
-          <p className="text-lg text-blue-100 mb-10 max-w-2xl mx-auto">
+          <p className="text-lg text-green-100 mb-10 max-w-2xl mx-auto">
             Rejoignez la plateforme nationale de surveillance des transactions Mobile Money.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/login"
-              className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 font-semibold px-8 py-4 rounded-full hover:bg-blue-50 transition-colors shadow-xl"
+              className="inline-flex items-center justify-center gap-2 bg-white text-green-700 font-semibold px-8 py-4 rounded-full hover:bg-green-50 transition-colors shadow-xl"
             >
               Commencer maintenant
               <ArrowRight className="h-5 w-5" />
             </Link>
             <Link
               href="/register"
-              className="inline-flex items-center justify-center gap-2 bg-blue-500/30 backdrop-blur-sm text-white font-semibold px-8 py-4 rounded-full hover:bg-blue-500/40 transition-colors border border-white/20"
+              className="inline-flex items-center justify-center gap-2 bg-green-600/30 backdrop-blur-sm text-white font-semibold px-8 py-4 rounded-full hover:bg-green-600/40 transition-colors border border-white/20"
             >
               Creer un compte
             </Link>
@@ -325,7 +325,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-xl bg-green-700 flex items-center justify-center">
                 <span className="text-lg font-bold text-white">T</span>
               </div>
               <div>

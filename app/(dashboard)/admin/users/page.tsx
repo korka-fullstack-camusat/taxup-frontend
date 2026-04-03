@@ -44,7 +44,7 @@ const ROLES = [
 ];
 
 const roleColors: Record<string, string> = {
-  CITOYEN: 'bg-blue-100 text-blue-700',
+  CITOYEN: 'bg-green-100 text-green-800',
   OPERATEUR_MOBILE: 'bg-purple-100 text-purple-700',
   AUDITEUR_FISCAL: 'bg-amber-100 text-amber-700',
   AGENT_DGID: 'bg-sky-100 text-sky-700',
@@ -61,8 +61,8 @@ const emptyForm: UserForm = {
   organization: '',
 };
 
-const INPUT = 'w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500';
-const SELECT = 'w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500';
+const INPUT = 'w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-green-600';
+const SELECT = 'w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-600';
 
 type ManageAction = 'deactivate_confirm' | 'delete_confirm' | null;
 
@@ -243,7 +243,7 @@ export default function AdminUsersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <Users className="h-6 w-6 text-blue-600" />
+            <Users className="h-6 w-6 text-green-700" />
             Gestion des utilisateurs
           </h1>
           <p className="text-gray-500 text-sm mt-1">{total} utilisateur{total !== 1 ? 's' : ''} au total</p>
@@ -259,7 +259,7 @@ export default function AdminUsersPage() {
           </button>
           <button
             onClick={openCreate}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+            className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
           >
             <Plus className="h-4 w-4" />
             Nouvel utilisateur
@@ -294,7 +294,7 @@ export default function AdminUsersPage() {
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center h-48">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-700" />
           </div>
         ) : users.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-48 text-gray-400">
@@ -304,28 +304,28 @@ export default function AdminUsersPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-blue-50 border-b border-blue-100">
+              <thead className="bg-green-50 border-b border-green-100">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Utilisateur</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Email</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Rôle</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Statut</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Organisation</th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold text-blue-700 uppercase tracking-wider">Actions</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-green-800 uppercase tracking-wider">Utilisateur</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-green-800 uppercase tracking-wider">Email</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-green-800 uppercase tracking-wider">Rôle</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-green-800 uppercase tracking-wider">Statut</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-green-800 uppercase tracking-wider">Organisation</th>
+                  <th className="px-4 py-3 text-center text-xs font-semibold text-green-800 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {users.map((u) => (
                   <tr
                     key={u.id}
-                    className="hover:bg-blue-50/40 transition-colors cursor-pointer"
+                    className="hover:bg-green-50/40 transition-colors cursor-pointer"
                     onClick={() => setViewTarget(u)}
                   >
 
                     {/* Utilisateur */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${u.is_active ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-400'}`}>
+                        <div className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${u.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'}`}>
                           {u.full_name?.[0]?.toUpperCase() || 'U'}
                         </div>
                         <div>
@@ -356,7 +356,7 @@ export default function AdminUsersPage() {
                     <td className="px-4 py-3 text-center" onClick={e => e.stopPropagation()}>
                       <button
                         onClick={() => openManage(u)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-700 hover:bg-green-800 text-white text-xs font-semibold rounded-lg transition-colors"
                       >
                         <Settings2 className="h-3.5 w-3.5" />
                         Gérer
@@ -381,9 +381,9 @@ export default function AdminUsersPage() {
       {viewTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-5">
+            <div className="bg-gradient-to-r from-green-700 to-green-800 px-6 py-5">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-blue-200 text-xs font-semibold uppercase tracking-wider">Détails du compte</span>
+                <span className="text-green-200 text-xs font-semibold uppercase tracking-wider">Détails du compte</span>
                 <button onClick={() => setViewTarget(null)} className="text-white/70 hover:text-white transition-colors">
                   <X className="h-5 w-5" />
                 </button>
@@ -394,7 +394,7 @@ export default function AdminUsersPage() {
                 </div>
                 <div>
                   <p className="font-bold text-white text-lg leading-tight">{viewTarget.full_name}</p>
-                  <p className="text-blue-200 text-sm">@{viewTarget.username}</p>
+                  <p className="text-green-200 text-sm">@{viewTarget.username}</p>
                 </div>
                 <div className="ml-auto flex flex-col items-end gap-1.5">
                   <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${viewTarget.is_active ? 'bg-green-400/20 text-green-100' : 'bg-red-400/20 text-red-200'}`}>
@@ -408,20 +408,20 @@ export default function AdminUsersPage() {
             </div>
             <div className="px-6 py-5 space-y-3">
               <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                <Mail className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <Mail className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
                 <div><p className="text-xs text-gray-400 font-medium">Adresse email</p><p className="text-sm text-gray-800 font-medium">{viewTarget.email}</p></div>
               </div>
               <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                <Phone className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <Phone className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
                 <div><p className="text-xs text-gray-400 font-medium">Téléphone</p><p className="text-sm text-gray-800 font-medium">{viewTarget.phone_number || '—'}</p></div>
               </div>
               <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                <Building2 className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <Building2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
                 <div><p className="text-xs text-gray-400 font-medium">Organisation</p><p className="text-sm text-gray-800 font-medium">{viewTarget.organization || '—'}</p></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                  <ShieldCheck className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                  <ShieldCheck className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-xs text-gray-400 font-medium">Rôle</p>
                     <span className={`mt-1 inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${roleColors[viewTarget.role] || 'bg-gray-100 text-gray-700'}`}>
@@ -430,7 +430,7 @@ export default function AdminUsersPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                  <Calendar className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                  <Calendar className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-xs text-gray-400 font-medium">Créé le</p>
                     <p className="text-sm text-gray-800 font-medium">
@@ -440,7 +440,7 @@ export default function AdminUsersPage() {
                 </div>
               </div>
               <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                <KeyRound className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <KeyRound className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
                 <div><p className="text-xs text-gray-400 font-medium">Identifiant (ID)</p><p className="text-xs text-gray-500 font-mono break-all">{viewTarget.id}</p></div>
               </div>
               <button onClick={() => setViewTarget(null)} className="w-full border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-xl py-2.5 text-sm font-medium transition-colors">
@@ -460,7 +460,7 @@ export default function AdminUsersPage() {
 
             {/* ── En-tête minimaliste ── */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <h2 className="text-sm font-semibold text-gray-700">Actions — <span className="text-blue-600">{manageTarget.full_name}</span></h2>
+              <h2 className="text-sm font-semibold text-gray-700">Actions — <span className="text-green-700">{manageTarget.full_name}</span></h2>
               <button onClick={closeManage} className="text-gray-400 hover:text-gray-600 transition-colors">
                 <X className="h-4 w-4" />
               </button>
@@ -631,8 +631,8 @@ export default function AdminUsersPage() {
       {showFormModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-blue-50">
-              <h2 className="text-lg font-bold text-blue-800">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-green-50">
+              <h2 className="text-lg font-bold text-green-900">
                 {editingUser ? 'Modifier l\'utilisateur' : 'Nouvel utilisateur'}
               </h2>
               <button onClick={() => setShowFormModal(false)} className="text-gray-400 hover:text-gray-600">
@@ -702,7 +702,7 @@ export default function AdminUsersPage() {
               )}
 
               {!editingUser && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-xs text-blue-700">
+                <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-xs text-green-800">
                   Un email avec les identifiants de connexion sera envoyé automatiquement.
                 </div>
               )}
@@ -713,7 +713,7 @@ export default function AdminUsersPage() {
                   Annuler
                 </button>
                 <button type="submit" disabled={saving}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg py-2.5 text-sm font-semibold transition-colors">
+                  className="flex-1 bg-green-700 hover:bg-green-800 disabled:bg-green-400 text-white rounded-lg py-2.5 text-sm font-semibold transition-colors">
                   {saving ? 'Enregistrement...' : (editingUser ? 'Modifier' : 'Créer')}
                 </button>
               </div>
