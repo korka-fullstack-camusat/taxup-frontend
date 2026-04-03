@@ -43,14 +43,8 @@ export default function LoginPage() {
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="h-12 w-12 rounded-xl overflow-hidden border border-white/20 shadow-lg flex-shrink-0 flex">
-              <div className="flex-1 bg-[#00853F] flex items-center justify-center">
-                <span className="text-sm font-black text-white">T</span>
-              </div>
-              <div className="flex-1 bg-[#FDEF42] flex items-center justify-center">
-                <span className="text-[10px] text-[#00853F] font-bold">★</span>
-              </div>
-              <div className="flex-1 bg-[#E31B23]" />
+            <div className="h-12 w-12 rounded-xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center p-2 group-hover:bg-white/20 transition-colors">
+              <img src="/taxup-logo.svg" alt="TAXUP" className="h-full w-full" />
             </div>
             <div>
               <span className="text-2xl font-bold text-white">TAXUP</span>
@@ -105,14 +99,8 @@ export default function LoginPage() {
         {/* Mobile header */}
         <div className="lg:hidden bg-gradient-to-br from-green-700 to-green-900 px-4 py-6">
           <Link href="/" className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl overflow-hidden border border-white/20 shadow-lg flex-shrink-0 flex">
-              <div className="flex-1 bg-[#00853F] flex items-center justify-center">
-                <span className="text-xs font-black text-white">T</span>
-              </div>
-              <div className="flex-1 bg-[#FDEF42] flex items-center justify-center">
-                <span className="text-[8px] text-[#00853F] font-bold">★</span>
-              </div>
-              <div className="flex-1 bg-[#E31B23]" />
+            <div className="h-10 w-10 rounded-xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center p-1.5">
+              <img src="/taxup-logo.svg" alt="TAXUP" className="h-full w-full" />
             </div>
             <div>
               <span className="text-xl font-bold text-white">TAXUP</span>

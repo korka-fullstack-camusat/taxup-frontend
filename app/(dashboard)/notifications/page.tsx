@@ -61,6 +61,19 @@ export default function NotificationsPage() {
   return (
     <div className="flex-1 flex flex-col">
       <main className="flex-1 p-6 space-y-4">
+        {/* Page Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-green-50 p-2.5 rounded-xl">
+              <Bell className="h-6 w-6 text-green-700" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">Notifications</h1>
+              <p className="text-gray-500 text-sm mt-0.5">Vos alertes et messages recents</p>
+            </div>
+          </div>
+        </div>
+
         {/* Toolbar */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-wrap gap-3 items-center justify-between">
           <label className="flex items-center gap-2 cursor-pointer">

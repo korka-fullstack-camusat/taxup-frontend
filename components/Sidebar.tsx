@@ -96,14 +96,8 @@ export default function Sidebar() {
     <aside className="fixed left-0 top-0 h-screen w-64 bg-gradient-to-b from-slate-900 to-slate-800 text-white flex flex-col z-20 shadow-xl">
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-5 border-b border-slate-700/50">
-        <div className="h-10 w-10 rounded-xl overflow-hidden shadow-lg flex-shrink-0 flex">
-          <div className="flex-1 bg-[#00853F] flex items-center justify-center">
-            <span className="text-xs font-black text-white">T</span>
-          </div>
-          <div className="flex-1 bg-[#FDEF42] flex items-center justify-center">
-            <span className="text-[9px] text-[#00853F] font-bold">★</span>
-          </div>
-          <div className="flex-1 bg-[#E31B23]" />
+        <div className="h-10 w-10 rounded-xl overflow-hidden shadow-lg flex-shrink-0 bg-white/10 flex items-center justify-center p-1.5">
+          <img src="/taxup-logo.svg" alt="TAXUP" className="h-full w-full" />
         </div>
         <div>
           <h1 className="text-lg font-bold tracking-wide text-white">TAXUP</h1>

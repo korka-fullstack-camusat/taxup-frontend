@@ -59,6 +59,19 @@ export default function FraudPage() {
   return (
     <div className="flex-1 flex flex-col">
       <main className="flex-1 p-6 space-y-4">
+        {/* Page Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-red-50 p-2.5 rounded-xl">
+              <Shield className="h-6 w-6 text-red-600" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">Detection de Fraude</h1>
+              <p className="text-gray-500 text-sm mt-0.5">Alertes et analyse des risques fiscaux</p>
+            </div>
+          </div>
+        </div>
+
         {/* Filters */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-wrap gap-3 items-center">
           <Filter className="h-4 w-4 text-gray-400" />
