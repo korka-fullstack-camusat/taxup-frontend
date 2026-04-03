@@ -95,7 +95,7 @@ export default function LoginPage() {
       </div>
       
       {/* Right Panel - Login Form */}
-      <div className="flex-1 flex flex-col bg-gray-50">
+      <div className="flex-1 flex flex-col bg-gray-50 dark:bg-slate-950 transition-colors">
         {/* Mobile header */}
         <div className="lg:hidden bg-gradient-to-br from-green-700 to-green-900 px-4 py-6">
           <Link href="/" className="flex items-center gap-3">
@@ -121,23 +121,23 @@ export default function LoginPage() {
             {/* Back link - desktop */}
             <Link 
               href="/"
-              className="hidden lg:inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 text-sm mb-8 transition-colors"
+              className="hidden lg:inline-flex items-center gap-2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 text-sm mb-8 transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               Retour a l&apos;accueil
             </Link>
             
             {/* Card */}
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700/60 p-8">
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Connexion</h2>
-                <p className="text-gray-500">Connectez-vous a votre compte TAXUP</p>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Connexion</h2>
+                <p className="text-gray-500 dark:text-slate-400">Connectez-vous a votre compte TAXUP</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Identifier field */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     Email ou nom d&apos;utilisateur
                   </label>
                   <div className="relative">
@@ -148,7 +148,7 @@ export default function LoginPage() {
                       type="text"
                       value={identifier}
                       onChange={(e) => setIdentifier(e.target.value)}
-                      className="w-full border border-gray-200 rounded-xl pl-12 pr-4 py-3.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition bg-gray-50 hover:bg-white focus:bg-white"
+                      className="w-full border border-gray-200 rounded-xl pl-12 pr-4 py-3.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition bg-gray-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 focus:bg-white dark:focus:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-500"
                       placeholder="email@exemple.com ou username"
                       autoComplete="username"
                       required
@@ -173,7 +173,7 @@ export default function LoginPage() {
 
                 {/* Password field */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     Mot de passe
                   </label>
                   <div className="relative">
@@ -189,7 +189,7 @@ export default function LoginPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition-colors"
                     >
                       {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
@@ -225,27 +225,27 @@ export default function LoginPage() {
             </div>
 
             {/* Help section */}
-            <div className="mt-6 bg-green-50 rounded-2xl p-5 border border-green-100">
-              <p className="text-sm font-semibold text-green-900 mb-3">Comment se connecter ?</p>
+            <div className="mt-6 bg-green-50 dark:bg-green-900/20 rounded-2xl p-5 border border-green-100 dark:border-green-800/30">
+              <p className="text-sm font-semibold text-green-900 dark:text-green-300 mb-3">Comment se connecter ?</p>
               <div className="space-y-2">
                 <div className="flex items-start gap-3 text-sm">
                   <div className="h-6 w-6 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
                     <AtSign className="h-3.5 w-3.5 text-green-700" />
                   </div>
-                  <span className="text-gray-600">
-                    Avec votre <span className="font-medium text-gray-900">adresse email</span>
+                  <span className="text-gray-600 dark:text-slate-400">
+                    Avec votre <span className="font-medium text-gray-900 dark:text-white">adresse email</span>
                   </span>
                 </div>
                 <div className="flex items-start gap-3 text-sm">
                   <div className="h-6 w-6 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
                     <User className="h-3.5 w-3.5 text-green-700" />
                   </div>
-                  <span className="text-gray-600">
-                    Ou votre <span className="font-medium text-gray-900">nom d&apos;utilisateur</span>
+                  <span className="text-gray-600 dark:text-slate-400">
+                    Ou votre <span className="font-medium text-gray-900 dark:text-white">nom d&apos;utilisateur</span>
                   </span>
                 </div>
               </div>
-              <p className="text-xs text-gray-500 mt-4 pt-3 border-t border-green-100">
+              <p className="text-xs text-gray-500 dark:text-slate-500 mt-4 pt-3 border-t border-green-100 dark:border-green-800/30">
                 Acces reserve aux utilisateurs autorises. Contactez votre administrateur pour obtenir un compte.
               </p>
             </div>
