@@ -1,4 +1,4 @@
-import axios, { type InternalAxiosRequestConfig } from 'axios';
+import axios from 'axios';
 import { getMockResponse } from './mockData';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -9,13 +9,13 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// ─── Mock adapter (dev/demo mode) ────────────────────────────────────────────
+// ─── Mock interceptor (dev/demo mode) ─────────────────────────────────────────
+// Injects a per-request adapter for mocked endpoints so the global adapter
+// (which may be an array in axios v1.x) is never replaced.
+// Auth endpoints (/auth/*) always fall through to the real network.
 if (USE_MOCK) {
-  const defaultAdapter = api.defaults.adapter as (config: InternalAxiosRequestConfig) => Promise<unknown>;
-
-  api.defaults.adapter = async (config: InternalAxiosRequestConfig) => {
+  api.interceptors.request.use((config) => {
     const url = config.url || '';
-    // Collect params from both config.params object and the query string in the URL
     const urlParams: Record<string, string> = {};
     const qIdx = url.indexOf('?');
     if (qIdx !== -1) {
@@ -31,19 +31,19 @@ if (USE_MOCK) {
     const mockData = getMockResponse(cleanUrl, urlParams);
 
     if (mockData !== null) {
-      return {
+      // Override the adapter for this single request only
+      config.adapter = async () => ({
         data: mockData,
         status: 200,
         statusText: 'OK',
         headers: { 'content-type': 'application/json' },
         config,
         request: {},
-      };
+      });
     }
 
-    // Fall through to real network for auth endpoints and anything not mocked
-    return defaultAdapter(config);
-  };
+    return config;
+  });
 }
 
 // ─── Auth token injection ─────────────────────────────────────────────────────
