@@ -22,7 +22,7 @@ export default function Header() {
       <div className="flex items-center gap-4">
         <h1 className="text-lg font-bold text-gray-800">Taxup - Tableau de Bord Fiscal</h1>
         <span className="px-2.5 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full">En ligne</span>
-        <span className="text-sm text-gray-400">Derni\u00e8re mise \u00e0 jour: {currentTime}</span>
+        <span className="text-sm text-gray-400">Dernière mise à jour: {currentTime}</span>
       </div>
       <div className="flex items-center gap-4">
         <div className="relative hidden lg:block">

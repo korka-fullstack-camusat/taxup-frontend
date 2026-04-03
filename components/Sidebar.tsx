@@ -72,7 +72,7 @@ const navConfig: Record<string, { href: string; label: string; icon: React.Eleme
 
 const roleLabel: Record<string, string> = {
   CITOYEN: 'Citoyen',
-  OPERATEUR_MOBILE: 'Op\u00e9rateur Mobile',
+  OPERATEUR_MOBILE: 'Opérateur Mobile',
   AUDITEUR_FISCAL: 'Auditeur Fiscal',
   AGENT_DGID: 'Agent DGID',
   ADMIN: 'Administrateur',

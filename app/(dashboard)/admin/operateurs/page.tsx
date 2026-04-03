@@ -56,9 +56,9 @@ export default function OperateursPage() {
   useEffect(() => { fetchOperators(); }, [fetchOperators]);
 
   const handleExport = (format: 'csv' | 'excel' | 'pdf') => {
-    if (format === 'pdf') { exportPDF('Gestion des Op\u00e9rateurs'); return; }
+    if (format === 'pdf') { exportPDF('Gestion des Opérateurs'); return; }
     const cols = [
-      { key: 'full_name', label: 'Op\u00e9rateur' },
+      { key: 'full_name', label: 'Opérateur' },
       { key: 'email', label: 'Email' },
       { key: 'organization', label: 'Organisation' },
       { key: 'tx_count', label: 'Volume Transactions' },
@@ -78,15 +78,15 @@ export default function OperateursPage() {
     <div className="p-6 space-y-6" data-export>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Gestion des Op\u00e9rateurs</h1>
-          <p className="text-gray-500 text-sm mt-1">{totalOps} op\u00e9rateur{totalOps !== 1 ? 's' : ''} enregistr\u00e9{totalOps !== 1 ? 's' : ''}</p>
+          <h1 className="text-2xl font-bold text-gray-800">Gestion des Opérateurs</h1>
+          <p className="text-gray-500 text-sm mt-1">{totalOps} opérateur{totalOps !== 1 ? 's' : ''} enregistré{totalOps !== 1 ? 's' : ''}</p>
         </div>
         <ExportMenu onExport={handleExport} />
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={Building2} bg="bg-blue-50" color="text-blue-600" label="Total Op\u00e9rateurs" value={totalOps.toString()} />
+        <StatCard icon={Building2} bg="bg-blue-50" color="text-blue-600" label="Total Opérateurs" value={totalOps.toString()} />
         <StatCard icon={TrendingUp} bg="bg-green-50" color="text-green-600" label="Volume Total" value={formatXOF(totalVolume)} />
         <StatCard icon={DollarSign} bg="bg-yellow-50" color="text-yellow-600" label="Valeur Totale" value={formatXOF(totalValue)} />
         <StatCard icon={Globe} bg="bg-purple-50" color="text-purple-600" label="Actifs" value={operators.filter(o => o.is_active).length.toString()} />
@@ -101,18 +101,18 @@ export default function OperateursPage() {
         ) : operators.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-48 text-gray-400">
             <Building2 className="h-10 w-10 mb-2" />
-            <p>Aucun op\u00e9rateur trouv\u00e9</p>
+            <p>Aucun opérateur trouvé</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-100">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Op\u00e9rateur</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Opérateur</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Secteur</th>
                   <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Volume Trans.</th>
                   <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Valeur</th>
-                  <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">\u00c9volution</th>
+                  <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Évolution</th>
                   <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Statut</th>
                 </tr>
               </thead>

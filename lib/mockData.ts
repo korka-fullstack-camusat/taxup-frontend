@@ -108,15 +108,26 @@ const AUDIT_TITLES = [
   'Analyse schémas de fraude détectés',
 ];
 
-export const MOCK_AUDITS = Array.from({ length: 20 }, (_, i) => ({
-  id: uid('au', i + 1),
-  title: AUDIT_TITLES[i % AUDIT_TITLES.length],
-  status: pick(AUDIT_STATUSES),
-  priority: pick(AUDIT_PRIORITIES),
-  created_at: daysAgo(ri(5, 120)),
-  operator_name: pick(['Orange Sénégal', 'Free Sénégal', 'Expresso', 'Wave', 'Wari', undefined]),
-  findings_count: ri(0, 15),
-}));
+export const MOCK_AUDITS = Array.from({ length: 20 }, (_, i) => {
+  const createdAt = daysAgo(ri(5, 120));
+  return {
+    id: uid('au', i + 1),
+    title: AUDIT_TITLES[i % AUDIT_TITLES.length],
+    description: pick([
+      'Vérification de la conformité des déclarations TVA sur les transactions mobile money.',
+      'Analyse des flux financiers suspects détectés par le système de fraude.',
+      'Contrôle des revenus déclarés par rapport aux transactions enregistrées.',
+      'Audit des remboursements TVA demandés par les opérateurs mobiles.',
+      undefined,
+    ]),
+    status: pick(AUDIT_STATUSES),
+    priority: pick(AUDIT_PRIORITIES),
+    created_at: createdAt,
+    updated_at: daysAgo(ri(0, 5)),
+    operator_name: pick(['Orange Sénégal', 'Free Sénégal', 'Expresso', 'Wave', 'Wari', undefined]),
+    findings_count: ri(0, 15),
+  };
+});
 
 // ─── Fiscal Receipts (30 items) ───────────────────────────────────────────────
 
@@ -124,14 +135,18 @@ const FISCAL_PERIODS = ['2026-01', '2026-02', '2026-03', '2025-12', '2025-11', '
 
 export const MOCK_RECEIPTS = Array.from({ length: 30 }, (_, i) => {
   const totalAmount = pick([50000, 75000, 100000, 150000, 200000, 350000, 500000]) + ri(0, 9999);
-  const taxAmount = Math.round(totalAmount * 0.18);
+  const taxRate = 0.18;
+  const taxAmount = Math.round(totalAmount * taxRate);
   return {
     id: uid('rc', i + 1),
     receipt_number: `RC-2026-${String(i + 1001).padStart(6, '0')}`,
+    transaction_id: uid('tx', ri(1, 80)),
     total_amount: totalAmount,
     tax_amount: taxAmount,
+    tax_rate: taxRate,
     fiscal_period: pick(FISCAL_PERIODS),
     issued_at: daysAgo(ri(0, 90)),
+    is_cancelled: i % 15 === 0, // ~7% annulés
   };
 });
 

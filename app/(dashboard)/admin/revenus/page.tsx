@@ -59,9 +59,9 @@ export default function AnalyseRevenusPage() {
   const handleExport = (format: 'csv' | 'excel' | 'pdf') => {
     if (format === 'pdf') { exportPDF('Analyse des Revenus'); return; }
     const cols = [
-      { key: 'period', label: 'P\u00e9riode' },
-      { key: 'receipt_count', label: 'Nombre de re\u00e7us' },
-      { key: 'total_tax_xof', label: 'TVA Collect\u00e9e (XOF)' },
+      { key: 'period', label: 'Période' },
+      { key: 'receipt_count', label: 'Nombre de reçus' },
+      { key: 'total_tax_xof', label: 'TVA Collectée (XOF)' },
       { key: 'total_volume_xof', label: 'Volume Total (XOF)' },
     ];
     const fn = format === 'csv' ? exportCSV : exportExcel;
@@ -75,7 +75,7 @@ export default function AnalyseRevenusPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Analyse des Revenus</h1>
-          <p className="text-gray-500 text-sm mt-1">Synth\u00e8se des revenus fiscaux par p\u00e9riode</p>
+          <p className="text-gray-500 text-sm mt-1">Synthèse des revenus fiscaux par période</p>
         </div>
         <ExportMenu onExport={handleExport} />
       </div>
@@ -89,27 +89,27 @@ export default function AnalyseRevenusPage() {
           {/* KPIs */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard label="TVA ce mois" value={formatXOF(overview.month_tax)} color="text-blue-600" />
-            <StatCard label="TVA cumul\u00e9e" value={formatXOF(overview.total_tax)} color="text-green-600" />
+            <StatCard label="TVA cumulée" value={formatXOF(overview.total_tax)} color="text-green-600" />
             <StatCard label="Volume total" value={formatXOF(overview.total_volume)} color="text-purple-600" />
-            <StatCard label="Total re\u00e7us" value={overview.total_receipts.toLocaleString('fr-FR')} color="text-orange-600" />
+            <StatCard label="Total reçus" value={overview.total_receipts.toLocaleString('fr-FR')} color="text-orange-600" />
           </div>
 
           {/* Table */}
           <div className="bg-white rounded-xl border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-2">
               <Calendar className="h-4 w-4 text-blue-600" />
-              <h2 className="font-semibold text-gray-800">D\u00e9tail par p\u00e9riode fiscale</h2>
+              <h2 className="font-semibold text-gray-800">Détail par période fiscale</h2>
             </div>
             {reports.length === 0 ? (
-              <div className="flex items-center justify-center h-32 text-gray-400 text-sm">Aucune donn\u00e9e</div>
+              <div className="flex items-center justify-center h-32 text-gray-400 text-sm">Aucune donnée</div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50 border-b border-gray-100">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">P\u00e9riode</th>
-                      <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Re\u00e7us</th>
-                      <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">TVA Collect\u00e9e</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Période</th>
+                      <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Reçus</th>
+                      <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">TVA Collectée</th>
                       <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Volume Total</th>
                       <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Taux Effectif</th>
                     </tr>

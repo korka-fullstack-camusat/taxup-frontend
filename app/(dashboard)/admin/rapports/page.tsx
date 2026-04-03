@@ -62,8 +62,8 @@ export default function RapportsPage() {
   const handleExportFiscal = (format: 'csv' | 'excel' | 'pdf') => {
     if (format === 'pdf') { exportPDF('Rapports Fiscaux'); return; }
     const cols = [
-      { key: 'period', label: 'P\u00e9riode' },
-      { key: 'receipt_count', label: 'Re\u00e7us' },
+      { key: 'period', label: 'Période' },
+      { key: 'receipt_count', label: 'Reçus' },
       { key: 'total_tax_xof', label: 'TVA (XOF)' },
       { key: 'total_volume_xof', label: 'Volume (XOF)' },
     ];
@@ -71,7 +71,7 @@ export default function RapportsPage() {
   };
 
   const handleExportEvolution = (format: 'csv' | 'excel' | 'pdf') => {
-    if (format === 'pdf') { exportPDF('Rapport d\'\u00e9volution'); return; }
+    if (format === 'pdf') { exportPDF('Rapport d\'évolution'); return; }
     const cols = [
       { key: 'date', label: 'Date' },
       { key: 'transactions', label: 'Transactions' },
@@ -79,7 +79,7 @@ export default function RapportsPage() {
       { key: 'tax_collected', label: 'TVA (XOF)' },
       { key: 'fraud_alerts', label: 'Alertes Fraude' },
       { key: 'new_users', label: 'Nouveaux Utilisateurs' },
-      { key: 'receipts', label: 'Re\u00e7us' },
+      { key: 'receipts', label: 'Reçus' },
     ];
     (format === 'csv' ? exportCSV : exportExcel)(evolution as unknown as Record<string, unknown>[], `rapport-evolution-${period}j`, cols);
   };
@@ -96,7 +96,7 @@ export default function RapportsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Rapports</h1>
-          <p className="text-gray-500 text-sm mt-1">G\u00e9n\u00e9rer et exporter les rapports de la plateforme</p>
+          <p className="text-gray-500 text-sm mt-1">Générer et exporter les rapports de la plateforme</p>
         </div>
         <select value={period} onChange={e => setPeriod(Number(e.target.value))}
           className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -123,7 +123,7 @@ export default function RapportsPage() {
               <p className="text-2xl font-bold text-blue-600">{formatXOF(totalVol)}</p>
             </div>
             <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <p className="text-sm text-gray-500 mb-1">TVA collect\u00e9e ({period}j)</p>
+              <p className="text-sm text-gray-500 mb-1">TVA collectée ({period}j)</p>
               <p className="text-2xl font-bold text-green-600">{formatXOF(totalTax)}</p>
             </div>
           </div>
@@ -133,12 +133,12 @@ export default function RapportsPage() {
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <h2 className="font-semibold text-gray-800 flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-blue-600" />
-                Rapport d&apos;\u00e9volution quotidienne
+                Rapport d&apos;évolution quotidienne
               </h2>
               <ExportMenu onExport={handleExportEvolution} />
             </div>
             {evolution.length === 0 ? (
-              <div className="flex items-center justify-center h-32 text-gray-400 text-sm">Aucune donn\u00e9e</div>
+              <div className="flex items-center justify-center h-32 text-gray-400 text-sm">Aucune donnée</div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -149,7 +149,7 @@ export default function RapportsPage() {
                       <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Volume</th>
                       <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">TVA</th>
                       <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Alertes</th>
-                      <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Re\u00e7us</th>
+                      <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Reçus</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
@@ -175,7 +175,7 @@ export default function RapportsPage() {
               <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                 <h2 className="font-semibold text-gray-800 flex items-center gap-2">
                   <FileText className="h-4 w-4 text-blue-600" />
-                  Rapports par p\u00e9riode fiscale
+                  Rapports par période fiscale
                 </h2>
                 <ExportMenu onExport={handleExportFiscal} />
               </div>
@@ -183,9 +183,9 @@ export default function RapportsPage() {
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50 border-b border-gray-100">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">P\u00e9riode</th>
-                      <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Re\u00e7us</th>
-                      <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">TVA Collect\u00e9e</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Période</th>
+                      <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Reçus</th>
+                      <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">TVA Collectée</th>
                       <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Volume Total</th>
                       <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Taux</th>
                     </tr>
