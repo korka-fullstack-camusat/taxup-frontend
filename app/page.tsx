@@ -19,12 +19,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 
-const stats = [
-  { value: '15M+', label: 'Transactions/mois' },
-  { value: '99.9%', label: 'Disponibilite' },
-  { value: '<100ms', label: 'Temps de reponse' },
-  { value: '5', label: 'Profils' },
-];
 
 const features = [
   {
@@ -216,21 +210,106 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {/* Right side - Stats cards */}
-              <div className="grid grid-cols-2 gap-4">
-                {stats.map(({ value, label }, i) => (
-                  <div
-                    key={label}
-                    className={`rounded-2xl p-6 border transition-colors ${
-                      i === 0
-                        ? 'bg-[#00853F]/10 border-[#00853F]/30 hover:bg-[#00853F]/15'
-                        : 'bg-slate-800/60 border-slate-700/60 hover:bg-slate-800'
-                    }`}
-                  >
-                    <div className={`text-3xl sm:text-4xl font-bold mb-1 ${i === 0 ? 'text-[#4ade80]' : 'text-white'}`}>{value}</div>
-                    <div className="text-sm text-slate-400">{label}</div>
+              {/* Right side - Dashboard mockup */}
+              <div className="relative hidden lg:block">
+                <div className="absolute -inset-4 bg-[#00853F]/15 rounded-3xl blur-3xl" />
+                <div className="relative bg-slate-800 rounded-2xl border border-slate-700/60 overflow-hidden shadow-2xl">
+
+                  {/* Browser chrome */}
+                  <div className="bg-slate-900 px-4 py-2.5 flex items-center gap-3 border-b border-slate-700/50">
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#00853F]/80" />
+                    </div>
+                    <div className="flex-1 bg-slate-700/50 rounded-full h-5 flex items-center px-3">
+                      <span className="text-[9px] text-slate-500">taxup.sn/dashboard</span>
+                    </div>
                   </div>
-                ))}
+
+                  {/* Dashboard content */}
+                  <div className="p-4 space-y-3">
+
+                    {/* Top bar */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-[11px] font-bold text-white">Tableau de Bord DGID</p>
+                        <p className="text-[9px] text-slate-400">Bienvenue, Agent DGID</p>
+                      </div>
+                      <span className="bg-[#00853F]/20 text-[#4ade80] text-[9px] px-2 py-0.5 rounded-full border border-[#00853F]/30">● En ligne</span>
+                    </div>
+
+                    {/* Stat cards */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="bg-[#00853F]/10 border border-[#00853F]/20 rounded-xl p-2.5">
+                        <p className="text-[9px] text-slate-400">Transactions</p>
+                        <p className="text-sm font-bold text-white mt-0.5">2 847</p>
+                        <p className="text-[9px] text-[#4ade80]">↑ +12% ce mois</p>
+                      </div>
+                      <div className="bg-slate-700/40 rounded-xl p-2.5">
+                        <p className="text-[9px] text-slate-400">TVA Collectee</p>
+                        <p className="text-sm font-bold text-white mt-0.5">48.2M XOF</p>
+                        <p className="text-[9px] text-[#4ade80]">↑ +8%</p>
+                      </div>
+                      <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-2.5">
+                        <p className="text-[9px] text-slate-400">Alertes Fraude</p>
+                        <p className="text-sm font-bold text-red-400 mt-0.5">14</p>
+                        <p className="text-[9px] text-orange-400">⚠ A traiter</p>
+                      </div>
+                      <div className="bg-slate-700/40 rounded-xl p-2.5">
+                        <p className="text-[9px] text-slate-400">Audits actifs</p>
+                        <p className="text-sm font-bold text-white mt-0.5">6</p>
+                        <p className="text-[9px] text-slate-500">en cours</p>
+                      </div>
+                    </div>
+
+                    {/* Mini bar chart */}
+                    <div className="bg-slate-700/30 rounded-xl p-3">
+                      <p className="text-[9px] text-slate-400 mb-2">Evolution transactions — 7 derniers jours</p>
+                      <div className="flex items-end gap-1.5 h-14">
+                        {[40, 65, 45, 80, 55, 95, 70].map((h, i) => (
+                          <div key={i} className="flex-1 flex items-end">
+                            <div
+                              className={`w-full rounded-t-sm transition-all ${i === 5 ? 'bg-[#00853F]' : 'bg-slate-600'}`}
+                              style={{ height: `${h}%` }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex mt-1">
+                        {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((d, i) => (
+                          <span key={i} className="flex-1 text-center text-[8px] text-slate-500">{d}</span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Mini transaction list */}
+                    <div>
+                      <p className="text-[9px] text-slate-400 mb-1.5">Transactions recentes</p>
+                      <div className="space-y-1.5">
+                        {[
+                          { type: 'Transfert', phone: '+221 77 xxx xxxx', amount: '25 000', ok: true },
+                          { type: 'Paiement mobile', phone: '+221 78 xxx xxxx', amount: '12 500', ok: false },
+                          { type: 'Depot', phone: '+221 76 xxx xxxx', amount: '50 000', ok: true },
+                        ].map((tx, i) => (
+                          <div key={i} className="flex items-center justify-between bg-slate-700/30 rounded-lg px-2.5 py-1.5">
+                            <div>
+                              <p className="text-[9px] font-medium text-white">{tx.type}</p>
+                              <p className="text-[8px] text-slate-500">{tx.phone}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-[9px] font-bold text-white">{tx.amount} XOF</p>
+                              <p className={`text-[8px] ${tx.ok ? 'text-[#4ade80]' : 'text-amber-400'}`}>
+                                {tx.ok ? '● Complete' : '● En attente'}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
               </div>
             </div>
           </div>
