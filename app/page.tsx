@@ -35,8 +35,8 @@ const features = [
   },
   {
     icon: Shield,
-    title: 'Detection Fraude IA',
-    description: 'Algorithmes intelligents pour identifier automatiquement les anomalies suspectes.',
+    title: 'Detection de Fraude',
+    description: 'Algorithmes avances pour identifier automatiquement les anomalies et transactions suspectes.',
     gradient: 'from-red-500 to-red-700',
   },
   {
@@ -136,7 +136,7 @@ export default function LandingPage() {
         </div>
 
         {/* Navigation */}
-        <nav className="relative z-10">
+        <nav className="sticky top-1 z-40 bg-slate-900/80 backdrop-blur-md border-b border-white/5">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="flex items-center justify-between h-20">
               <div className="flex items-center gap-3">
