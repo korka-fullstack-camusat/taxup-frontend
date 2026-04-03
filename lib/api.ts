@@ -1,12 +1,52 @@
-import axios from 'axios';
+import axios, { type InternalAxiosRequestConfig } from 'axios';
+import { getMockResponse } from './mockData';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
 
 const api = axios.create({
   baseURL: `${API_URL}/api/v1`,
   headers: { 'Content-Type': 'application/json' },
 });
 
+// ─── Mock adapter (dev/demo mode) ────────────────────────────────────────────
+if (USE_MOCK) {
+  const defaultAdapter = api.defaults.adapter as (config: InternalAxiosRequestConfig) => Promise<unknown>;
+
+  api.defaults.adapter = async (config: InternalAxiosRequestConfig) => {
+    const url = config.url || '';
+    // Collect params from both config.params object and the query string in the URL
+    const urlParams: Record<string, string> = {};
+    const qIdx = url.indexOf('?');
+    if (qIdx !== -1) {
+      new URLSearchParams(url.slice(qIdx + 1)).forEach((v, k) => { urlParams[k] = v; });
+    }
+    if (config.params && typeof config.params === 'object') {
+      for (const [k, v] of Object.entries(config.params as Record<string, unknown>)) {
+        urlParams[k] = String(v);
+      }
+    }
+
+    const cleanUrl = qIdx !== -1 ? url.slice(0, qIdx) : url;
+    const mockData = getMockResponse(cleanUrl, urlParams);
+
+    if (mockData !== null) {
+      return {
+        data: mockData,
+        status: 200,
+        statusText: 'OK',
+        headers: { 'content-type': 'application/json' },
+        config,
+        request: {},
+      };
+    }
+
+    // Fall through to real network for auth endpoints and anything not mocked
+    return defaultAdapter(config);
+  };
+}
+
+// ─── Auth token injection ─────────────────────────────────────────────────────
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem('access_token');
