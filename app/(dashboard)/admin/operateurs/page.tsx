@@ -45,9 +45,9 @@ export default function OperateursPage() {
       const items = res.data.items || res.data || [];
       const enriched = items.map((op: Operator) => ({
         ...op,
-        tx_count: Math.floor(Math.random() * 250000) + 10000,
-        tx_volume: Math.floor(Math.random() * 15000000000) + 500000000,
-        trend: parseFloat((Math.random() * 8 - 2).toFixed(1)),
+        tx_count: op.tx_count ?? Math.floor(Math.random() * 250000) + 10000,
+        tx_volume: op.tx_volume ?? Math.floor(Math.random() * 15000000000) + 500000000,
+        trend: op.trend ?? parseFloat((Math.random() * 8 - 2).toFixed(1)),
       }));
       setOperators(enriched);
     } catch { setOperators([]); } finally { setLoading(false); }

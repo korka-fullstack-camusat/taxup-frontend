@@ -255,6 +255,191 @@ export const MOCK_REALTIME = {
   })),
 };
 
+// ─── Opérateurs Mobile Money Sénégal ─────────────────────────────────────────
+
+export const MOCK_OPERATORS = [
+  {
+    id: uid('op', 1),
+    full_name: 'Mamadou Diallo',
+    username: 'orange.money',
+    email: 'mdm.ops@orange-sonatel.sn',
+    organization: 'Orange Money (Sonatel)',
+    is_active: true,
+    phone_number: '+221 33 839 10 00',
+    tx_count: 2_847_320,
+    tx_volume: 1_234_567_890_000,
+    trend: 8.4,
+  },
+  {
+    id: uid('op', 2),
+    full_name: 'Aissatou Bâ',
+    username: 'wave.sn',
+    email: 'ops@wave.com',
+    organization: 'Wave Sénégal',
+    is_active: true,
+    phone_number: '+221 33 867 00 00',
+    tx_count: 1_923_410,
+    tx_volume: 678_432_100_000,
+    trend: 22.1,
+  },
+  {
+    id: uid('op', 3),
+    full_name: 'Ibrahima Sow',
+    username: 'free.money',
+    email: 'ibra.sow@free.sn',
+    organization: 'Free Money (Expresso/Free Sénégal)',
+    is_active: true,
+    phone_number: '+221 33 839 70 00',
+    tx_count: 487_230,
+    tx_volume: 145_230_000_000,
+    trend: 5.7,
+  },
+  {
+    id: uid('op', 4),
+    full_name: 'Fatou Ndiaye',
+    username: 'expresso.money',
+    email: 'fndiaye@expresso.sn',
+    organization: 'Expresso Money (Sudatel)',
+    is_active: true,
+    phone_number: '+221 33 839 40 00',
+    tx_count: 198_760,
+    tx_volume: 56_789_000_000,
+    trend: -1.3,
+  },
+  {
+    id: uid('op', 5),
+    full_name: 'Cheikh Mbaye',
+    username: 'wari.ops',
+    email: 'cmbaye@wari.com',
+    organization: 'Wari (Cellular Systems International)',
+    is_active: true,
+    phone_number: '+221 33 824 12 12',
+    tx_count: 312_540,
+    tx_volume: 98_450_000_000,
+    trend: -3.2,
+  },
+  {
+    id: uid('op', 6),
+    full_name: 'Rokhaya Diop',
+    username: 'yobantel.ops',
+    email: 'rdiop@yobantel.sn',
+    organization: 'Yobantel SA',
+    is_active: true,
+    phone_number: '+221 33 864 00 00',
+    tx_count: 87_430,
+    tx_volume: 21_230_000_000,
+    trend: 4.1,
+  },
+  {
+    id: uid('op', 7),
+    full_name: 'Ousmane Faye',
+    username: 'poste.finances',
+    email: 'ofaye@laposte.sn',
+    organization: 'PosteFinances (La Poste du Sénégal)',
+    is_active: true,
+    phone_number: '+221 33 839 00 00',
+    tx_count: 143_210,
+    tx_volume: 34_560_000_000,
+    trend: 1.8,
+  },
+  {
+    id: uid('op', 8),
+    full_name: 'Mariama Konaté',
+    username: 'wizall.money',
+    email: 'mkonate@wizall.sn',
+    organization: 'Wizall Money (Atlantique Télécom)',
+    is_active: true,
+    phone_number: '+221 33 859 80 00',
+    tx_count: 54_870,
+    tx_volume: 12_340_000_000,
+    trend: 6.3,
+  },
+  {
+    id: uid('op', 9),
+    full_name: 'Pape Diouf',
+    username: 'yup.ops',
+    email: 'pdiouf@yup.sn',
+    organization: 'YUP (Société Générale)',
+    is_active: false,
+    phone_number: '+221 33 839 50 00',
+    tx_count: 34_120,
+    tx_volume: 7_890_000_000,
+    trend: -8.7,
+  },
+  {
+    id: uid('op', 10),
+    full_name: 'Awa Traoré',
+    username: 'paydunya.ops',
+    email: 'atraore@paydunya.com',
+    organization: 'PayDunya (Avante Sénégal)',
+    is_active: true,
+    phone_number: '+221 33 860 12 34',
+    tx_count: 123_450,
+    tx_volume: 28_900_000_000,
+    trend: 14.5,
+  },
+  {
+    id: uid('op', 11),
+    full_name: 'Modou Fall',
+    username: 'sama.money',
+    email: 'mfall@samamoney.sn',
+    organization: 'Sama Money',
+    is_active: true,
+    phone_number: '+221 33 841 00 00',
+    tx_count: 45_670,
+    tx_volume: 10_230_000_000,
+    trend: 9.2,
+  },
+  {
+    id: uid('op', 12),
+    full_name: 'Ndéye Sarr',
+    username: 'ding.ding',
+    email: 'nsarr@sagamulti.sn',
+    organization: 'Ding Ding Money (Saga Multiservices)',
+    is_active: true,
+    phone_number: '+221 33 825 00 00',
+    tx_count: 67_890,
+    tx_volume: 15_670_000_000,
+    trend: 3.4,
+  },
+  {
+    id: uid('op', 13),
+    full_name: 'Abdoulaye Diagne',
+    username: 'kash.kash',
+    email: 'adiagne@ecobank.com',
+    organization: 'Kash Kash (Ecobank Sénégal)',
+    is_active: true,
+    phone_number: '+221 33 849 00 00',
+    tx_count: 29_340,
+    tx_volume: 6_780_000_000,
+    trend: 2.1,
+  },
+  {
+    id: uid('op', 14),
+    full_name: 'Aminata Cissé',
+    username: 'liqo.ops',
+    email: 'acisse@bsic.sn',
+    organization: 'Liqo (BSIC Sénégal)',
+    is_active: false,
+    phone_number: '+221 33 824 50 00',
+    tx_count: 12_560,
+    tx_volume: 2_340_000_000,
+    trend: -5.6,
+  },
+  {
+    id: uid('op', 15),
+    full_name: 'Serigne Thiam',
+    username: 'qhala.ops',
+    email: 'sthiam@qhala.com',
+    organization: 'Qhala Mobile Money',
+    is_active: true,
+    phone_number: '+221 33 861 00 00',
+    tx_count: 38_920,
+    tx_volume: 8_120_000_000,
+    trend: 11.3,
+  },
+];
+
 // ─── Router ───────────────────────────────────────────────────────────────────
 
 function paginate<T>(
@@ -309,6 +494,15 @@ export function getMockResponse(url: string, params: Record<string, string> = {}
     const items = [...MOCK_RECEIPTS].sort(
       (a, b) => new Date(b.issued_at).getTime() - new Date(a.issued_at).getTime(),
     );
+    return paginate(items, page, pageSize);
+  }
+
+  // Users (operators list)
+  if (path === '/users') {
+    const role = params.role || '';
+    let items = role === 'OPERATEUR_MOBILE' ? [...MOCK_OPERATORS] : [];
+    const page = parseInt(params.page || '1');
+    const pageSize = parseInt(params.page_size || '100');
     return paginate(items, page, pageSize);
   }
 
