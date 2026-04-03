@@ -440,6 +440,84 @@ export const MOCK_OPERATORS = [
   },
 ];
 
+// ─── Utilisateurs (tous rôles) ────────────────────────────────────────────────
+
+const ROLES = [
+  'CITOYEN', 'CITOYEN', 'CITOYEN', 'CITOYEN', 'CITOYEN',
+  'OPERATEUR_MOBILE', 'OPERATEUR_MOBILE',
+  'AUDITEUR_FISCAL',
+  'AGENT_DGID',
+  'ADMIN',
+];
+
+const USER_NAMES = [
+  ['Mamadou', 'Diallo'], ['Fatou', 'Ndiaye'], ['Ibrahima', 'Sow'], ['Aminata', 'Bâ'],
+  ['Ousmane', 'Fall'], ['Mariama', 'Konaté'], ['Cheikh', 'Mbaye'], ['Awa', 'Traoré'],
+  ['Abdoulaye', 'Diagne'], ['Ndéye', 'Sarr'], ['Pape', 'Diouf'], ['Rokhaya', 'Diop'],
+  ['Serigne', 'Thiam'], ['Bineta', 'Gueye'], ['Modou', 'Fall'], ['Sokhna', 'Wade'],
+  ['Assane', 'Cissé'], ['Khady', 'Sall'], ['Babacar', 'Faye'], ['Coumba', 'Lô'],
+  ['Moussa', 'Coulibaly'], ['Adja', 'Barry'], ['Lamine', 'Touré'], ['Yacine', 'Badji'],
+  ['Boubacar', 'Diallo'], ['Seynabou', 'Dème'], ['Thierno', 'Ka'], ['Ndeye Fatou', 'Diallo'],
+  ['Elhadji', 'Tall'], ['Astou', 'Samb'], ['Cheikhou', 'Kouyaté'], ['Aïssatou', 'Camara'],
+  ['Mouhamed', 'Lamine'], ['Penda', 'Seck'], ['Mor', 'Diop'], ['Rokhaya', 'Ndiaye'],
+  ['Birame', 'Faye'], ['Soumaya', 'Diallo'], ['Tidiane', 'Balde'], ['Amy', 'Cissokho'],
+  ['Seydou', 'Traoré'], ['Mame Diarra', 'Sow'], ['Doudou', 'Gning'], ['Fatimata', 'Fofana'],
+  ['Bamba', 'Dieye'], ['Marème', 'Diop'], ['Sidy', 'Sarr'], ['Yandé', 'Diaw'],
+  ['Oumar', 'Thiongane'], ['Ramatoulaye', 'Bousso'],
+];
+
+const ORGS = [
+  'Orange Sénégal', 'Wave Sénégal', 'Free Sénégal', 'Expresso', 'Wari',
+  'Société Générale', 'Ecobank', 'CBAO', 'BICIS', 'La Poste',
+  'Ministère des Finances', 'DGID', 'DGI', undefined,
+];
+
+export const MOCK_USERS = USER_NAMES.map(([first, last], i) => {
+  const role = ROLES[i % ROLES.length];
+  const isActive = i % 10 !== 7; // 90% actifs
+  const org = role === 'OPERATEUR_MOBILE' ? ORGS[i % 5]
+    : role === 'AGENT_DGID' || role === 'AUDITEUR_FISCAL' ? ORGS[10 + (i % 3)]
+    : ORGS[13];
+  const slug = `${first.toLowerCase().replace(/[\s']/g, '.')}.${last.toLowerCase()}`;
+  return {
+    id: uid('us', i + 1),
+    username: slug,
+    email: `${slug}@taxup.sn`,
+    full_name: `${first} ${last}`,
+    role,
+    is_active: isActive,
+    phone_number: `+221 7${7 + (i % 3)} ${String(100 + i).padStart(3, '0')} ${String(10 + (i % 90)).padStart(2, '0')} ${String(10 + (i % 89)).padStart(2, '0')}`,
+    organization: org,
+    created_at: daysAgo(ri(10, 365)),
+  };
+});
+
+// ─── Rapports fiscaux par période ─────────────────────────────────────────────
+
+const rngFR = mkRng(77);
+function riFR(min: number, max: number) { return Math.floor(rngFR() * (max - min + 1)) + min; }
+
+export const MOCK_FISCAL_REPORTS = [
+  '2026-03', '2026-02', '2026-01',
+  '2025-12', '2025-11', '2025-10', '2025-09', '2025-08',
+  '2025-07', '2025-06', '2025-05', '2025-04',
+].map(period => {
+  const receiptCount = riFR(120, 420);
+  const totalVolume = riFR(200_000_000, 800_000_000);
+  const totalTax = Math.round(totalVolume * (0.15 + rngFR() * 0.06));
+  return { period, receipt_count: receiptCount, total_tax_xof: totalTax, total_volume_xof: totalVolume };
+});
+
+// ─── Paramètres plateforme ────────────────────────────────────────────────────
+
+export const MOCK_PLATFORM_SETTINGS = {
+  fraud_threshold: 0.75,
+  max_transaction_amount: 5_000_000,
+  alert_email: 'alertes@taxup.sn',
+  maintenance_mode: false,
+  auto_audit_enabled: true,
+};
+
 // ─── Router ───────────────────────────────────────────────────────────────────
 
 function paginate<T>(
@@ -497,13 +575,36 @@ export function getMockResponse(url: string, params: Record<string, string> = {}
     return paginate(items, page, pageSize);
   }
 
-  // Users (operators list)
+  // Users
   if (path === '/users') {
     const role = params.role || '';
-    let items = role === 'OPERATEUR_MOBILE' ? [...MOCK_OPERATORS] : [];
+    const search = (params.search || '').toLowerCase();
     const page = parseInt(params.page || '1');
-    const pageSize = parseInt(params.page_size || '100');
-    return paginate(items, page, pageSize);
+    const pageSize = parseInt(params.page_size || '15');
+
+    // Operators from dedicated list; other roles from MOCK_USERS
+    let items: typeof MOCK_USERS | typeof MOCK_OPERATORS = role === 'OPERATEUR_MOBILE'
+      ? [...MOCK_OPERATORS]
+      : role
+        ? MOCK_USERS.filter(u => u.role === role)
+        : [...MOCK_USERS];
+
+    if (search) {
+      items = (items as Array<{ full_name: string; email: string; username: string }>).filter(u =>
+        u.full_name.toLowerCase().includes(search) ||
+        u.email.toLowerCase().includes(search) ||
+        u.username.toLowerCase().includes(search),
+      ) as typeof items;
+    }
+
+    // Return paginated + a realistic total (from admin-summary)
+    const paged = paginate(items, page, pageSize);
+    // Inflate total to match summary counts for non-operator roles
+    const totalMap: Record<string, number> = {
+      CITOYEN: 856, OPERATEUR_MOBILE: 124, AUDITEUR_FISCAL: 47, AGENT_DGID: 18, ADMIN: 5,
+    };
+    if (!search) paged.total = role ? (totalMap[role] ?? paged.total) : 1247;
+    return paged;
   }
 
   // Dashboard DGID
@@ -516,6 +617,10 @@ export function getMockResponse(url: string, params: Record<string, string> = {}
 
   // Dashboard Admin
   if (path === '/dashboard/admin-summary') return MOCK_ADMIN_SUMMARY;
+  if (path === '/dashboard/fiscal-reports') return { fiscal_reports: MOCK_FISCAL_REPORTS };
+
+  // Platform settings
+  if (path === '/admin/settings') return MOCK_PLATFORM_SETTINGS;
 
   // Auth – never mock; let real handler run
   if (path.startsWith('/auth/')) return null;
