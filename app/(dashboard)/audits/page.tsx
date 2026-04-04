@@ -76,22 +76,22 @@ export default function AuditsPage() {
         {/* Page Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-green-50 p-2.5 rounded-xl">
+            <div className="bg-green-50 dark:bg-green-900/20 p-2.5 rounded-xl">
               <ClipboardList className="h-6 w-6 text-green-700" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">Gestion des Audits</h1>
-              <p className="text-gray-500 text-sm mt-0.5">Creation et suivi des audits fiscaux</p>
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Gestion des Audits</h1>
+              <p className="text-gray-500 dark:text-slate-400 text-sm mt-0.5">Creation et suivi des audits fiscaux</p>
             </div>
           </div>
         </div>
 
         {/* Toolbar */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-wrap gap-3 items-center">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-700/50 shadow-sm p-4 flex flex-wrap gap-3 items-center">
           <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
             <input type="text" placeholder="Rechercher un audit..." value={search} onChange={e => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-600" />
+              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500 bg-white dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-400" />
           </div>
           {canCreate && (
             <button onClick={() => setShowForm(!showForm)}
@@ -104,27 +104,27 @@ export default function AuditsPage() {
 
         {/* Create form */}
         {showForm && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h3 className="font-semibold text-gray-800 mb-4">Créer un audit</h3>
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700/50 p-6">
+            <h3 className="font-semibold text-gray-800 dark:text-white mb-4">Créer un audit</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Titre *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1">Titre *</label>
                 <input type="text" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600"
+                  className="w-full border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-2.5 text-sm text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500 bg-white dark:bg-slate-800"
                   placeholder="Audit de conformité Q1 2026" required />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Priorité</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1">Priorité</label>
                   <select value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                    className="w-full border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500">
                     {Object.entries(priorityConfig).map(([v, { label }]) => <option key={v} value={v}>{label}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1">Description</label>
                   <input type="text" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600"
+                    className="w-full border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-2.5 text-sm text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500 bg-white dark:bg-slate-800"
                     placeholder="Description optionnelle" />
                 </div>
               </div>
@@ -139,31 +139,31 @@ export default function AuditsPage() {
         )}
 
         {/* List */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700/50 overflow-hidden">
           {loading ? (
             <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-700" /></div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-16 text-gray-400">
+            <div className="text-center py-16 text-gray-400 dark:text-slate-500">
               <ClipboardList className="h-12 w-12 mx-auto mb-3 opacity-30" />
               <p>Aucun audit trouvé</p>
             </div>
           ) : (
             <>
-              <div className="divide-y divide-gray-50">
+              <div className="divide-y divide-gray-50 dark:divide-slate-700/50">
                 {filtered.map(audit => {
                   const s = statusConfig[audit.status] || statusConfig.OPEN;
                   const p = priorityConfig[audit.priority] || priorityConfig.MEDIUM;
                   const StatusIcon = s.icon;
                   return (
-                    <div key={audit.id} className="px-6 py-5 hover:bg-gray-50 transition-colors flex items-start justify-between gap-4">
+                    <div key={audit.id} className="px-6 py-5 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors flex items-start justify-between gap-4">
                       <div className="flex items-start gap-4 flex-1 min-w-0">
-                        <div className="h-10 w-10 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0">
+                        <div className="h-10 w-10 rounded-lg bg-green-50 dark:bg-green-900/20 flex items-center justify-center flex-shrink-0">
                           <ClipboardList className="h-5 w-5 text-green-700" />
                         </div>
                         <div className="min-w-0">
-                          <p className="font-medium text-gray-800 truncate">{audit.title}</p>
-                          {audit.description && <p className="text-sm text-gray-500 mt-0.5 truncate">{audit.description}</p>}
-                          <p className="text-xs text-gray-400 mt-1">{new Date(audit.created_at).toLocaleDateString('fr-FR')}</p>
+                          <p className="font-medium text-gray-800 dark:text-white truncate">{audit.title}</p>
+                          {audit.description && <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5 truncate">{audit.description}</p>}
+                          <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">{new Date(audit.created_at).toLocaleDateString('fr-FR')}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
@@ -176,13 +176,13 @@ export default function AuditsPage() {
                   );
                 })}
               </div>
-              <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
-                <p className="text-sm text-gray-500">Page {page} · {total} résultats</p>
+              <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 dark:border-slate-700/50">
+                <p className="text-sm text-gray-500 dark:text-slate-400">Page {page} · {total} résultats</p>
                 <div className="flex gap-2">
                   <button disabled={page === 1} onClick={() => setPage(p => p - 1)}
-                    className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50">Précédent</button>
+                    className="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-600 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:text-slate-300">Précédent</button>
                   <button disabled={page * pageSize >= total} onClick={() => setPage(p => p + 1)}
-                    className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50">Suivant</button>
+                    className="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-600 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:text-slate-300">Suivant</button>
                 </div>
               </div>
             </>

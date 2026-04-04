@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { 
-  ArrowLeftRight, 
-  TrendingUp, 
-  CheckCircle, 
-  AlertTriangle, 
-  Plus, 
+import {
+  ArrowLeftRight,
+  TrendingUp,
+  CheckCircle,
+  AlertTriangle,
+  Plus,
   Clock,
   Wallet,
   Send,
@@ -63,23 +63,23 @@ export default function DashboardOperateur() {
   const { user } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({ 
-    total: 0, 
-    completed: 0, 
+  const [stats, setStats] = useState({
+    total: 0,
+    completed: 0,
     pending: 0,
-    flagged: 0, 
+    flagged: 0,
     volume: 0,
     todayCount: 0,
     todayVolume: 0
   });
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ 
-    transaction_type: 'TRANSFER', 
-    amount: '', 
-    currency: 'XOF', 
-    sender_phone: '', 
-    recipient_phone: '', 
-    description: '' 
+  const [form, setForm] = useState({
+    transaction_type: 'TRANSFER',
+    amount: '',
+    currency: 'XOF',
+    sender_phone: '',
+    recipient_phone: '',
+    description: ''
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitMsg, setSubmitMsg] = useState({ type: '', text: '' });
@@ -91,7 +91,7 @@ export default function DashboardOperateur() {
         const items: Transaction[] = res.data.items || [];
         const today = new Date().toDateString();
         const todayTx = items.filter(t => new Date(t.created_at).toDateString() === today);
-        
+
         setTransactions(items);
         setStats({
           total: res.data.total || items.length,
@@ -155,13 +155,13 @@ export default function DashboardOperateur() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Tableau de Bord Operateur</h1>
-            <p className="text-gray-500 text-sm mt-1">Bienvenue, {user?.full_name || 'Operateur'}</p>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Tableau de Bord Operateur</h1>
+            <p className="text-gray-500 dark:text-slate-400 text-sm mt-1">Bienvenue, {user?.full_name || 'Operateur'}</p>
           </div>
           <div className="flex items-center gap-3">
-            <button 
+            <button
               onClick={fetchData}
-              className="flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+              className="flex items-center gap-2 border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-200 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
             >
               <RefreshCw className="h-4 w-4" /> Actualiser
             </button>
@@ -177,8 +177,8 @@ export default function DashboardOperateur() {
         {/* Alert Message */}
         {submitMsg.text && (
           <div className={`rounded-xl px-4 py-3 text-sm flex items-center justify-between ${
-            submitMsg.type === 'success' 
-              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+            submitMsg.type === 'success'
+              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
               : 'bg-red-50 text-red-600 border border-red-200'
           }`}>
             <span>{submitMsg.text}</span>
@@ -190,28 +190,28 @@ export default function DashboardOperateur() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard 
-            icon={ArrowLeftRight} 
-            label="Total transactions" 
+          <StatCard
+            icon={ArrowLeftRight}
+            label="Total transactions"
             value={stats.total}
             subtitle={`${stats.todayCount} aujourd'hui`}
             gradient="from-green-600 to-green-700"
           />
-          <StatCard 
-            icon={CheckCircle} 
-            label="Completees" 
+          <StatCard
+            icon={CheckCircle}
+            label="Completees"
             value={stats.completed}
             gradient="from-emerald-500 to-emerald-600"
           />
-          <StatCard 
-            icon={AlertTriangle} 
-            label="Signalees" 
+          <StatCard
+            icon={AlertTriangle}
+            label="Signalees"
             value={stats.flagged}
             gradient="from-red-500 to-red-600"
           />
-          <StatCard 
-            icon={TrendingUp} 
-            label="Volume traite" 
+          <StatCard
+            icon={TrendingUp}
+            label="Volume traite"
             value={formatShort(stats.volume)}
             subtitle={`${formatShort(stats.todayVolume)} aujourd'hui`}
             gradient="from-purple-500 to-purple-600"
@@ -221,22 +221,22 @@ export default function DashboardOperateur() {
         {/* Charts + Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Status Distribution */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 p-6">
+            <h3 className="font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
               <Activity className="h-4 w-4 text-green-700" />
               Repartition par statut
             </h3>
             {statusData.length === 0 ? (
-              <div className="h-48 flex items-center justify-center text-gray-400 text-sm">Aucune donnee</div>
+              <div className="h-48 flex items-center justify-center text-gray-400 dark:text-slate-500 text-sm">Aucune donnee</div>
             ) : (
               <ResponsiveContainer width="100%" height={180}>
                 <PieChart>
-                  <Pie 
-                    data={statusData} 
-                    cx="50%" 
-                    cy="50%" 
-                    innerRadius={45} 
-                    outerRadius={70} 
+                  <Pie
+                    data={statusData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={45}
+                    outerRadius={70}
                     dataKey="value"
                     paddingAngle={3}
                   >
@@ -252,20 +252,20 @@ export default function DashboardOperateur() {
               {statusData.map((d, i) => (
                 <div key={i} className="flex items-center gap-2 text-xs">
                   <div className="h-2 w-2 rounded-full" style={{ backgroundColor: d.color }} />
-                  <span className="text-gray-600">{d.name}: {d.value}</span>
+                  <span className="text-gray-600 dark:text-slate-300">{d.name}: {d.value}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Type Distribution */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 p-6">
+            <h3 className="font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
               <Wallet className="h-4 w-4 text-purple-600" />
               Par type de transaction
             </h3>
             {typeData.length === 0 ? (
-              <div className="h-48 flex items-center justify-center text-gray-400 text-sm">Aucune donnee</div>
+              <div className="h-48 flex items-center justify-center text-gray-400 dark:text-slate-500 text-sm">Aucune donnee</div>
             ) : (
               <ResponsiveContainer width="100%" height={180}>
                 <BarChart data={typeData}>
@@ -280,77 +280,77 @@ export default function DashboardOperateur() {
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 p-6">
+            <h3 className="font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
               <Send className="h-4 w-4 text-emerald-600" />
               Actions rapides
             </h3>
             <div className="space-y-3">
-              <button 
+              <button
                 onClick={() => setShowForm(true)}
-                className="w-full flex items-center gap-3 p-4 rounded-xl border border-green-100 bg-green-50 hover:bg-green-100 transition-colors text-left group"
+                className="w-full flex items-center gap-3 p-4 rounded-xl border border-green-100 dark:border-green-800/30 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors text-left group"
               >
                 <div className="bg-green-700 p-2 rounded-lg">
                   <Plus className="h-4 w-4 text-white" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-gray-800">Creer une transaction</p>
-                  <p className="text-xs text-gray-500">Transfert, paiement, depot...</p>
+                  <p className="font-medium text-gray-800 dark:text-white">Creer une transaction</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400">Transfert, paiement, depot...</p>
                 </div>
-                <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-green-700 transition-colors" />
+                <ChevronRight className="h-4 w-4 text-gray-300 dark:text-slate-500 group-hover:text-green-700 transition-colors" />
               </button>
-              <a 
+              <a
                 href="/transactions"
-                className="w-full flex items-center gap-3 p-4 rounded-xl border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors text-left group"
+                className="w-full flex items-center gap-3 p-4 rounded-xl border border-gray-100 dark:border-slate-700/50 bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-left group"
               >
                 <div className="bg-gray-600 p-2 rounded-lg">
                   <ArrowLeftRight className="h-4 w-4 text-white" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-gray-800">Voir toutes les transactions</p>
-                  <p className="text-xs text-gray-500">Historique et filtres</p>
+                  <p className="font-medium text-gray-800 dark:text-white">Voir toutes les transactions</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400">Historique et filtres</p>
                 </div>
-                <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-gray-600 transition-colors" />
+                <ChevronRight className="h-4 w-4 text-gray-300 dark:text-slate-500 group-hover:text-gray-600 transition-colors" />
               </a>
-              <a 
+              <a
                 href="/receipts"
-                className="w-full flex items-center gap-3 p-4 rounded-xl border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors text-left group"
+                className="w-full flex items-center gap-3 p-4 rounded-xl border border-gray-100 dark:border-slate-700/50 bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-left group"
               >
                 <div className="bg-emerald-600 p-2 rounded-lg">
                   <DollarSign className="h-4 w-4 text-white" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-gray-800">Recus fiscaux</p>
-                  <p className="text-xs text-gray-500">Consulter et telecharger</p>
+                  <p className="font-medium text-gray-800 dark:text-white">Recus fiscaux</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400">Consulter et telecharger</p>
                 </div>
-                <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-emerald-600 transition-colors" />
+                <ChevronRight className="h-4 w-4 text-gray-300 dark:text-slate-500 group-hover:text-emerald-600 transition-colors" />
               </a>
             </div>
           </div>
         </div>
 
         {/* Recent Transactions Table */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-slate-700/50">
             <div className="flex items-center gap-3">
-              <div className="bg-green-50 p-2 rounded-lg">
+              <div className="bg-green-50 dark:bg-green-900/20 p-2 rounded-lg">
                 <ArrowLeftRight className="h-4 w-4 text-green-700" />
               </div>
-              <h2 className="font-semibold text-gray-800">Transactions recentes</h2>
+              <h2 className="font-semibold text-gray-800 dark:text-white">Transactions recentes</h2>
             </div>
             <a href="/transactions" className="text-sm text-green-700 hover:text-green-800 font-medium flex items-center gap-1">
               Voir tout <ChevronRight className="h-4 w-4" />
             </a>
           </div>
           {transactions.length === 0 ? (
-            <div className="text-center py-12 text-gray-400">
+            <div className="text-center py-12 text-gray-400 dark:text-slate-500">
               <ArrowLeftRight className="h-12 w-12 mx-auto mb-3 opacity-30" />
               <p>Aucune transaction</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+                <thead className="bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-slate-400 text-xs uppercase">
                   <tr>
                     <th className="px-6 py-3 text-left">Type</th>
                     <th className="px-6 py-3 text-left">Emetteur</th>
@@ -361,25 +361,25 @@ export default function DashboardOperateur() {
                     <th className="px-6 py-3 text-left">Date</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-gray-50 dark:divide-slate-700/50">
                   {transactions.slice(0, 10).map(tx => {
                     const s = statusConfig[tx.status] || statusConfig.PENDING;
                     return (
-                      <tr key={tx.id} className="hover:bg-gray-50/50 transition-colors">
+                      <tr key={tx.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
                             <div className={`p-1.5 rounded-lg ${tx.transaction_type === 'WITHDRAWAL' || tx.transaction_type === 'TRANSFER' ? 'bg-orange-50' : 'bg-emerald-50'}`}>
-                              {tx.transaction_type === 'WITHDRAWAL' || tx.transaction_type === 'TRANSFER' 
+                              {tx.transaction_type === 'WITHDRAWAL' || tx.transaction_type === 'TRANSFER'
                                 ? <ArrowUpRight className="h-3.5 w-3.5 text-orange-600" />
                                 : <ArrowDownLeft className="h-3.5 w-3.5 text-emerald-600" />
                               }
                             </div>
-                            <span className="font-medium text-gray-800">{typeLabel[tx.transaction_type] || tx.transaction_type}</span>
+                            <span className="font-medium text-gray-800 dark:text-white">{typeLabel[tx.transaction_type] || tx.transaction_type}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-gray-500 font-mono text-xs">{tx.sender_phone || '—'}</td>
-                        <td className="px-6 py-4 text-gray-500 font-mono text-xs">{tx.recipient_phone || '—'}</td>
-                        <td className="px-6 py-4 text-right font-semibold text-gray-800">{formatXOF(tx.amount)}</td>
+                        <td className="px-6 py-4 text-gray-500 dark:text-slate-400 font-mono text-xs">{tx.sender_phone || '—'}</td>
+                        <td className="px-6 py-4 text-gray-500 dark:text-slate-400 font-mono text-xs">{tx.recipient_phone || '—'}</td>
+                        <td className="px-6 py-4 text-right font-semibold text-gray-800 dark:text-white">{formatXOF(tx.amount)}</td>
                         <td className="px-6 py-4 text-center">
                           <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${s.bgColor} ${s.color}`}>
                             {s.label}
@@ -391,9 +391,9 @@ export default function DashboardOperateur() {
                               tx.risk_score >= 0.7 ? 'text-red-600 bg-red-50' :
                               tx.risk_score >= 0.4 ? 'text-orange-600 bg-orange-50' : 'text-emerald-600 bg-emerald-50'
                             }`}>{Math.round(tx.risk_score * 100)}%</span>
-                          ) : <span className="text-gray-300">—</span>}
+                          ) : <span className="text-gray-300 dark:text-slate-600">—</span>}
                         </td>
-                        <td className="px-6 py-4 text-gray-400 text-xs">{new Date(tx.created_at).toLocaleDateString('fr-FR')}</td>
+                        <td className="px-6 py-4 text-gray-400 dark:text-slate-500 text-xs">{new Date(tx.created_at).toLocaleDateString('fr-FR')}</td>
                       </tr>
                     );
                   })}
@@ -406,26 +406,26 @@ export default function DashboardOperateur() {
         {/* Transaction Form Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-slate-700/50">
                 <div className="flex items-center gap-3">
-                  <div className="bg-green-50 p-2 rounded-lg">
+                  <div className="bg-green-50 dark:bg-green-900/20 p-2 rounded-lg">
                     <Plus className="h-4 w-4 text-green-700" />
                   </div>
-                  <h3 className="font-semibold text-gray-800">Nouvelle transaction</h3>
+                  <h3 className="font-semibold text-gray-800 dark:text-white">Nouvelle transaction</h3>
                 </div>
-                <button onClick={() => setShowForm(false)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                  <X className="h-5 w-5 text-gray-400" />
+                <button onClick={() => setShowForm(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                  <X className="h-5 w-5 text-gray-400 dark:text-slate-500" />
                 </button>
               </div>
               <form onSubmit={handleSubmit} className="p-6 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Type *</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1.5">Type *</label>
                     <select
                       value={form.transaction_type}
                       onChange={e => setForm({ ...form, transaction_type: e.target.value })}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 bg-white"
+                      className="w-full border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500 bg-white dark:bg-slate-800 dark:text-slate-100"
                     >
                       {Object.entries(typeLabel).map(([k, v]) => (
                         <option key={k} value={k}>{v}</option>
@@ -433,12 +433,12 @@ export default function DashboardOperateur() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Montant (XOF) *</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1.5">Montant (XOF) *</label>
                     <input
                       type="number"
                       value={form.amount}
                       onChange={e => setForm({ ...form, amount: e.target.value })}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
+                      className="w-full border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500 bg-white dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-400"
                       placeholder="10000"
                       required
                       min="1"
@@ -447,28 +447,28 @@ export default function DashboardOperateur() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Telephone emetteur *</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1.5">Telephone emetteur *</label>
                     <div className="relative">
-                      <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
                       <input
                         type="text"
                         value={form.sender_phone}
                         onChange={e => setForm({ ...form, sender_phone: e.target.value })}
-                        className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
+                        className="w-full border border-gray-200 dark:border-slate-600 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500 bg-white dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-400"
                         placeholder="+221 77 000 0000"
                         required
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Telephone destinataire *</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1.5">Telephone destinataire *</label>
                     <div className="relative">
-                      <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
                       <input
                         type="text"
                         value={form.recipient_phone}
                         onChange={e => setForm({ ...form, recipient_phone: e.target.value })}
-                        className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
+                        className="w-full border border-gray-200 dark:border-slate-600 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500 bg-white dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-400"
                         placeholder="+221 77 000 0001"
                         required
                       />
@@ -476,12 +476,12 @@ export default function DashboardOperateur() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1.5">Description</label>
                   <input
                     type="text"
                     value={form.description}
                     onChange={e => setForm({ ...form, description: e.target.value })}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
+                    className="w-full border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500 bg-white dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-400"
                     placeholder="Paiement facture electricite..."
                   />
                 </div>
@@ -489,7 +489,7 @@ export default function DashboardOperateur() {
                   <button
                     type="button"
                     onClick={() => setShowForm(false)}
-                    className="flex-1 border border-gray-200 text-gray-600 font-semibold py-2.5 rounded-xl text-sm hover:bg-gray-50 transition-colors"
+                    className="flex-1 border border-gray-200 dark:border-slate-600 text-gray-600 dark:text-slate-300 font-semibold py-2.5 rounded-xl text-sm hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                   >
                     Annuler
                   </button>
@@ -510,16 +510,16 @@ export default function DashboardOperateur() {
   );
 }
 
-function StatCard({ 
-  icon: Icon, 
-  label, 
-  value, 
+function StatCard({
+  icon: Icon,
+  label,
+  value,
   subtitle,
-  gradient 
-}: { 
-  icon: React.ElementType; 
-  label: string; 
-  value: string | number; 
+  gradient
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string | number;
   subtitle?: string;
   gradient: string;
 }) {

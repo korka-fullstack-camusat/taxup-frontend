@@ -200,15 +200,15 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
   // ── UI ──────────────────────────────────────────────────────────────────
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-green-50 border-b border-green-100">
+        <div className="flex items-center justify-between px-6 py-4 bg-green-50 dark:bg-green-900/20 border-b border-green-100 dark:border-green-800/30">
           <div className="flex items-center gap-2">
             <Download className="h-5 w-5 text-green-700" />
-            <h2 className="text-base font-bold text-green-900">Exporter les données</h2>
+            <h2 className="text-base font-bold text-green-900 dark:text-white">Exporter les données</h2>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button onClick={onClose} className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition-colors">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -217,20 +217,20 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
 
           {/* Format */}
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Format d&apos;export</p>
+            <p className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">Format d&apos;export</p>
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setFormat('excel')}
                 className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
                   format === 'excel'
-                    ? 'border-green-500 bg-green-50'
-                    : 'border-gray-200 hover:border-gray-300 bg-white'
+                    ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                    : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 bg-white dark:bg-slate-800'
                 }`}
               >
-                <FileSpreadsheet className={`h-6 w-6 ${format === 'excel' ? 'text-green-600' : 'text-gray-400'}`} />
+                <FileSpreadsheet className={`h-6 w-6 ${format === 'excel' ? 'text-green-600' : 'text-gray-400 dark:text-slate-500'}`} />
                 <div className="text-left">
-                  <p className={`text-sm font-semibold ${format === 'excel' ? 'text-green-700' : 'text-gray-600'}`}>Excel</p>
-                  <p className="text-xs text-gray-400">.xls</p>
+                  <p className={`text-sm font-semibold ${format === 'excel' ? 'text-green-700' : 'text-gray-600 dark:text-slate-300'}`}>Excel</p>
+                  <p className="text-xs text-gray-400 dark:text-slate-500">.xls</p>
                 </div>
                 {format === 'excel' && (
                   <div className="ml-auto h-4 w-4 rounded-full bg-green-500 flex items-center justify-center">
@@ -243,14 +243,14 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
                 onClick={() => setFormat('pdf')}
                 className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
                   format === 'pdf'
-                    ? 'border-red-500 bg-red-50'
-                    : 'border-gray-200 hover:border-gray-300 bg-white'
+                    ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
+                    : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 bg-white dark:bg-slate-800'
                 }`}
               >
-                <FileText className={`h-6 w-6 ${format === 'pdf' ? 'text-red-600' : 'text-gray-400'}`} />
+                <FileText className={`h-6 w-6 ${format === 'pdf' ? 'text-red-600' : 'text-gray-400 dark:text-slate-500'}`} />
                 <div className="text-left">
-                  <p className={`text-sm font-semibold ${format === 'pdf' ? 'text-red-700' : 'text-gray-600'}`}>PDF</p>
-                  <p className="text-xs text-gray-400">.pdf</p>
+                  <p className={`text-sm font-semibold ${format === 'pdf' ? 'text-red-700' : 'text-gray-600 dark:text-slate-300'}`}>PDF</p>
+                  <p className="text-xs text-gray-400 dark:text-slate-500">.pdf</p>
                 </div>
                 {format === 'pdf' && (
                   <div className="ml-auto h-4 w-4 rounded-full bg-red-500 flex items-center justify-center">
@@ -264,7 +264,7 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
           {/* Colonnes */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Colonnes à inclure</p>
+              <p className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Colonnes à inclure</p>
               <button
                 onClick={toggleAll}
                 className="text-xs text-green-700 hover:text-green-900 font-medium transition-colors"
@@ -281,13 +281,13 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
                     onClick={() => toggleField(f.key)}
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all text-left ${
                       isSelected
-                        ? 'border-green-400 bg-green-50 text-green-800'
-                        : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
+                        ? 'border-green-400 bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-white'
+                        : 'border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 hover:border-gray-300'
                     }`}
                   >
                     {isSelected
                       ? <CheckSquare className="h-4 w-4 flex-shrink-0 text-green-600" />
-                      : <Square className="h-4 w-4 flex-shrink-0 text-gray-300" />
+                      : <Square className="h-4 w-4 flex-shrink-0 text-gray-300 dark:text-slate-500" />
                     }
                     <span className="truncate">{f.label}</span>
                   </button>
@@ -297,10 +297,10 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
           </div>
 
           {/* Résumé */}
-          <div className="bg-gray-50 rounded-xl px-4 py-3 flex items-center justify-between text-sm">
-            <span className="text-gray-500">
-              <span className="font-semibold text-gray-800">{data.length}</span> ligne{data.length !== 1 ? 's' : ''} ·{' '}
-              <span className="font-semibold text-gray-800">{selected.size}</span> colonne{selected.size !== 1 ? 's' : ''}
+          <div className="bg-gray-50 dark:bg-slate-800 rounded-xl px-4 py-3 flex items-center justify-between text-sm">
+            <span className="text-gray-500 dark:text-slate-400">
+              <span className="font-semibold text-gray-800 dark:text-white">{data.length}</span> ligne{data.length !== 1 ? 's' : ''} ·{' '}
+              <span className="font-semibold text-gray-800 dark:text-white">{selected.size}</span> colonne{selected.size !== 1 ? 's' : ''}
             </span>
             <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${format === 'excel' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
               {format === 'excel' ? '.xls' : '.pdf'}
@@ -311,7 +311,7 @@ export default function ExportModal({ title, fields, data, filename = 'export', 
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-xl py-2.5 text-sm font-medium transition-colors"
+              className="flex-1 border border-gray-200 dark:border-slate-600 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-xl py-2.5 text-sm font-medium transition-colors"
             >
               Annuler
             </button>

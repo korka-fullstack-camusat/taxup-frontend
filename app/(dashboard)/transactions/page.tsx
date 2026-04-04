@@ -66,32 +66,32 @@ export default function TransactionsPage() {
         {/* Page Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-green-50 p-2.5 rounded-xl">
+            <div className="bg-green-50 dark:bg-green-900/20 p-2.5 rounded-xl">
               <ArrowLeftRight className="h-6 w-6 text-green-700" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">Transactions</h1>
-              <p className="text-gray-500 text-sm mt-0.5">Historique et gestion des transactions</p>
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Transactions</h1>
+              <p className="text-gray-500 dark:text-slate-400 text-sm mt-0.5">Historique et gestion des transactions</p>
             </div>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-wrap gap-3 items-center">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-700/50 shadow-sm p-4 flex flex-wrap gap-3 items-center">
           <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
             <input
               type="text"
               placeholder="Rechercher par numéro, ID..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
+              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500 bg-white dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-400"
             />
           </div>
           <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-gray-400" />
+            <Filter className="h-4 w-4 text-gray-400 dark:text-slate-500" />
             <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
-              className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+              className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500">
               <option value="">Tous les statuts</option>
               <option value="COMPLETED">Complété</option>
               <option value="PENDING">En attente</option>
@@ -99,7 +99,7 @@ export default function TransactionsPage() {
               <option value="FLAGGED">Signalé</option>
             </select>
             <select value={typeFilter} onChange={e => { setTypeFilter(e.target.value); setPage(1); }}
-              className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+              className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500">
               <option value="">Tous les types</option>
               {Object.entries(typeLabel).map(([val, lbl]) => <option key={val} value={val}>{lbl}</option>)}
             </select>
@@ -107,11 +107,11 @@ export default function TransactionsPage() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700/50 overflow-hidden">
           {loading ? (
             <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-700" /></div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-16 text-gray-400">
+            <div className="text-center py-16 text-gray-400 dark:text-slate-500">
               <ArrowLeftRight className="h-12 w-12 mx-auto mb-3 opacity-30" />
               <p>Aucune transaction trouvée</p>
             </div>
@@ -119,7 +119,7 @@ export default function TransactionsPage() {
             <>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+                  <thead className="bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-slate-400 text-xs uppercase">
                     <tr>
                       <th className="px-6 py-3 text-left">Type</th>
                       <th className="px-6 py-3 text-left">Émetteur</th>
@@ -130,16 +130,16 @@ export default function TransactionsPage() {
                       <th className="px-6 py-3 text-left">Date</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-50">
+                  <tbody className="divide-y divide-gray-50 dark:divide-slate-700/50">
                     {filtered.map(tx => {
                       const s = statusConfig[tx.status] || statusConfig.PENDING;
                       const StatusIcon = s.icon;
                       return (
-                        <tr key={tx.id} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-6 py-4 font-medium text-gray-800">{typeLabel[tx.transaction_type] || tx.transaction_type}</td>
-                          <td className="px-6 py-4 text-gray-500 font-mono text-xs">{tx.sender_phone || '—'}</td>
-                          <td className="px-6 py-4 text-gray-500 font-mono text-xs">{tx.recipient_phone || '—'}</td>
-                          <td className="px-6 py-4 text-right font-semibold text-gray-800">{formatXOF(tx.amount)}</td>
+                        <tr key={tx.id} className="hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+                          <td className="px-6 py-4 font-medium text-gray-800 dark:text-white">{typeLabel[tx.transaction_type] || tx.transaction_type}</td>
+                          <td className="px-6 py-4 text-gray-500 dark:text-slate-400 font-mono text-xs">{tx.sender_phone || '—'}</td>
+                          <td className="px-6 py-4 text-gray-500 dark:text-slate-400 font-mono text-xs">{tx.recipient_phone || '—'}</td>
+                          <td className="px-6 py-4 text-right font-semibold text-gray-800 dark:text-white">{formatXOF(tx.amount)}</td>
                           <td className="px-6 py-4 text-center">
                             <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${s.color}`}>
                               <StatusIcon className="h-3 w-3" />{s.label}
@@ -151,9 +151,9 @@ export default function TransactionsPage() {
                                 tx.risk_score >= 0.7 ? 'text-red-600 bg-red-50' :
                                 tx.risk_score >= 0.4 ? 'text-orange-600 bg-orange-50' : 'text-green-700 bg-green-50'
                               }`}>{Math.round(tx.risk_score * 100)}%</span>
-                            ) : <span className="text-gray-300">—</span>}
+                            ) : <span className="text-gray-300 dark:text-slate-600">—</span>}
                           </td>
-                          <td className="px-6 py-4 text-gray-400 text-xs">{new Date(tx.created_at).toLocaleString('fr-FR')}</td>
+                          <td className="px-6 py-4 text-gray-400 dark:text-slate-500 text-xs">{new Date(tx.created_at).toLocaleString('fr-FR')}</td>
                         </tr>
                       );
                     })}
@@ -161,15 +161,15 @@ export default function TransactionsPage() {
                 </table>
               </div>
               {/* Pagination */}
-              <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
-                <p className="text-sm text-gray-500">Page {page} · {total} résultats</p>
+              <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 dark:border-slate-700/50">
+                <p className="text-sm text-gray-500 dark:text-slate-400">Page {page} · {total} résultats</p>
                 <div className="flex gap-2">
                   <button disabled={page === 1} onClick={() => setPage(p => p - 1)}
-                    className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50">
+                    className="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-600 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:text-slate-300">
                     Précédent
                   </button>
                   <button disabled={page * pageSize >= total} onClick={() => setPage(p => p + 1)}
-                    className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50">
+                    className="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-600 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:text-slate-300">
                     Suivant
                   </button>
                 </div>

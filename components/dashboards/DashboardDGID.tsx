@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { 
-  ArrowLeftRight, 
-  AlertTriangle, 
-  ClipboardList, 
-  Receipt, 
-  TrendingUp, 
-  Shield, 
-  Activity, 
+import {
+  ArrowLeftRight,
+  AlertTriangle,
+  ClipboardList,
+  Receipt,
+  TrendingUp,
+  Shield,
+  Activity,
   DollarSign,
   RefreshCw,
   ChevronRight,
@@ -23,9 +23,9 @@ import {
 import { useAuth } from '@/lib/auth';
 import api from '@/lib/api';
 import { exportCSV } from '@/lib/export';
-import { 
-  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
-  Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line 
+import {
+  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line
 } from 'recharts';
 
 interface OverviewData {
@@ -60,9 +60,9 @@ const typeLabel: Record<string, string> = {
 };
 
 const fraudTypeLabel: Record<string, string> = {
-  STRUCTURING: 'Fragmentation', 
+  STRUCTURING: 'Fragmentation',
   RAPID_TRANSFER: 'Transfert rapide',
-  UNUSUAL_PATTERN: 'Schema inhabituel', 
+  UNUSUAL_PATTERN: 'Schema inhabituel',
   SUSPICIOUS_AMOUNT: 'Montant suspect',
   VELOCITY_ABUSE: 'Abus frequence',
 };
@@ -146,23 +146,23 @@ export default function DashboardDGID() {
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Tableau de Bord DGID</h1>
-            <p className="text-gray-500 text-sm mt-1">Bienvenue, {user?.full_name || 'Agent DGID'}</p>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Tableau de Bord DGID</h1>
+            <p className="text-gray-500 dark:text-slate-400 text-sm mt-1">Bienvenue, {user?.full_name || 'Agent DGID'}</p>
           </div>
           <div className="flex items-center gap-3">
-            <select 
-              value={period} 
+            <select
+              value={period}
               onChange={e => setPeriod(Number(e.target.value))}
-              className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-600"
+              className="border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 text-sm bg-white dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500"
             >
               <option value={7}>7 jours</option>
               <option value={14}>14 jours</option>
               <option value={30}>30 jours</option>
               <option value={90}>90 jours</option>
             </select>
-            <button 
+            <button
               onClick={fetchData}
-              className="flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+              className="flex items-center gap-2 border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-200 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
             >
               <RefreshCw className="h-4 w-4" /> Actualiser
             </button>
@@ -178,30 +178,30 @@ export default function DashboardDGID() {
 
         {/* KPI Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard 
-            icon={ArrowLeftRight} 
-            label="Total transactions" 
+          <StatCard
+            icon={ArrowLeftRight}
+            label="Total transactions"
             value={overview?.transactions.total ?? 0}
             subtitle={formatXOF(overview?.transactions.total_volume ?? 0)}
             gradient="from-green-600 to-green-700"
           />
-          <StatCard 
-            icon={AlertTriangle} 
-            label="Alertes fraude" 
+          <StatCard
+            icon={AlertTriangle}
+            label="Alertes fraude"
             value={overview?.fraud.total_alerts ?? 0}
             subtitle={`${overview?.fraud.pending_alerts ?? 0} en attente`}
             gradient="from-red-500 to-red-600"
           />
-          <StatCard 
-            icon={ClipboardList} 
-            label="Audits actifs" 
+          <StatCard
+            icon={ClipboardList}
+            label="Audits actifs"
             value={(overview?.audits.open ?? 0) + (overview?.audits.in_progress ?? 0)}
             subtitle={`${overview?.audits.completed ?? 0} termines`}
             gradient="from-purple-500 to-purple-600"
           />
-          <StatCard 
-            icon={DollarSign} 
-            label="TVA ce mois" 
+          <StatCard
+            icon={DollarSign}
+            label="TVA ce mois"
             value={formatShort(overview?.fiscal.month_tax_collected_xof ?? 0)}
             subtitle={`${overview?.fiscal.total_receipts ?? 0} recus`}
             gradient="from-emerald-500 to-emerald-600"
@@ -211,13 +211,13 @@ export default function DashboardDGID() {
         {/* Charts Row 1 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Evolution Chart */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 p-6">
+            <h3 className="font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
               <Activity className="h-4 w-4 text-green-700" />
               Evolution des transactions ({period}j)
             </h3>
             {evolution.length === 0 ? (
-              <div className="h-64 flex items-center justify-center text-gray-400 text-sm">Aucune donnee</div>
+              <div className="h-64 flex items-center justify-center text-gray-400 dark:text-slate-500 text-sm">Aucune donnee</div>
             ) : (
               <ResponsiveContainer width="100%" height={250}>
                 <AreaChart data={evolution}>
@@ -233,13 +233,13 @@ export default function DashboardDGID() {
           </div>
 
           {/* Revenue Evolution */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 p-6">
+            <h3 className="font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-emerald-600" />
               Evolution TVA ({period}j)
             </h3>
             {evolution.length === 0 ? (
-              <div className="h-64 flex items-center justify-center text-gray-400 text-sm">Aucune donnee</div>
+              <div className="h-64 flex items-center justify-center text-gray-400 dark:text-slate-500 text-sm">Aucune donnee</div>
             ) : (
               <ResponsiveContainer width="100%" height={250}>
                 <AreaChart data={evolution}>
@@ -257,13 +257,13 @@ export default function DashboardDGID() {
         {/* Charts Row 2 */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Bar chart transactions par type */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 p-6">
+            <h3 className="font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
               <BarChart3 className="h-4 w-4 text-green-700" />
               Transactions 24h par type
             </h3>
             {byTypeData.length === 0 ? (
-              <div className="h-52 flex items-center justify-center text-gray-400 text-sm">Aucune donnee</div>
+              <div className="h-52 flex items-center justify-center text-gray-400 dark:text-slate-500 text-sm">Aucune donnee</div>
             ) : (
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={byTypeData}>
@@ -278,13 +278,13 @@ export default function DashboardDGID() {
           </div>
 
           {/* Pie chart par statut */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 p-6">
+            <h3 className="font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
               <Activity className="h-4 w-4 text-purple-600" />
               Repartition par statut (24h)
             </h3>
             {byStatusData.length === 0 ? (
-              <div className="h-52 flex items-center justify-center text-gray-400 text-sm">Aucune donnee</div>
+              <div className="h-52 flex items-center justify-center text-gray-400 dark:text-slate-500 text-sm">Aucune donnee</div>
             ) : (
               <>
                 <ResponsiveContainer width="100%" height={160}>
@@ -301,7 +301,7 @@ export default function DashboardDGID() {
                   {byStatusData.map((d, i) => (
                     <div key={i} className="flex items-center gap-1.5 text-xs">
                       <div className="h-2 w-2 rounded-full" style={{ backgroundColor: d.color }} />
-                      <span className="text-gray-600">{d.name}</span>
+                      <span className="text-gray-600 dark:text-slate-300">{d.name}</span>
                     </div>
                   ))}
                 </div>
@@ -310,13 +310,13 @@ export default function DashboardDGID() {
           </div>
 
           {/* Fraud Alerts Evolution */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 p-6">
+            <h3 className="font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
               <Shield className="h-4 w-4 text-red-600" />
               Alertes fraude ({period}j)
             </h3>
             {evolution.length === 0 ? (
-              <div className="h-52 flex items-center justify-center text-gray-400 text-sm">Aucune donnee</div>
+              <div className="h-52 flex items-center justify-center text-gray-400 dark:text-slate-500 text-sm">Aucune donnee</div>
             ) : (
               <ResponsiveContainer width="100%" height={200}>
                 <LineChart data={evolution}>
@@ -332,51 +332,51 @@ export default function DashboardDGID() {
         </div>
 
         {/* Recent Fraud Alerts */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-slate-700/50">
             <div className="flex items-center gap-3">
-              <div className="bg-red-50 p-2 rounded-lg">
+              <div className="bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">
                 <AlertTriangle className="h-4 w-4 text-red-600" />
               </div>
-              <h2 className="font-semibold text-gray-800">Alertes fraude recentes (24h)</h2>
+              <h2 className="font-semibold text-gray-800 dark:text-white">Alertes fraude recentes (24h)</h2>
             </div>
             <a href="/fraud" className="text-sm text-green-700 hover:text-green-800 font-medium flex items-center gap-1">
               Voir tout <ChevronRight className="h-4 w-4" />
             </a>
           </div>
           {!realtime?.recent_fraud_alerts.length ? (
-            <div className="text-center py-12 text-gray-400">
+            <div className="text-center py-12 text-gray-400 dark:text-slate-500">
               <Shield className="h-10 w-10 mx-auto mb-2 opacity-30" />
               <p className="text-sm">Aucune alerte recente</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+                <thead className="bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-slate-400 text-xs uppercase">
                   <tr>
                     <th className="px-6 py-3 text-left">Type de fraude</th>
                     <th className="px-6 py-3 text-center">Score de risque</th>
                     <th className="px-6 py-3 text-left">Detecte le</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-gray-50 dark:divide-slate-700/50">
                   {realtime.recent_fraud_alerts.slice(0, 8).map(alert => {
                     const risk = alert.risk_score;
                     const riskClass = risk >= 0.8 ? 'text-red-600 bg-red-50' : risk >= 0.6 ? 'text-orange-600 bg-orange-50' : risk >= 0.4 ? 'text-amber-600 bg-amber-50' : 'text-emerald-600 bg-emerald-50';
                     return (
-                      <tr key={alert.id} className="hover:bg-gray-50/50 transition-colors">
+                      <tr key={alert.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
                             <AlertTriangle className={`h-4 w-4 ${risk >= 0.7 ? 'text-red-500' : 'text-orange-500'}`} />
-                            <span className="font-medium text-gray-800">{fraudTypeLabel[alert.fraud_type] || alert.fraud_type}</span>
+                            <span className="font-medium text-gray-800 dark:text-white">{fraudTypeLabel[alert.fraud_type] || alert.fraud_type}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-center gap-2">
-                            <div className="w-16 bg-gray-200 rounded-full h-1.5">
-                              <div 
+                            <div className="w-16 bg-gray-200 dark:bg-slate-700 rounded-full h-1.5">
+                              <div
                                 className={`h-1.5 rounded-full ${risk >= 0.8 ? 'bg-red-500' : risk >= 0.6 ? 'bg-orange-500' : risk >= 0.4 ? 'bg-amber-500' : 'bg-emerald-500'}`}
-                                style={{ width: `${risk * 100}%` }} 
+                                style={{ width: `${risk * 100}%` }}
                               />
                             </div>
                             <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${riskClass}`}>
@@ -384,7 +384,7 @@ export default function DashboardDGID() {
                             </span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-gray-500 text-xs">{new Date(alert.detected_at).toLocaleString('fr-FR')}</td>
+                        <td className="px-6 py-4 text-gray-500 dark:text-slate-400 text-xs">{new Date(alert.detected_at).toLocaleString('fr-FR')}</td>
                       </tr>
                     );
                   })}
@@ -404,15 +404,15 @@ export default function DashboardDGID() {
             { href: '/admin/operateurs', icon: Building2, label: 'Operateurs', color: 'amber' },
             { href: '/admin/carte-fiscale', icon: Map, label: 'Carte', color: 'cyan' },
           ].map(({ href, icon: Icon, label, color }) => (
-            <a 
-              key={href} 
-              href={href} 
+            <a
+              key={href}
+              href={href}
               className={`group rounded-2xl p-4 flex flex-col items-center gap-2 border transition-all hover:shadow-lg bg-${color}-50 border-${color}-100 hover:bg-${color}-100`}
             >
               <div className={`bg-${color}-100 p-3 rounded-xl group-hover:bg-${color}-600 transition-colors`}>
                 <Icon className={`h-5 w-5 text-${color}-600 group-hover:text-white transition-colors`} />
               </div>
-              <span className="text-sm font-medium text-gray-700">{label}</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-slate-200">{label}</span>
             </a>
           ))}
         </div>
@@ -421,16 +421,16 @@ export default function DashboardDGID() {
   );
 }
 
-function StatCard({ 
-  icon: Icon, 
-  label, 
-  value, 
+function StatCard({
+  icon: Icon,
+  label,
+  value,
   subtitle,
-  gradient 
-}: { 
-  icon: React.ElementType; 
-  label: string; 
-  value: string | number; 
+  gradient
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string | number;
   subtitle?: string;
   gradient: string;
 }) {

@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { 
-  ClipboardList, 
-  AlertTriangle, 
-  CheckCircle, 
-  Clock, 
+import {
+  ClipboardList,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
   TrendingUp,
   Shield,
   FileText,
@@ -19,9 +19,9 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import api from '@/lib/api';
-import { 
-  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
-  Tooltip, ResponsiveContainer, PieChart, Pie, Cell 
+import {
+  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
 
 interface Audit {
@@ -58,9 +58,9 @@ const priorityConfig: Record<string, { label: string; color: string; bgColor: st
 };
 
 const fraudTypeLabel: Record<string, string> = {
-  STRUCTURING: 'Fragmentation', 
+  STRUCTURING: 'Fragmentation',
   RAPID_TRANSFER: 'Transfert rapide',
-  UNUSUAL_PATTERN: 'Schema inhabituel', 
+  UNUSUAL_PATTERN: 'Schema inhabituel',
   SUSPICIOUS_AMOUNT: 'Montant suspect',
   VELOCITY_ABUSE: 'Abus frequence',
 };
@@ -79,10 +79,10 @@ export default function DashboardAuditeur() {
   const [audits, setAudits] = useState<Audit[]>([]);
   const [alerts, setAlerts] = useState<FraudAlert[]>([]);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({ 
-    totalAudits: 0, 
-    open: 0, 
-    inProgress: 0, 
+  const [stats, setStats] = useState({
+    totalAudits: 0,
+    open: 0,
+    inProgress: 0,
     completed: 0,
     totalAlerts: 0,
     highRisk: 0,
@@ -152,13 +152,13 @@ export default function DashboardAuditeur() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Tableau de Bord Auditeur</h1>
-            <p className="text-gray-500 text-sm mt-1">Bienvenue, {user?.full_name || 'Auditeur Fiscal'}</p>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Tableau de Bord Auditeur</h1>
+            <p className="text-gray-500 dark:text-slate-400 text-sm mt-1">Bienvenue, {user?.full_name || 'Auditeur Fiscal'}</p>
           </div>
           <div className="flex items-center gap-3">
-            <button 
+            <button
               onClick={fetchData}
-              className="flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+              className="flex items-center gap-2 border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-200 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
             >
               <RefreshCw className="h-4 w-4" /> Actualiser
             </button>
@@ -173,29 +173,29 @@ export default function DashboardAuditeur() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard 
-            icon={ClipboardList} 
-            label="Total audits" 
+          <StatCard
+            icon={ClipboardList}
+            label="Total audits"
             value={stats.totalAudits}
             subtitle={`${stats.open} ouverts`}
             gradient="from-green-600 to-green-700"
           />
-          <StatCard 
-            icon={Activity} 
-            label="En cours" 
+          <StatCard
+            icon={Activity}
+            label="En cours"
             value={stats.inProgress}
             gradient="from-amber-500 to-amber-600"
           />
-          <StatCard 
-            icon={AlertTriangle} 
-            label="Alertes fraude" 
+          <StatCard
+            icon={AlertTriangle}
+            label="Alertes fraude"
             value={stats.totalAlerts}
             subtitle={`${stats.highRisk} haut risque`}
             gradient="from-red-500 to-red-600"
           />
-          <StatCard 
-            icon={Target} 
-            label="A traiter" 
+          <StatCard
+            icon={Target}
+            label="A traiter"
             value={stats.pendingAlerts}
             gradient="from-purple-500 to-purple-600"
           />
@@ -204,23 +204,23 @@ export default function DashboardAuditeur() {
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Audit Status Pie */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 p-6">
+            <h3 className="font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
               <ClipboardList className="h-4 w-4 text-green-700" />
               Statut des audits
             </h3>
             {auditStatusData.length === 0 ? (
-              <div className="h-48 flex items-center justify-center text-gray-400 text-sm">Aucun audit</div>
+              <div className="h-48 flex items-center justify-center text-gray-400 dark:text-slate-500 text-sm">Aucun audit</div>
             ) : (
               <>
                 <ResponsiveContainer width="100%" height={180}>
                   <PieChart>
-                    <Pie 
-                      data={auditStatusData} 
-                      cx="50%" 
-                      cy="50%" 
-                      innerRadius={45} 
-                      outerRadius={70} 
+                    <Pie
+                      data={auditStatusData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={45}
+                      outerRadius={70}
                       dataKey="value"
                       paddingAngle={3}
                     >
@@ -235,7 +235,7 @@ export default function DashboardAuditeur() {
                   {auditStatusData.map((d, i) => (
                     <div key={i} className="flex items-center gap-2 text-xs">
                       <div className="h-2 w-2 rounded-full" style={{ backgroundColor: d.color }} />
-                      <span className="text-gray-600">{d.name}: {d.value}</span>
+                      <span className="text-gray-600 dark:text-slate-300">{d.name}: {d.value}</span>
                     </div>
                   ))}
                 </div>
@@ -244,13 +244,13 @@ export default function DashboardAuditeur() {
           </div>
 
           {/* Alerts by Type */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 p-6">
+            <h3 className="font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
               <BarChart3 className="h-4 w-4 text-red-600" />
               Alertes par type
             </h3>
             {alertsByType.length === 0 ? (
-              <div className="h-48 flex items-center justify-center text-gray-400 text-sm">Aucune alerte</div>
+              <div className="h-48 flex items-center justify-center text-gray-400 dark:text-slate-500 text-sm">Aucune alerte</div>
             ) : (
               <ResponsiveContainer width="100%" height={180}>
                 <BarChart data={alertsByType} layout="vertical">
@@ -265,23 +265,23 @@ export default function DashboardAuditeur() {
           </div>
 
           {/* Risk Distribution */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 p-6">
+            <h3 className="font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
               <Shield className="h-4 w-4 text-purple-600" />
               Distribution des risques
             </h3>
             {riskDistribution.length === 0 ? (
-              <div className="h-48 flex items-center justify-center text-gray-400 text-sm">Aucune donnee</div>
+              <div className="h-48 flex items-center justify-center text-gray-400 dark:text-slate-500 text-sm">Aucune donnee</div>
             ) : (
               <>
                 <ResponsiveContainer width="100%" height={180}>
                   <PieChart>
-                    <Pie 
-                      data={riskDistribution} 
-                      cx="50%" 
-                      cy="50%" 
-                      innerRadius={45} 
-                      outerRadius={70} 
+                    <Pie
+                      data={riskDistribution}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={45}
+                      outerRadius={70}
                       dataKey="value"
                       paddingAngle={3}
                     >
@@ -296,7 +296,7 @@ export default function DashboardAuditeur() {
                   {riskDistribution.map((d, i) => (
                     <div key={i} className="flex items-center gap-2 text-xs">
                       <div className="h-2 w-2 rounded-full" style={{ backgroundColor: d.color }} />
-                      <span className="text-gray-600">{d.name}: {d.value}</span>
+                      <span className="text-gray-600 dark:text-slate-300">{d.name}: {d.value}</span>
                     </div>
                   ))}
                 </div>
@@ -308,38 +308,38 @@ export default function DashboardAuditeur() {
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Audits */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-slate-700/50">
               <div className="flex items-center gap-3">
-                <div className="bg-green-50 p-2 rounded-lg">
+                <div className="bg-green-50 dark:bg-green-900/20 p-2 rounded-lg">
                   <ClipboardList className="h-4 w-4 text-green-700" />
                 </div>
-                <h2 className="font-semibold text-gray-800">Audits recents</h2>
+                <h2 className="font-semibold text-gray-800 dark:text-white">Audits recents</h2>
               </div>
               <a href="/audits" className="text-sm text-green-700 hover:text-green-800 font-medium flex items-center gap-1">
                 Voir tout <ChevronRight className="h-4 w-4" />
               </a>
             </div>
             {audits.length === 0 ? (
-              <div className="text-center py-12 text-gray-400">
+              <div className="text-center py-12 text-gray-400 dark:text-slate-500">
                 <ClipboardList className="h-10 w-10 mx-auto mb-2 opacity-30" />
                 <p className="text-sm">Aucun audit</p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-50">
+              <div className="divide-y divide-gray-50 dark:divide-slate-700/50">
                 {audits.slice(0, 6).map(audit => {
                   const s = auditStatusConfig[audit.status] || auditStatusConfig.OPEN;
                   const p = priorityConfig[audit.priority] || priorityConfig.MEDIUM;
                   const StatusIcon = s.icon;
                   return (
-                    <div key={audit.id} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50/50 transition-colors">
+                    <div key={audit.id} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50/50 dark:hover:bg-slate-800 transition-colors">
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <div className={`h-10 w-10 rounded-xl ${s.bgColor} flex items-center justify-center flex-shrink-0`}>
                           <StatusIcon className={`h-5 w-5 ${s.color}`} />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-gray-800 truncate">{audit.title}</p>
-                          <p className="text-xs text-gray-400 mt-0.5">
+                          <p className="text-sm font-medium text-gray-800 dark:text-white truncate">{audit.title}</p>
+                          <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
                             {new Date(audit.created_at).toLocaleDateString('fr-FR')}
                           </p>
                         </div>
@@ -360,52 +360,52 @@ export default function DashboardAuditeur() {
           </div>
 
           {/* Recent Fraud Alerts */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-slate-700/50">
               <div className="flex items-center gap-3">
-                <div className="bg-red-50 p-2 rounded-lg">
+                <div className="bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">
                   <AlertTriangle className="h-4 w-4 text-red-600" />
                 </div>
-                <h2 className="font-semibold text-gray-800">Alertes fraude recentes</h2>
+                <h2 className="font-semibold text-gray-800 dark:text-white">Alertes fraude recentes</h2>
               </div>
               <a href="/fraud" className="text-sm text-green-700 hover:text-green-800 font-medium flex items-center gap-1">
                 Voir tout <ChevronRight className="h-4 w-4" />
               </a>
             </div>
             {alerts.length === 0 ? (
-              <div className="text-center py-12 text-gray-400">
+              <div className="text-center py-12 text-gray-400 dark:text-slate-500">
                 <Shield className="h-10 w-10 mx-auto mb-2 opacity-30" />
                 <p className="text-sm">Aucune alerte</p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-50">
+              <div className="divide-y divide-gray-50 dark:divide-slate-700/50">
                 {alerts.slice(0, 6).map(alert => {
                   const risk = riskLevel(alert.risk_score);
                   return (
-                    <div key={alert.id} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50/50 transition-colors">
+                    <div key={alert.id} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50/50 dark:hover:bg-slate-800 transition-colors">
                       <div className="flex items-center gap-3">
                         <div className={`h-10 w-10 rounded-xl ${alert.risk_score >= 0.7 ? 'bg-red-100' : 'bg-orange-100'} flex items-center justify-center`}>
                           <AlertTriangle className={`h-5 w-5 ${alert.risk_score >= 0.7 ? 'text-red-600' : 'text-orange-600'}`} />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-800">
+                          <p className="text-sm font-medium text-gray-800 dark:text-white">
                             {fraudTypeLabel[alert.fraud_type] || alert.fraud_type}
                           </p>
-                          <p className="text-xs text-gray-400 mt-0.5">
+                          <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
                             {new Date(alert.detected_at).toLocaleDateString('fr-FR')}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-1">
-                          <div className="w-12 bg-gray-200 rounded-full h-1.5">
-                            <div 
+                          <div className="w-12 bg-gray-200 dark:bg-slate-700 rounded-full h-1.5">
+                            <div
                               className={`h-1.5 rounded-full ${
-                                alert.risk_score >= 0.8 ? 'bg-red-500' : 
-                                alert.risk_score >= 0.6 ? 'bg-orange-500' : 
+                                alert.risk_score >= 0.8 ? 'bg-red-500' :
+                                alert.risk_score >= 0.6 ? 'bg-orange-500' :
                                 alert.risk_score >= 0.4 ? 'bg-amber-500' : 'bg-emerald-500'
                               }`}
-                              style={{ width: `${alert.risk_score * 100}%` }} 
+                              style={{ width: `${alert.risk_score * 100}%` }}
                             />
                           </div>
                           <span className={`text-xs font-bold px-2 py-1 rounded-full ${risk.bgColor} ${risk.color}`}>
@@ -423,52 +423,52 @@ export default function DashboardAuditeur() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <a 
-            href="/audits" 
-            className="group bg-white rounded-2xl border border-gray-100 p-5 flex flex-col items-center gap-3 hover:shadow-lg hover:border-green-200 transition-all text-center"
+          <a
+            href="/audits"
+            className="group bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-700/50 p-5 flex flex-col items-center gap-3 hover:shadow-lg hover:border-green-200 dark:hover:bg-slate-800 transition-all text-center"
           >
             <div className="bg-green-100 p-4 rounded-xl group-hover:bg-green-700 transition-colors">
               <ClipboardList className="h-6 w-6 text-green-700 group-hover:text-white transition-colors" />
             </div>
             <div>
-              <p className="font-semibold text-gray-800 text-sm">Gerer les audits</p>
-              <p className="text-xs text-gray-500 mt-0.5">Creer et suivre</p>
+              <p className="font-semibold text-gray-800 dark:text-white text-sm">Gerer les audits</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Creer et suivre</p>
             </div>
           </a>
-          <a 
-            href="/fraud" 
-            className="group bg-white rounded-2xl border border-gray-100 p-5 flex flex-col items-center gap-3 hover:shadow-lg hover:border-red-200 transition-all text-center"
+          <a
+            href="/fraud"
+            className="group bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-700/50 p-5 flex flex-col items-center gap-3 hover:shadow-lg hover:border-red-200 dark:hover:bg-slate-800 transition-all text-center"
           >
             <div className="bg-red-100 p-4 rounded-xl group-hover:bg-red-600 transition-colors">
               <AlertTriangle className="h-6 w-6 text-red-600 group-hover:text-white transition-colors" />
             </div>
             <div>
-              <p className="font-semibold text-gray-800 text-sm">Alertes fraude</p>
-              <p className="text-xs text-gray-500 mt-0.5">Analyser et traiter</p>
+              <p className="font-semibold text-gray-800 dark:text-white text-sm">Alertes fraude</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Analyser et traiter</p>
             </div>
           </a>
-          <a 
-            href="/transactions" 
-            className="group bg-white rounded-2xl border border-gray-100 p-5 flex flex-col items-center gap-3 hover:shadow-lg hover:border-purple-200 transition-all text-center"
+          <a
+            href="/transactions"
+            className="group bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-700/50 p-5 flex flex-col items-center gap-3 hover:shadow-lg hover:border-purple-200 dark:hover:bg-slate-800 transition-all text-center"
           >
             <div className="bg-purple-100 p-4 rounded-xl group-hover:bg-purple-600 transition-colors">
               <Eye className="h-6 w-6 text-purple-600 group-hover:text-white transition-colors" />
             </div>
             <div>
-              <p className="font-semibold text-gray-800 text-sm">Transactions</p>
-              <p className="text-xs text-gray-500 mt-0.5">Consulter l&apos;historique</p>
+              <p className="font-semibold text-gray-800 dark:text-white text-sm">Transactions</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Consulter l&apos;historique</p>
             </div>
           </a>
-          <a 
-            href="/admin/rapports" 
-            className="group bg-white rounded-2xl border border-gray-100 p-5 flex flex-col items-center gap-3 hover:shadow-lg hover:border-emerald-200 transition-all text-center"
+          <a
+            href="/admin/rapports"
+            className="group bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-700/50 p-5 flex flex-col items-center gap-3 hover:shadow-lg hover:border-emerald-200 dark:hover:bg-slate-800 transition-all text-center"
           >
             <div className="bg-emerald-100 p-4 rounded-xl group-hover:bg-emerald-600 transition-colors">
               <FileText className="h-6 w-6 text-emerald-600 group-hover:text-white transition-colors" />
             </div>
             <div>
-              <p className="font-semibold text-gray-800 text-sm">Rapports</p>
-              <p className="text-xs text-gray-500 mt-0.5">Generer des rapports</p>
+              <p className="font-semibold text-gray-800 dark:text-white text-sm">Rapports</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Generer des rapports</p>
             </div>
           </a>
         </div>
@@ -477,16 +477,16 @@ export default function DashboardAuditeur() {
   );
 }
 
-function StatCard({ 
-  icon: Icon, 
-  label, 
-  value, 
+function StatCard({
+  icon: Icon,
+  label,
+  value,
   subtitle,
-  gradient 
-}: { 
-  icon: React.ElementType; 
-  label: string; 
-  value: string | number; 
+  gradient
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string | number;
   subtitle?: string;
   gradient: string;
 }) {
