@@ -72,9 +72,12 @@ export default function TransactionsPage() {
   // statsDisplay = valeurs affichées (légèrement variées pour simuler le flux)
   const [statsDisplay, setStatsDisplay] = useState<LiveStats>({ total: 0, totalValue: 0, successRate: 0, lastUpdate: '--:--' });
   const [pulse, setPulse] = useState(false);
+  const [activeRows, setActiveRows] = useState<Set<string>>(new Set());
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const tickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const rowTickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const statsBaseRef = useRef<LiveStats>({ total: 0, totalValue: 0, successRate: 0, lastUpdate: '--:--' });
+  const transactionsRef = useRef<Transaction[]>([]);
   const pageSize = 20;
 
   const fetchData = (silent = false) => {
@@ -87,6 +90,7 @@ export default function TransactionsPage() {
         const items: Transaction[] = res.data.items || [];
         const t = res.data.total || 0;
         setTransactions(items);
+        transactionsRef.current = items;
         setTotal(t);
         const base = computeStats(items, t);
         statsBaseRef.current = base;
@@ -131,6 +135,27 @@ export default function TransactionsPage() {
       setStatsDisplay(statsBaseRef.current);
     }
     return () => { if (tickerRef.current) clearInterval(tickerRef.current); };
+  }, [live]);
+
+  // Ticker lignes : flash aléatoire sur 1-2 lignes toutes les 2.5s
+  useEffect(() => {
+    if (live) {
+      rowTickerRef.current = setInterval(() => {
+        const rows = transactionsRef.current;
+        if (rows.length === 0) return;
+        const count = Math.random() > 0.4 ? 2 : 1;
+        const picks = new Set<string>();
+        while (picks.size < count) {
+          picks.add(rows[Math.floor(Math.random() * rows.length)].id);
+        }
+        setActiveRows(picks);
+        setTimeout(() => setActiveRows(new Set()), 800);
+      }, 2500);
+    } else {
+      if (rowTickerRef.current) clearInterval(rowTickerRef.current);
+      setActiveRows(new Set());
+    }
+    return () => { if (rowTickerRef.current) clearInterval(rowTickerRef.current); };
   }, [live]);
 
   const filtered = transactions.filter(t =>
@@ -292,15 +317,36 @@ export default function TransactionsPage() {
                     {filtered.map(tx => {
                       const s = statusConfig[tx.status] || statusConfig.PENDING;
                       const StatusIcon = s.icon;
+                      const isActive = activeRows.has(tx.id);
                       return (
-                        <tr key={tx.id} className="hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
-                          <td className="px-6 py-4 font-medium text-gray-800 dark:text-white">{typeLabel[tx.transaction_type] || tx.transaction_type}</td>
+                        <tr
+                          key={tx.id}
+                          className={`transition-all duration-500 ${
+                            isActive
+                              ? 'bg-[#00853F]/8 dark:bg-[#00853F]/12'
+                              : 'hover:bg-gray-50 dark:hover:bg-slate-800'
+                          }`}
+                        >
+                          {/* Barre latérale d'activité */}
+                          <td className="relative px-6 py-4 font-medium text-gray-800 dark:text-white">
+                            {isActive && (
+                              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-[#00853F] rounded-r-full" />
+                            )}
+                            {typeLabel[tx.transaction_type] || tx.transaction_type}
+                          </td>
                           <td className="px-6 py-4 text-gray-500 dark:text-slate-400 font-mono text-xs">{tx.sender_phone || '—'}</td>
                           <td className="px-6 py-4 text-gray-500 dark:text-slate-400 font-mono text-xs">{tx.recipient_phone || '—'}</td>
-                          <td className="px-6 py-4 text-right font-semibold text-gray-800 dark:text-white">{formatXOF(tx.amount)}</td>
+                          <td className={`px-6 py-4 text-right font-semibold transition-colors duration-500 ${
+                            isActive ? 'text-[#00853F] dark:text-[#4ade80]' : 'text-gray-800 dark:text-white'
+                          }`}>{formatXOF(tx.amount)}</td>
                           <td className="px-6 py-4 text-center">
-                            <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${s.color}`}>
-                              <StatusIcon className="h-3 w-3" />{s.label}
+                            <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full transition-all duration-500 ${
+                              isActive && tx.status === 'COMPLETED'
+                                ? 'bg-[#00853F] text-white shadow-sm shadow-[#00853F]/30'
+                                : s.color
+                            }`}>
+                              {isActive ? <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse" /> : <StatusIcon className="h-3 w-3" />}
+                              {s.label}
                             </span>
                           </td>
                           <td className="px-6 py-4 text-center">
