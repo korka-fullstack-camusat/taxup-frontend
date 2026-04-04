@@ -1,7 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { ArrowLeftRight, Search, Filter, CheckCircle, Clock, XCircle, AlertTriangle } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import {
+  ArrowLeftRight, Search, Filter, CheckCircle, Clock,
+  XCircle, AlertTriangle, Play, Pause, TrendingUp, Wallet, Activity
+} from 'lucide-react';
 import api from '@/lib/api';
 
 interface Transaction {
@@ -17,11 +20,18 @@ interface Transaction {
   risk_score?: number;
 }
 
+interface LiveStats {
+  total: number;
+  totalValue: number;
+  successRate: number;
+  lastUpdate: string;
+}
+
 const statusConfig: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  COMPLETED: { label: 'Complété', color: 'text-green-700 bg-green-50', icon: CheckCircle },
-  PENDING: { label: 'En attente', color: 'text-yellow-600 bg-yellow-50', icon: Clock },
-  FAILED: { label: 'Échoué', color: 'text-red-600 bg-red-50', icon: XCircle },
-  FLAGGED: { label: 'Signalé', color: 'text-orange-600 bg-orange-50', icon: AlertTriangle },
+  COMPLETED: { label: 'Complété', color: 'text-green-700 bg-green-50 dark:text-green-400 dark:bg-green-900/30', icon: CheckCircle },
+  PENDING: { label: 'En attente', color: 'text-yellow-600 bg-yellow-50 dark:text-yellow-400 dark:bg-yellow-900/30', icon: Clock },
+  FAILED: { label: 'Échoué', color: 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/30', icon: XCircle },
+  FLAGGED: { label: 'Signalé', color: 'text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-900/30', icon: AlertTriangle },
 };
 
 const typeLabel: Record<string, string> = {
@@ -33,6 +43,16 @@ function formatXOF(n: number) {
   return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 }).format(n);
 }
 
+function computeStats(items: Transaction[], total: number): LiveStats {
+  const completed = items.filter(t => t.status === 'COMPLETED').length;
+  const totalValue = items.reduce((s, t) => s + t.amount, 0);
+  const successRate = items.length > 0 ? (completed / items.length) * 100 : 0;
+  const lastUpdate = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  return { total, totalValue, successRate, lastUpdate };
+}
+
+const REFRESH_INTERVAL = 15_000; // 15 secondes
+
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,20 +61,44 @@ export default function TransactionsPage() {
   const [typeFilter, setTypeFilter] = useState('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [live, setLive] = useState(true);
+  const [stats, setStats] = useState<LiveStats>({ total: 0, totalValue: 0, successRate: 0, lastUpdate: '--:--' });
+  const [pulse, setPulse] = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pageSize = 20;
 
-  const fetch = () => {
-    setLoading(true);
+  const fetchData = (silent = false) => {
+    if (!silent) setLoading(true);
     const params = new URLSearchParams({ page: String(page), page_size: String(pageSize) });
     if (statusFilter) params.append('status', statusFilter);
     if (typeFilter) params.append('transaction_type', typeFilter);
     api.get(`/transactions?${params}`)
-      .then(res => { setTransactions(res.data.items || []); setTotal(res.data.total || 0); })
+      .then(res => {
+        const items: Transaction[] = res.data.items || [];
+        const t = res.data.total || 0;
+        setTransactions(items);
+        setTotal(t);
+        setStats(computeStats(items, t));
+        // flash pulse
+        setPulse(true);
+        setTimeout(() => setPulse(false), 600);
+      })
       .catch(() => {})
-      .finally(() => setLoading(false));
+      .finally(() => { if (!silent) setLoading(false); });
   };
 
-  useEffect(() => { fetch(); }, [page, statusFilter, typeFilter]);
+  // Initial + filter/page change fetch
+  useEffect(() => { fetchData(); }, [page, statusFilter, typeFilter]);
+
+  // Live refresh interval
+  useEffect(() => {
+    if (live) {
+      intervalRef.current = setInterval(() => fetchData(true), REFRESH_INTERVAL);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [live, page, statusFilter, typeFilter]);
 
   const filtered = transactions.filter(t =>
     !search || t.sender_phone?.includes(search) || t.recipient_phone?.includes(search) || t.id.includes(search)
@@ -62,23 +106,90 @@ export default function TransactionsPage() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <main className="flex-1 p-6 space-y-4">
-        {/* Page Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="bg-green-50 dark:bg-green-900/20 p-2.5 rounded-xl">
-              <ArrowLeftRight className="h-6 w-6 text-green-700" />
+      <main className="flex-1 p-4 md:p-6 space-y-4">
+
+        {/* Live Stats Banner */}
+        <div className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 rounded-2xl overflow-hidden shadow-lg">
+          {/* Top bar: title + live indicator + pause button */}
+          <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/10 p-2 rounded-lg">
+                <ArrowLeftRight className="h-4 w-4 text-white" />
+              </div>
+              <div>
+                <h1 className="text-base font-bold text-white">Transactions</h1>
+                <p className="text-xs text-slate-400">Suivi en temps réel</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Transactions</h1>
-              <p className="text-gray-500 dark:text-slate-400 text-sm mt-0.5">Historique et gestion des transactions</p>
+
+            <div className="flex items-center gap-3">
+              {/* Live / Paused badge */}
+              <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
+                live
+                  ? 'bg-[#00853F]/20 border border-[#00853F]/40 text-[#4ade80]'
+                  : 'bg-slate-700/50 border border-slate-600 text-slate-400'
+              }`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${live ? 'bg-[#4ade80] animate-pulse' : 'bg-slate-500'}`} />
+                {live ? 'En direct' : 'En pause'}
+              </div>
+
+              {/* Play / Pause button */}
+              <button
+                onClick={() => setLive(l => !l)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition-colors"
+              >
+                {live ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+                {live ? 'Pause' : 'Reprendre'}
+              </button>
+            </div>
+          </div>
+
+          {/* Stats grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/5">
+            {/* Transactions */}
+            <div className={`px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60 transition-all ${pulse ? 'brightness-125' : ''}`}>
+              <div className="flex items-center gap-2 mb-1">
+                <Activity className="h-3.5 w-3.5 text-slate-400" />
+                <p className="text-xs text-slate-400 uppercase tracking-wide">Transactions</p>
+              </div>
+              <p className="text-2xl font-bold text-white">{stats.total.toLocaleString('fr-FR')}</p>
+            </div>
+
+            {/* Valeur Totale */}
+            <div className={`px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60 transition-all ${pulse ? 'brightness-125' : ''}`}>
+              <div className="flex items-center gap-2 mb-1">
+                <Wallet className="h-3.5 w-3.5 text-slate-400" />
+                <p className="text-xs text-slate-400 uppercase tracking-wide">Valeur Totale</p>
+              </div>
+              <p className="text-lg font-bold text-white leading-tight">{formatXOF(stats.totalValue)}</p>
+            </div>
+
+            {/* Taux de Succès */}
+            <div className={`px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60 transition-all ${pulse ? 'brightness-125' : ''}`}>
+              <div className="flex items-center gap-2 mb-1">
+                <TrendingUp className="h-3.5 w-3.5 text-slate-400" />
+                <p className="text-xs text-slate-400 uppercase tracking-wide">Taux de Succès</p>
+              </div>
+              <div className="flex items-end gap-2">
+                <p className="text-2xl font-bold text-[#4ade80]">{stats.successRate.toFixed(1)}%</p>
+              </div>
+            </div>
+
+            {/* Dernière MAJ */}
+            <div className="px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60">
+              <div className="flex items-center gap-2 mb-1">
+                <Clock className="h-3.5 w-3.5 text-slate-400" />
+                <p className="text-xs text-slate-400 uppercase tracking-wide">Dernière MAJ</p>
+              </div>
+              <p className="text-2xl font-bold text-white">{stats.lastUpdate}</p>
+              <p className="text-xs text-slate-500 mt-1">Actualisation {live ? `auto / ${REFRESH_INTERVAL / 1000}s` : 'suspendue'}</p>
             </div>
           </div>
         </div>
 
         {/* Filters */}
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-700/50 shadow-sm p-4 flex flex-wrap gap-3 items-center">
-          <div className="relative flex-1 min-w-[200px]">
+          <div className="relative flex-1 min-w-[180px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
             <input
               type="text"
@@ -88,7 +199,7 @@ export default function TransactionsPage() {
               className="w-full pl-9 pr-4 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500 bg-white dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-400"
             />
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Filter className="h-4 w-4 text-gray-400 dark:text-slate-500" />
             <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
               className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500">
@@ -148,8 +259,9 @@ export default function TransactionsPage() {
                           <td className="px-6 py-4 text-center">
                             {tx.risk_score != null ? (
                               <span className={`text-xs font-bold px-2 py-1 rounded-full ${
-                                tx.risk_score >= 0.7 ? 'text-red-600 bg-red-50' :
-                                tx.risk_score >= 0.4 ? 'text-orange-600 bg-orange-50' : 'text-green-700 bg-green-50'
+                                tx.risk_score >= 0.7 ? 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/30' :
+                                tx.risk_score >= 0.4 ? 'text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-900/30' :
+                                'text-green-700 bg-green-50 dark:text-green-400 dark:bg-green-900/30'
                               }`}>{Math.round(tx.risk_score * 100)}%</span>
                             ) : <span className="text-gray-300 dark:text-slate-600">—</span>}
                           </td>
