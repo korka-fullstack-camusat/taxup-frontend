@@ -7,6 +7,7 @@ import {
   Eye, ScanLine, X, Camera, CameraOff,
 } from 'lucide-react';
 import api from '@/lib/api';
+import { generateReceiptPDF } from '@/lib/export';
 import ExportModal, { ExportField } from '@/components/ExportModal';
 import Pagination from '@/components/Pagination';
 
@@ -109,11 +110,17 @@ function ReceiptDetailModal({ receipt, onClose }: { receipt: FiscalReceipt; onCl
             onClick={async () => {
               try {
                 const res = await api.get(`/receipts/${receipt.id}/download`, { responseType: 'blob' });
-                const url = URL.createObjectURL(res.data);
-                const a = document.createElement('a');
-                a.href = url; a.download = `recu-${receipt.receipt_number}.pdf`; a.click();
-                URL.revokeObjectURL(url);
-              } catch {}
+                if (res.data?.size > 0) {
+                  const url = URL.createObjectURL(res.data);
+                  const a = document.createElement('a');
+                  a.href = url; a.download = `recu-${receipt.receipt_number}.pdf`; a.click();
+                  URL.revokeObjectURL(url);
+                } else {
+                  generateReceiptPDF(receipt);
+                }
+              } catch {
+                generateReceiptPDF(receipt);
+              }
             }}
             className="flex-1 flex items-center justify-center gap-2 bg-[#00853F] hover:bg-[#006830] text-white text-sm font-semibold py-2.5 rounded-xl transition-colors"
           >
