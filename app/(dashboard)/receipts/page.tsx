@@ -564,40 +564,16 @@ export default function ReceiptsPage() {
             />
           </div>
 
-          {/* Filtre statut — boutons pills */}
-          <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-slate-800 p-1 rounded-xl">
-            {([
-              { value: 'all',       label: 'Tous' },
-              { value: 'valid',     label: 'Valides' },
-              { value: 'cancelled', label: 'Annulés' },
-            ] as const).map(opt => (
-              <button
-                key={opt.value}
-                onClick={() => { setStatusFilter(opt.value); setPage(1); }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  statusFilter === opt.value
-                    ? opt.value === 'cancelled'
-                      ? 'bg-red-600 text-white shadow-sm'
-                      : opt.value === 'valid'
-                        ? 'bg-[#00853F] text-white shadow-sm'
-                        : 'bg-white dark:bg-slate-700 text-gray-800 dark:text-white shadow-sm'
-                    : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200'
-                }`}
-              >
-                {opt.label}
-                {/* Compteur */}
-                <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full ${
-                  statusFilter === opt.value
-                    ? 'bg-white/20 text-white'
-                    : 'bg-gray-200 dark:bg-slate-600 text-gray-600 dark:text-slate-300'
-                }`}>
-                  {opt.value === 'all' ? receipts.length :
-                   opt.value === 'valid' ? receipts.filter(r => !r.is_cancelled).length :
-                   receipts.filter(r => r.is_cancelled).length}
-                </span>
-              </button>
-            ))}
-          </div>
+          {/* Filtre statut — déroulant */}
+          <select
+            value={statusFilter}
+            onChange={e => { setStatusFilter(e.target.value as typeof statusFilter); setPage(1); }}
+            className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-600"
+          >
+            <option value="all">Tous les statuts ({receipts.length})</option>
+            <option value="valid">Valides ({receipts.filter(r => !r.is_cancelled).length})</option>
+            <option value="cancelled">Annulés ({receipts.filter(r => r.is_cancelled).length})</option>
+          </select>
 
           <button
             onClick={() => setShowExport(true)}

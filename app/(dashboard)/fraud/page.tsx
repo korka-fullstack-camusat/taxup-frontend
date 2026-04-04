@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Shield, Filter, TrendingUp, TrendingDown, DollarSign, Activity, BarChart2, X } from 'lucide-react';
+import { AlertTriangle, Shield, Filter, TrendingUp, TrendingDown, DollarSign, Activity, BarChart2, X, Search } from 'lucide-react';
 import api from '@/lib/api';
 
 const FRAUD_TYPES = [
@@ -75,6 +75,7 @@ function computeFraudStats(items: FraudAlert[], total: number): FraudStats {
 export default function FraudPage() {
   const [alerts, setAlerts] = useState<FraudAlert[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [minRisk, setMinRisk] = useState('');
   const [page, setPage] = useState(1);
@@ -106,6 +107,13 @@ export default function FraudPage() {
   };
 
   useEffect(() => { fetchAlerts(); }, [page, statusFilter, minRisk]);
+
+  const filtered = alerts.filter(a =>
+    !search ||
+    (fraudTypeLabel[a.fraud_type] || a.fraud_type).toLowerCase().includes(search.toLowerCase()) ||
+    a.transaction_id.toLowerCase().includes(search.toLowerCase()) ||
+    a.id.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="flex-1 flex flex-col">
@@ -188,21 +196,35 @@ export default function FraudPage() {
           </div>
         </div>
 
-        {/* Filters */}
+        {/* Search + Filters */}
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-700/50 shadow-sm p-4 flex flex-wrap gap-3 items-center">
-          <Filter className="h-4 w-4 text-gray-400 dark:text-slate-500" />
-          <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
-            className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-600">
-            <option value="">Tous les statuts</option>
-            {Object.entries(statusConfig).map(([v, { label }]) => <option key={v} value={v}>{label}</option>)}
-          </select>
-          <select value={minRisk} onChange={e => { setMinRisk(e.target.value); setPage(1); }}
-            className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-600">
-            <option value="">Tout niveau de risque</option>
-            <option value="0.4">≥ 40% (Moyen+)</option>
-            <option value="0.6">≥ 60% (Élevé+)</option>
-            <option value="0.8">≥ 80% (Critique)</option>
-          </select>
+          {/* Recherche — à gauche */}
+          <div className="relative flex-1 min-w-[180px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
+            <input
+              type="text"
+              placeholder="Type, ID transaction..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-600 bg-white dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-400"
+            />
+          </div>
+          {/* Filtres — sur la même ligne */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <Filter className="h-4 w-4 text-gray-400 dark:text-slate-500 flex-shrink-0" />
+            <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
+              className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-600">
+              <option value="">Tous les statuts</option>
+              {Object.entries(statusConfig).map(([v, { label }]) => <option key={v} value={v}>{label}</option>)}
+            </select>
+            <select value={minRisk} onChange={e => { setMinRisk(e.target.value); setPage(1); }}
+              className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-600">
+              <option value="">Tout niveau de risque</option>
+              <option value="0.4">≥ 40% (Moyen+)</option>
+              <option value="0.6">≥ 60% (Élevé+)</option>
+              <option value="0.8">≥ 80% (Critique)</option>
+            </select>
+          </div>
         </div>
 
         {/* Table */}
