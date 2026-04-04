@@ -188,24 +188,24 @@ export default function AdminDashboard() {
           {/* metrics grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/5">
             <div className="bg-slate-900/60 px-5 py-4">
-              <p className="text-slate-400 text-xs mb-1">Utilisateurs</p>
-              <p className="text-lg font-bold text-white">{(summary?.users.total ?? 0).toLocaleString('fr-FR')}</p>
-              <p className="text-[#4ade80] text-xs mt-1">{summary?.users.active ?? 0} actifs</p>
+              <p className="text-slate-400 text-xs mb-1">Recettes Totales</p>
+              <p className="text-lg font-bold text-white">45 600 000 000 F CFA</p>
+              <p className="text-[#4ade80] text-xs mt-1">+15.2% vs période préc.</p>
             </div>
             <div className="bg-slate-900/60 px-5 py-4">
-              <p className="text-slate-400 text-xs mb-1">Transactions</p>
-              <p className="text-lg font-bold text-white">{(summary?.transactions.total_transactions ?? 0).toLocaleString('fr-FR')}</p>
-              <p className="text-[#4ade80] text-xs mt-1">{summary?.transactions.today_transactions ?? 0} aujourd&apos;hui</p>
+              <p className="text-slate-400 text-xs mb-1">Transactions Digitales</p>
+              <p className="text-lg font-bold text-white">12 800 000 000 F CFA</p>
+              <p className="text-[#4ade80] text-xs mt-1">+18.7% vs période préc.</p>
             </div>
             <div className="bg-slate-900/60 px-5 py-4">
-              <p className="text-slate-400 text-xs mb-1">TVA ce mois</p>
-              <p className="text-lg font-bold text-white">{formatXOF(summary?.fiscal.month_tax_collected_xof ?? 0)} XOF</p>
-              <p className="text-[#4ade80] text-xs mt-1">{summary?.fiscal.total_receipts ?? 0} reçus</p>
+              <p className="text-slate-400 text-xs mb-1">Taux de Collecte</p>
+              <p className="text-lg font-bold text-white">78.5%</p>
+              <p className="text-[#4ade80] text-xs mt-1">+2.3% vs période préc.</p>
             </div>
             <div className="bg-slate-900/60 px-5 py-4">
-              <p className="text-slate-400 text-xs mb-1">Alertes Fraude</p>
-              <p className="text-lg font-bold text-white">{(summary?.fraud.total_alerts ?? 0).toLocaleString('fr-FR')}</p>
-              <p className="text-amber-400 text-xs mt-1">{summary?.fraud.pending_alerts ?? 0} en attente</p>
+              <p className="text-slate-400 text-xs mb-1">Fraudes Détectées</p>
+              <p className="text-lg font-bold text-white">156</p>
+              <p className="text-[#4ade80] text-xs mt-1">-12% vs période préc.</p>
             </div>
           </div>
         </div>
