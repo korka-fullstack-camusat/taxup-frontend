@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Users, ArrowLeftRight, ShieldAlert, DollarSign, TrendingUp, Activity,
-  Receipt, ClipboardList, BarChart3, Building2, Download,
+  Receipt, BarChart3, Building2, Download,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import api from '@/lib/api';
@@ -59,15 +59,14 @@ const statusColors: Record<string, string> = {
   UNDER_REVIEW: '#00853F', // bleu standard
 };
 
-type Section = 'all' | 'transactions' | 'fraud' | 'fiscal' | 'users' | 'audits';
+type Section = 'all' | 'transactions' | 'fraud' | 'fiscal' | 'users';
 
 const sections: { id: Section; label: string; icon: React.ElementType }[] = [
-  { id: 'all', label: 'Vue générale', icon: BarChart3 },
-  { id: 'transactions', label: 'Transactions', icon: ArrowLeftRight },
-  { id: 'fraud', label: 'Fraude', icon: ShieldAlert },
-  { id: 'fiscal', label: 'Revenus & TVA', icon: DollarSign },
-  { id: 'users', label: 'Utilisateurs', icon: Users },
-  { id: 'audits', label: 'Audits', icon: ClipboardList },
+  { id: 'all',          label: 'Vue générale',  icon: BarChart3      },
+  { id: 'transactions', label: 'Transactions',  icon: ArrowLeftRight },
+  { id: 'fraud',        label: 'Fraude',        icon: ShieldAlert    },
+  { id: 'fiscal',       label: 'Revenus & TVA', icon: DollarSign     },
+  { id: 'users',        label: 'Utilisateurs',  icon: Users          },
 ];
 
 function formatXOF(n: number): string {
@@ -151,50 +150,87 @@ export default function AdminDashboard() {
   const show = (s: Section) => section === 'all' || section === s;
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Tableau de Bord</h1>
-          <p className="text-gray-500 text-sm mt-1">Vue centralisée de toutes les données TAXUP</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <select value={period} onChange={e => setPeriod(Number(e.target.value))}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
-            <option value={7}>7 jours</option>
-            <option value={14}>14 jours</option>
-            <option value={30}>30 jours</option>
-            <option value={90}>90 jours</option>
-          </select>
-          <div className="relative group">
-            <button className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-              <Download className="h-4 w-4" /> Exporter
-            </button>
-            <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 hidden group-hover:block z-20 min-w-[140px]">
-              <button onClick={() => handleExportEvolution('csv')} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Export CSV</button>
-              <button onClick={() => handleExportEvolution('excel')} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Export Excel</button>
+    <div>
+
+      {/* ── sticky zone: dark banner + section filters ── */}
+      <div className="sticky top-12 md:top-0 z-10 bg-gray-50 dark:bg-slate-950 px-4 sm:px-6 pt-4 sm:pt-6 pb-0">
+        <div className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 rounded-2xl overflow-hidden shadow-xl">
+
+          {/* top bar */}
+          <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-white/10 flex-wrap">
+            <div>
+              <h1 className="text-sm font-bold text-white leading-tight">Tableau de Bord Admin</h1>
+              <p className="text-slate-400 text-xs mt-0.5">Vue centralisée de toutes les données TAXUP</p>
             </div>
+            {/* period selector */}
+            <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1">
+              {[7, 14, 30, 90].map(d => (
+                <button key={d} onClick={() => setPeriod(d)}
+                  className={`text-xs px-3 py-1 rounded-md font-medium transition-colors ${
+                    period === d ? 'bg-[#00853F] text-white' : 'text-slate-400 hover:text-white'
+                  }`}>
+                  {d}j
+                </button>
+              ))}
+            </div>
+            {/* export */}
+            <div className="relative group">
+              <button className="flex items-center gap-1.5 text-xs text-slate-200 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors font-medium">
+                <Download className="h-3.5 w-3.5" /> Exporter
+              </button>
+              <div className="absolute right-0 top-full mt-1 bg-slate-800 border border-slate-600 rounded-lg shadow-xl py-1 hidden group-hover:block z-20 min-w-[140px]">
+                <button onClick={() => handleExportEvolution('csv')}   className="w-full text-left px-4 py-2 text-sm text-slate-200 hover:bg-slate-700">CSV</button>
+                <button onClick={() => handleExportEvolution('excel')} className="w-full text-left px-4 py-2 text-sm text-slate-200 hover:bg-slate-700">Excel</button>
+              </div>
+            </div>
+          </div>
+
+          {/* metrics grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/5">
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">Utilisateurs</p>
+              <p className="text-lg font-bold text-white">{(summary?.users.total ?? 0).toLocaleString('fr-FR')}</p>
+              <p className="text-[#4ade80] text-xs mt-1">{summary?.users.active ?? 0} actifs</p>
+            </div>
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">Transactions</p>
+              <p className="text-lg font-bold text-white">{(summary?.transactions.total_transactions ?? 0).toLocaleString('fr-FR')}</p>
+              <p className="text-[#4ade80] text-xs mt-1">{summary?.transactions.today_transactions ?? 0} aujourd&apos;hui</p>
+            </div>
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">TVA ce mois</p>
+              <p className="text-lg font-bold text-white">{formatXOF(summary?.fiscal.month_tax_collected_xof ?? 0)} XOF</p>
+              <p className="text-[#4ade80] text-xs mt-1">{summary?.fiscal.total_receipts ?? 0} reçus</p>
+            </div>
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">Alertes Fraude</p>
+              <p className="text-lg font-bold text-white">{(summary?.fraud.total_alerts ?? 0).toLocaleString('fr-FR')}</p>
+              <p className="text-amber-400 text-xs mt-1">{summary?.fraud.pending_alerts ?? 0} en attente</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Section filters — collés sous le banner */}
+        <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 border-t-0 rounded-b-xl overflow-x-auto">
+          <div className="flex gap-1 px-2 min-w-max">
+            {sections.map(s => {
+              const Icon = s.icon;
+              return (
+                <button key={s.id} onClick={() => setSection(s.id)}
+                  className={`flex items-center gap-2 px-4 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${
+                    section === s.id
+                      ? 'border-[#00853F] text-[#00853F] dark:text-[#4ade80] dark:border-[#4ade80]'
+                      : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200'
+                  }`}>
+                  <Icon className="h-3.5 w-3.5" /> {s.label}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* Section Filter */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {sections.map(s => {
-          const Icon = s.icon;
-          return (
-            <button key={s.id} onClick={() => setSection(s.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-                section === s.id
-                  ? 'bg-green-700 text-white shadow-sm'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:bg-green-50'
-              }`}>
-              <Icon className="h-4 w-4" /> {s.label}
-            </button>
-          );
-        })}
-      </div>
-
+      <div className="px-4 sm:px-6 pb-6 pt-5 space-y-6">
       {loading ? (
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-700" />
@@ -219,10 +255,6 @@ export default function AdminDashboard() {
               <KPI icon={DollarSign} bg="bg-green-50" color="text-green-700" label="TVA ce mois"
                 value={`${formatXOF(summary?.fiscal.month_tax_collected_xof ?? 0)} XOF`}
                 sub={`${summary?.fiscal.total_receipts ?? 0} reçus`} />
-            )}
-            {show('audits') && (
-              <KPI icon={ClipboardList} bg="bg-green-50" color="text-green-700" label="Audits"
-                value={summary?.audits.total ?? 0} sub={`${summary?.audits.open ?? 0} ouverts`} />
             )}
             {show('transactions') && (
               <KPI icon={Activity} bg="bg-green-100" color="text-green-800" label="Volume ce mois"
@@ -395,34 +427,10 @@ export default function AdminDashboard() {
               </ChartCard>
             )}
 
-            {/* Audits stats */}
-            {show('audits') && summary && (
-              <ChartCard title="Répartition des audits" icon={ClipboardList}>
-                <ResponsiveContainer width="100%" height={260}>
-                  <PieChart>
-                    <Pie
-                      data={[
-                        { name: 'Ouverts', value: summary.audits.open, color: '#60a5fa' },
-                        { name: 'En cours', value: summary.audits.in_progress, color: '#00853F' },
-                        { name: 'Terminés', value: summary.audits.completed, color: '#1d4ed8' },
-                      ].filter(d => d.value > 0)}
-                      cx="50%" cy="50%" outerRadius={90} innerRadius={40} dataKey="value" nameKey="name">
-                      {[
-                        { name: 'Ouverts', value: summary.audits.open, color: '#60a5fa' },
-                        { name: 'En cours', value: summary.audits.in_progress, color: '#00853F' },
-                        { name: 'Terminés', value: summary.audits.completed, color: '#1d4ed8' },
-                      ].filter(d => d.value > 0).map(e => <Cell key={e.name} fill={e.color} />)}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </ChartCard>
-            )}
-
           </div>
         </>
       )}
+      </div>
     </div>
   );
 }
