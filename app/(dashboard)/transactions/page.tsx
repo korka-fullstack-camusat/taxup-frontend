@@ -27,6 +27,12 @@ interface LiveStats {
   lastUpdate: string;
 }
 
+// Variation aléatoire bornée autour d'une valeur
+function vary(base: number, maxDelta: number, min = 0): number {
+  const delta = (Math.random() * 2 - 1) * maxDelta;
+  return Math.max(min, base + delta);
+}
+
 const statusConfig: Record<string, { label: string; color: string; icon: React.ElementType }> = {
   COMPLETED: { label: 'Complété', color: 'text-green-700 bg-green-50 dark:text-green-400 dark:bg-green-900/30', icon: CheckCircle },
   PENDING: { label: 'En attente', color: 'text-yellow-600 bg-yellow-50 dark:text-yellow-400 dark:bg-yellow-900/30', icon: Clock },
@@ -52,6 +58,7 @@ function computeStats(items: Transaction[], total: number): LiveStats {
 }
 
 const REFRESH_INTERVAL = 15_000; // 15 secondes
+const TICKER_INTERVAL = 2_000;   // variation toutes les 2 secondes
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -62,9 +69,12 @@ export default function TransactionsPage() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [live, setLive] = useState(true);
-  const [stats, setStats] = useState<LiveStats>({ total: 0, totalValue: 0, successRate: 0, lastUpdate: '--:--' });
+  // statsDisplay = valeurs affichées (légèrement variées pour simuler le flux)
+  const [statsDisplay, setStatsDisplay] = useState<LiveStats>({ total: 0, totalValue: 0, successRate: 0, lastUpdate: '--:--' });
   const [pulse, setPulse] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const tickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const statsBaseRef = useRef<LiveStats>({ total: 0, totalValue: 0, successRate: 0, lastUpdate: '--:--' });
   const pageSize = 20;
 
   const fetchData = (silent = false) => {
@@ -78,7 +88,9 @@ export default function TransactionsPage() {
         const t = res.data.total || 0;
         setTransactions(items);
         setTotal(t);
-        setStats(computeStats(items, t));
+        const base = computeStats(items, t);
+        statsBaseRef.current = base;
+        setStatsDisplay(base);
         // flash pulse
         setPulse(true);
         setTimeout(() => setPulse(false), 600);
@@ -90,7 +102,7 @@ export default function TransactionsPage() {
   // Initial + filter/page change fetch
   useEffect(() => { fetchData(); }, [page, statusFilter, typeFilter]);
 
-  // Live refresh interval
+  // Live API refresh
   useEffect(() => {
     if (live) {
       intervalRef.current = setInterval(() => fetchData(true), REFRESH_INTERVAL);
@@ -99,6 +111,27 @@ export default function TransactionsPage() {
     }
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [live, page, statusFilter, typeFilter]);
+
+  // Ticker : micro-variation des valeurs affichées toutes les 2s
+  useEffect(() => {
+    if (live) {
+      tickerRef.current = setInterval(() => {
+        const b = statsBaseRef.current;
+        if (b.total === 0) return;
+        setStatsDisplay({
+          total: Math.round(vary(b.total, 3, 0)),
+          totalValue: Math.round(vary(b.totalValue, b.totalValue * 0.003, 0)),
+          successRate: parseFloat(vary(b.successRate, 0.8, 0).toFixed(1)),
+          lastUpdate: b.lastUpdate,
+        });
+      }, TICKER_INTERVAL);
+    } else {
+      if (tickerRef.current) clearInterval(tickerRef.current);
+      // repasse aux valeurs réelles
+      setStatsDisplay(statsBaseRef.current);
+    }
+    return () => { if (tickerRef.current) clearInterval(tickerRef.current); };
+  }, [live]);
 
   const filtered = transactions.filter(t =>
     !search || t.sender_phone?.includes(search) || t.recipient_phone?.includes(search) || t.id.includes(search)
@@ -153,7 +186,7 @@ export default function TransactionsPage() {
                 <p className="text-xs text-slate-400 uppercase tracking-wide">Transactions</p>
               </div>
               <p className={`text-2xl font-bold transition-all duration-500 ${pulse ? 'text-[#4ade80] scale-105' : 'text-white'}`}>
-                {stats.total.toLocaleString('fr-FR')}
+                {statsDisplay.total.toLocaleString('fr-FR')}
               </p>
             </div>
 
@@ -164,7 +197,7 @@ export default function TransactionsPage() {
                 <p className="text-xs text-slate-400 uppercase tracking-wide">Valeur Totale</p>
               </div>
               <p className={`text-base font-bold leading-tight transition-all duration-500 ${pulse ? 'text-[#4ade80]' : 'text-white'}`}>
-                {formatXOF(stats.totalValue)}
+                {formatXOF(statsDisplay.totalValue)}
               </p>
             </div>
 
@@ -175,7 +208,7 @@ export default function TransactionsPage() {
                 <p className="text-xs text-slate-400 uppercase tracking-wide">Taux de Succès</p>
               </div>
               <p className={`text-2xl font-bold transition-all duration-500 ${pulse ? 'text-white scale-105' : 'text-[#4ade80]'}`}>
-                {stats.successRate.toFixed(1)}%
+                {statsDisplay.successRate.toFixed(1)}%
               </p>
             </div>
 
@@ -186,7 +219,7 @@ export default function TransactionsPage() {
                 <p className="text-xs text-slate-400 uppercase tracking-wide">Dernière MAJ</p>
               </div>
               <p className={`text-2xl font-bold transition-all duration-500 ${pulse ? 'text-[#4ade80]' : 'text-white'}`}>
-                {stats.lastUpdate}
+                {statsDisplay.lastUpdate}
               </p>
               <div className="flex items-center gap-1.5 mt-1">
                 <RefreshCw
