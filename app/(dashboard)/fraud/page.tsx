@@ -104,77 +104,71 @@ export default function FraudPage() {
     <div className="flex-1 flex flex-col">
       <main className="flex-1 p-4 md:p-6 space-y-4">
 
-        {/* Stats Banner */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {/* Stats Banner — même design que /transactions */}
+        <div className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 rounded-2xl overflow-hidden shadow-lg">
 
-          {/* Alertes Actives */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-700/50 p-5 shadow-sm">
-            <div className="flex items-start justify-between mb-3">
-              <div className="bg-orange-50 dark:bg-orange-900/20 p-2.5 rounded-xl">
-                <AlertTriangle className="h-5 w-5 text-orange-500" />
+          {/* Top bar */}
+          <div className="flex items-center gap-3 px-5 py-3 border-b border-white/10">
+            <div className="bg-white/10 p-2 rounded-lg">
+              <Shield className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <h1 className="text-base font-bold text-white">Détection de Fraude</h1>
+              <p className="text-xs text-slate-400">Alertes et analyse des risques fiscaux</p>
+            </div>
+          </div>
+
+          {/* Grid métriques */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/5">
+
+            {/* Alertes Actives */}
+            <div className="px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="h-3.5 w-3.5 text-slate-400" />
+                <p className="text-xs text-slate-400 uppercase tracking-wide">Alertes Actives</p>
               </div>
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 px-2 py-1 rounded-full">
+              <p className="text-2xl font-bold text-white">{stats.alertesActives}</p>
+              <p className="text-xs text-orange-400 mt-1 flex items-center gap-1">
                 <TrendingUp className="h-3 w-3" />
                 +{stats.alertesDelta} depuis hier
-              </span>
+              </p>
             </div>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.alertesActives}</p>
-            <p className="text-sm text-gray-500 dark:text-slate-400">Alertes Actives</p>
-          </div>
 
-          {/* Fraudes Confirmées */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-700/50 p-5 shadow-sm">
-            <div className="flex items-start justify-between mb-3">
-              <div className="bg-red-50 dark:bg-red-900/20 p-2.5 rounded-xl">
-                <Shield className="h-5 w-5 text-red-600" />
+            {/* Fraudes Confirmées */}
+            <div className="px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60">
+              <div className="flex items-center gap-2 mb-2">
+                <Shield className="h-3.5 w-3.5 text-slate-400" />
+                <p className="text-xs text-slate-400 uppercase tracking-wide">Fraudes Confirmées</p>
               </div>
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-full">
+              <p className="text-2xl font-bold text-white">{stats.fraudesConfirmees}</p>
+              <p className="text-xs text-[#4ade80] mt-1 flex items-center gap-1">
                 <TrendingDown className="h-3 w-3" />
                 {stats.fraudesDelta} vs semaine dernière
-              </span>
+              </p>
             </div>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.fraudesConfirmees}</p>
-            <p className="text-sm text-gray-500 dark:text-slate-400">Fraudes Confirmées</p>
-          </div>
 
-          {/* Montant Récupéré */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-700/50 p-5 shadow-sm">
-            <div className="flex items-start justify-between mb-3">
-              <div className="bg-green-50 dark:bg-green-900/20 p-2.5 rounded-xl">
-                <DollarSign className="h-5 w-5 text-green-700" />
+            {/* Montant Récupéré */}
+            <div className="px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60">
+              <div className="flex items-center gap-2 mb-2">
+                <DollarSign className="h-3.5 w-3.5 text-slate-400" />
+                <p className="text-xs text-slate-400 uppercase tracking-wide">Montant Récupéré</p>
               </div>
-              <span className="text-xs font-medium text-gray-400 dark:text-slate-500 bg-gray-100 dark:bg-slate-800 px-2 py-1 rounded-full">
-                Ce mois
-              </span>
+              <p className="text-base font-bold text-white leading-tight">{formatXOF(stats.montantRecupere)}</p>
+              <p className="text-xs text-slate-500 mt-1">Ce mois</p>
             </div>
-            <p className="text-xl font-bold text-gray-900 dark:text-white mb-1 leading-tight">{formatXOF(stats.montantRecupere)}</p>
-            <p className="text-sm text-gray-500 dark:text-slate-400">Montant Récupéré</p>
-          </div>
 
-          {/* Taux de Détection */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-700/50 p-5 shadow-sm">
-            <div className="flex items-start justify-between mb-3">
-              <div className="bg-[#00853F]/10 dark:bg-[#00853F]/20 p-2.5 rounded-xl">
-                <Activity className="h-5 w-5 text-[#00853F]" />
+            {/* Taux de Détection */}
+            <div className="px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60">
+              <div className="flex items-center gap-2 mb-2">
+                <Activity className="h-3.5 w-3.5 text-slate-400" />
+                <p className="text-xs text-slate-400 uppercase tracking-wide">Taux de Détection</p>
               </div>
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#00853F] dark:text-[#4ade80] bg-[#00853F]/10 dark:bg-[#00853F]/20 px-2 py-1 rounded-full">
+              <p className="text-2xl font-bold text-[#4ade80]">{stats.tauxDetection}%</p>
+              <p className="text-xs text-[#4ade80] mt-1 flex items-center gap-1">
                 <TrendingUp className="h-3 w-3" />
                 +{stats.tauxDelta}% ce mois
-              </span>
+              </p>
             </div>
-            <p className="text-3xl font-bold text-[#00853F] dark:text-[#4ade80] mb-1">{stats.tauxDetection}%</p>
-            <p className="text-sm text-gray-500 dark:text-slate-400">Taux de Détection</p>
-          </div>
-        </div>
-
-        {/* Page Header */}
-        <div className="flex items-center gap-3">
-          <div className="bg-red-50 dark:bg-red-900/20 p-2.5 rounded-xl">
-            <Shield className="h-6 w-6 text-red-600" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Détection de Fraude</h1>
-            <p className="text-gray-500 dark:text-slate-400 text-sm mt-0.5">Alertes et analyse des risques fiscaux</p>
           </div>
         </div>
 
