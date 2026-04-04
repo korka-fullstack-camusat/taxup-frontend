@@ -307,6 +307,7 @@ export default function ReceiptsPage() {
   const [receipts, setReceipts]     = useState<FiscalReceipt[]>([]);
   const [loading, setLoading]       = useState(true);
   const [search, setSearch]         = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'valid' | 'cancelled'>('all');
   const [page, setPage]             = useState(1);
   const [total, setTotal]           = useState(0);
   const [showExport, setShowExport] = useState(false);
@@ -429,11 +430,16 @@ export default function ReceiptsPage() {
     }
   }, []);
 
-  const filtered = receipts.filter(r =>
-    !search ||
-    r.receipt_number.toLowerCase().includes(search.toLowerCase()) ||
-    r.fiscal_period.includes(search)
-  );
+  const filtered = receipts.filter(r => {
+    const matchSearch = !search ||
+      r.receipt_number.toLowerCase().includes(search.toLowerCase()) ||
+      r.fiscal_period.includes(search);
+    const matchStatus =
+      statusFilter === 'all' ? true :
+      statusFilter === 'valid' ? !r.is_cancelled :
+      r.is_cancelled;
+    return matchSearch && matchStatus;
+  });
 
   return (
     <div className="flex-1 flex flex-col">
@@ -544,9 +550,10 @@ export default function ReceiptsPage() {
           </div>
         </div>
 
-        {/* Search + export */}
+        {/* Search + filtres + export */}
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-700/50 shadow-sm p-4 flex flex-wrap gap-3 items-center">
-          <div className="relative flex-1 min-w-[200px]">
+          {/* Recherche */}
+          <div className="relative flex-1 min-w-[180px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
             <input
               type="text"
@@ -556,6 +563,42 @@ export default function ReceiptsPage() {
               className="w-full pl-9 pr-4 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-600 bg-white dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-400"
             />
           </div>
+
+          {/* Filtre statut — boutons pills */}
+          <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-slate-800 p-1 rounded-xl">
+            {([
+              { value: 'all',       label: 'Tous' },
+              { value: 'valid',     label: 'Valides' },
+              { value: 'cancelled', label: 'Annulés' },
+            ] as const).map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => { setStatusFilter(opt.value); setPage(1); }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  statusFilter === opt.value
+                    ? opt.value === 'cancelled'
+                      ? 'bg-red-600 text-white shadow-sm'
+                      : opt.value === 'valid'
+                        ? 'bg-[#00853F] text-white shadow-sm'
+                        : 'bg-white dark:bg-slate-700 text-gray-800 dark:text-white shadow-sm'
+                    : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200'
+                }`}
+              >
+                {opt.label}
+                {/* Compteur */}
+                <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full ${
+                  statusFilter === opt.value
+                    ? 'bg-white/20 text-white'
+                    : 'bg-gray-200 dark:bg-slate-600 text-gray-600 dark:text-slate-300'
+                }`}>
+                  {opt.value === 'all' ? receipts.length :
+                   opt.value === 'valid' ? receipts.filter(r => !r.is_cancelled).length :
+                   receipts.filter(r => r.is_cancelled).length}
+                </span>
+              </button>
+            ))}
+          </div>
+
           <button
             onClick={() => setShowExport(true)}
             disabled={receipts.length === 0}
