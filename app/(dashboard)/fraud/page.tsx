@@ -1,8 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Shield, Filter, TrendingUp, TrendingDown, DollarSign, Activity } from 'lucide-react';
+import { AlertTriangle, Shield, Filter, TrendingUp, TrendingDown, DollarSign, Activity, BarChart2, X } from 'lucide-react';
 import api from '@/lib/api';
+
+const FRAUD_TYPES = [
+  { label: 'Sous-déclaration',       pct: 65, color: '#E31B23' },
+  { label: 'Transactions cachées',   pct: 25, color: '#f97316' },
+  { label: 'Anomalies de pattern',   pct: 10, color: '#FDEF42' },
+];
 
 interface FraudAlert {
   id: string;
@@ -79,6 +85,7 @@ export default function FraudPage() {
     montantRecupere: 0,
     tauxDetection: 0, tauxDelta: 1.5,
   });
+  const [showTypes, setShowTypes] = useState(false);
   const pageSize = 20;
 
   const fetchAlerts = () => {
@@ -108,14 +115,23 @@ export default function FraudPage() {
         <div className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 rounded-2xl overflow-hidden shadow-lg">
 
           {/* Top bar */}
-          <div className="flex items-center gap-3 px-5 py-3 border-b border-white/10">
-            <div className="bg-white/10 p-2 rounded-lg">
-              <Shield className="h-4 w-4 text-white" />
+          <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/10 p-2 rounded-lg">
+                <Shield className="h-4 w-4 text-white" />
+              </div>
+              <div>
+                <h1 className="text-base font-bold text-white">Détection de Fraude</h1>
+                <p className="text-xs text-slate-400">Alertes et analyse des risques fiscaux</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-base font-bold text-white">Détection de Fraude</h1>
-              <p className="text-xs text-slate-400">Alertes et analyse des risques fiscaux</p>
-            </div>
+            <button
+              onClick={() => setShowTypes(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition-colors"
+            >
+              <BarChart2 className="h-3.5 w-3.5" />
+              Types de fraude
+            </button>
           </div>
 
           {/* Grid métriques */}
@@ -268,6 +284,62 @@ export default function FraudPage() {
           )}
         </div>
       </main>
+
+      {/* Modal — Types de fraude */}
+      {showTypes && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowTypes(false)} />
+          <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+
+            {/* Header modal */}
+            <div className="bg-gradient-to-r from-slate-900 to-slate-800 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="bg-white/10 p-2 rounded-lg">
+                  <BarChart2 className="h-4 w-4 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-bold text-white">Types de Fraude les Plus Fréquents</h2>
+                  <p className="text-xs text-slate-400 mt-0.5">Répartition sur les 30 derniers jours</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowTypes(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Contenu */}
+            <div className="p-6 space-y-5">
+              {FRAUD_TYPES.map(({ label, pct, color }) => (
+                <div key={label}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2.5 w-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                      <span className="text-sm font-medium text-gray-800 dark:text-white">{label}</span>
+                    </div>
+                    <span className="text-sm font-bold text-gray-900 dark:text-white">{pct}%</span>
+                  </div>
+                  {/* Barre de progression */}
+                  <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-700"
+                      style={{ width: `${pct}%`, backgroundColor: color }}
+                    />
+                  </div>
+                </div>
+              ))}
+
+              {/* Légende totale */}
+              <div className="pt-2 border-t border-gray-100 dark:border-slate-700 flex items-center justify-between">
+                <span className="text-xs text-gray-400 dark:text-slate-500">Total des types détectés</span>
+                <span className="text-xs font-semibold text-gray-600 dark:text-slate-300">{FRAUD_TYPES.reduce((s, f) => s + f.pct, 0)}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
