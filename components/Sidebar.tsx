@@ -21,6 +21,7 @@ import {
   X,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
+import ThemeToggle from '@/components/ThemeToggle';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -150,8 +151,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         })}
       </nav>
 
-      {/* User info */}
+      {/* User info + theme toggle */}
       <div className="px-3 py-4 border-t border-slate-700/50 space-y-2">
+        {/* Theme toggle row */}
+        <div className="flex items-center justify-between px-3 py-2">
+          <span className="text-xs text-slate-400">Theme</span>
+          <ThemeToggle variant="nav" />
+        </div>
+
         <button
           onClick={() => setShowLogoutModal(true)}
           className="w-full flex items-center gap-3 px-3 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:bg-slate-700/50 transition-colors cursor-pointer"
