@@ -131,42 +131,87 @@ export default function ParametresPage() {
 
   if (!user || user.role !== 'ADMIN') return null;
 
-  // Shared input class
+  // Shared input class (alerts / security tabs)
   const inp = 'w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 bg-white';
 
+  const sourcesActives = 2; // API Mobile Money + Base DGID
+
   return (
-    <div className="p-6 space-y-6">
+    <div>
 
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="p-2.5 bg-green-50 rounded-xl">
-          <Settings className="h-6 w-6 text-green-700" />
-        </div>
-        <h1 className="text-2xl font-bold text-gray-900">Paramètres du tableau de bord TAXUP</h1>
-      </div>
+      {/* ── sticky zone: dark banner + tabs ── */}
+      <div className="sticky top-12 md:top-0 z-10 bg-gray-50 dark:bg-slate-950 px-4 sm:px-6 pt-4 sm:pt-6 pb-0">
+        <div className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 rounded-2xl overflow-hidden shadow-xl">
 
-      {/* Tabs */}
-      <div className="border-b border-gray-200 overflow-x-auto">
-        <div className="flex gap-1 min-w-max">
-          {tabs.map(t => {
-            const Icon = t.icon;
-            return (
-              <button
-                key={t.id}
-                onClick={() => setActiveTab(t.id)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                  activeTab === t.id
-                    ? 'border-green-700 text-green-700'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-green-50'
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                {t.label}
+          {/* top bar */}
+          <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-white/10 flex-wrap">
+            <div>
+              <h1 className="text-sm font-bold text-white leading-tight">Paramètres du tableau de bord TAXUP</h1>
+              <p className="text-slate-400 text-xs mt-0.5">Administration système · Configuration générale</p>
+            </div>
+            {activeTab === 'users' && (
+              <button onClick={openCreate}
+                className="flex items-center gap-1.5 text-xs text-white bg-green-700 hover:bg-green-600 px-3 py-1.5 rounded-lg transition-colors font-medium">
+                <Plus className="h-3.5 w-3.5" /> Nouvel Utilisateur
               </button>
-            );
-          })}
+            )}
+          </div>
+
+          {/* metrics grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/5">
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">Total Utilisateurs</p>
+              <p className="text-lg font-bold text-white">{users.length || '—'}</p>
+              <p className="text-[#4ade80] text-xs mt-1">{users.filter(u => u.is_active).length} actifs</p>
+            </div>
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">Rôles Définis</p>
+              <p className="text-lg font-bold text-white">{ROLES.length}</p>
+              <p className="text-[#4ade80] text-xs mt-1">Système sécurisé</p>
+            </div>
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">Sources Actives</p>
+              <p className="text-lg font-bold text-white">{sourcesActives}</p>
+              <p className="text-[#4ade80] text-xs mt-1">API connectées</p>
+            </div>
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">Système</p>
+              <p className="text-lg font-bold text-white">
+                {settings.maintenance_mode ? 'Maintenance' : 'Opérationnel'}
+              </p>
+              <p className={`text-xs mt-1 ${settings.maintenance_mode ? 'text-amber-400' : 'text-[#4ade80]'}`}>
+                {settings.maintenance_mode ? 'Accès restreint' : 'Tous les services actifs'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs — collés sous le banner */}
+        <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 border-t-0 rounded-b-xl overflow-x-auto">
+          <div className="flex gap-1 px-2 min-w-max">
+            {tabs.map(t => {
+              const Icon = t.icon;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setActiveTab(t.id)}
+                  className={`flex items-center gap-2 px-4 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${
+                    activeTab === t.id
+                      ? 'border-[#00853F] text-[#00853F] dark:text-[#4ade80] dark:border-[#4ade80]'
+                      : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200'
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
+
+      {/* ── content ── */}
+      <div className="px-4 sm:px-6 pb-6 pt-5 space-y-6">
 
       {/* ── Tab: Utilisateurs ──────────────────────────────────────────────── */}
       {activeTab === 'users' && (
@@ -272,33 +317,22 @@ export default function ParametresPage() {
         </div>
       )}
 
-      {/* ── Tab: Règles Fiscales ───────────────────────────────────────────── */}
+      {/* ── Tab: Règles Fiscales (lecture seule) ─────────────────────────── */}
       {activeTab === 'fiscal' && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
-          <h2 className="text-lg font-semibold text-gray-800">Règles Fiscales</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Taux de TVA standard (%)</label>
-              <input type="number" defaultValue={18} className={inp} />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Taux réduit (%)</label>
-              <input type="number" defaultValue={10} className={inp} />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Période fiscale</label>
-              <select className={inp}>
-                <option>Trimestriel</option><option>Mensuel</option><option>Annuel</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Devise</label>
-              <select className={inp}>
-                <option>XOF (Franc CFA)</option><option>EUR (Euro)</option><option>USD (Dollar)</option>
-              </select>
-            </div>
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700 flex items-center gap-2">
+            <FileText className="h-4 w-4 text-[#00853F]" />
+            <h2 className="font-semibold text-gray-800 dark:text-white text-sm">Règles Fiscales</h2>
+            <span className="ml-auto text-xs text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">Lecture seule</span>
           </div>
-          <SaveBtn />
+          <div className="divide-y divide-gray-50 dark:divide-slate-800">
+            <FiscalRow label="Taux de TVA standard" value="18 %" highlight />
+            <FiscalRow label="Taux réduit" value="10 %" />
+            <FiscalRow label="Période fiscale" value="Trimestriel" />
+            <FiscalRow label="Devise" value="XOF — Franc CFA (UEMOA)" />
+            <FiscalRow label="Base de calcul TVA" value="Montant brut de la transaction" />
+            <FiscalRow label="Seuil d'assujettissement" value="50 000 000 F CFA / an" />
+          </div>
         </div>
       )}
 
@@ -567,6 +601,7 @@ export default function ParametresPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
@@ -581,6 +616,21 @@ function SaveBtn() {
     >
       <Save className="h-4 w-4" /> Enregistrer
     </button>
+  );
+}
+
+function FiscalRow({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
+  return (
+    <div className="flex items-center justify-between px-6 py-4">
+      <span className="text-sm text-gray-500 dark:text-slate-400">{label}</span>
+      <span className={`text-sm font-semibold px-3 py-1 rounded-full ${
+        highlight
+          ? 'bg-[#00853F]/10 text-[#00853F] dark:bg-[#00853F]/20 dark:text-[#4ade80]'
+          : 'text-gray-800 dark:text-white bg-gray-50 dark:bg-slate-800'
+      }`}>
+        {value}
+      </span>
+    </div>
   );
 }
 
