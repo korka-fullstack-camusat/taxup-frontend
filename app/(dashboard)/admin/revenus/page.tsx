@@ -158,31 +158,18 @@ export default function AnalyseRevenusPage() {
 
   return (
     <div data-export>
-      {/* ── sticky page header ── */}
-      <div className="sticky top-12 md:top-0 z-10 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 px-4 sm:px-6 py-3 flex items-center justify-between gap-3 flex-wrap">
-        <div>
-          <h1 className="text-base font-bold text-gray-800 dark:text-white leading-tight">Analyse des Revenus</h1>
-          <p className="text-gray-500 dark:text-slate-400 text-xs mt-0.5">Synthèse fiscale · Sénégal</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowChoice(true)}
-            className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-          >
-            <BarChart2 className="h-4 w-4" />
-            Rapports
-            <ChevronRight className="h-3.5 w-3.5 opacity-60" />
-          </button>
-          <ExportMenu onExport={handleExport} />
-        </div>
-      </div>
-
       <div className="p-4 sm:p-6 space-y-6">
 
       {/* ── live banner ── */}
       <div className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 rounded-2xl overflow-hidden shadow-xl">
-        {/* top bar */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
+        {/* top bar — title + live controls + action buttons all in one row */}
+        <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-white/10 flex-wrap">
+          {/* left: title */}
+          <div>
+            <h1 className="text-sm font-bold text-white leading-tight">Analyse des Revenus</h1>
+            <p className="text-slate-400 text-xs mt-0.5">Synthèse fiscale · Sénégal</p>
+          </div>
+          {/* center: live badge + refresh */}
           <div className="flex items-center gap-3">
             <span className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${live ? 'bg-[#00853F]/20 text-[#4ade80]' : 'bg-slate-700 text-slate-400'}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${live ? 'bg-[#4ade80] animate-pulse' : 'bg-slate-500'}`} />
@@ -193,17 +180,28 @@ export default function AnalyseRevenusPage() {
                 className={`h-3 w-3 ${live ? 'text-[#4ade80]' : 'text-slate-600'}`}
                 style={{ animation: live ? 'spin 2s linear infinite' : 'none' }}
               />
-              <span>Actualisation auto / 2s</span>
+              <span className="hidden sm:inline">Actualisation auto / 2s</span>
             </div>
           </div>
-          <button
-            onClick={() => setLive((l: boolean) => !l)}
-            className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors"
-          >
-            {live
-              ? <><PauseCircle className="h-3.5 w-3.5" /> Pause</>
-              : <><PlayCircle  className="h-3.5 w-3.5" /> Reprendre</>}
-          </button>
+          {/* right: action buttons + pause */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowChoice(true)}
+              className="flex items-center gap-1.5 text-xs text-slate-200 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors font-medium"
+            >
+              <BarChart2 className="h-3.5 w-3.5" />
+              Rapports
+            </button>
+            <ExportMenuDark onExport={handleExport} />
+            <button
+              onClick={() => setLive((l: boolean) => !l)}
+              className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              {live
+                ? <><PauseCircle className="h-3.5 w-3.5" /> Pause</>
+                : <><PlayCircle  className="h-3.5 w-3.5" /> Reprendre</>}
+            </button>
+          </div>
         </div>
 
         {/* metrics grid */}
@@ -539,16 +537,17 @@ function DetailModal({ title, children, onClose }: { title: string; children: Re
   );
 }
 
-function ExportMenu({ onExport }: { onExport: (f: 'csv' | 'excel' | 'pdf') => void }) {
+/* Dark variant used inside the banner */
+function ExportMenuDark({ onExport }: { onExport: (f: 'csv' | 'excel' | 'pdf') => void }) {
   return (
     <div className="relative group">
-      <button className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">
-        <Download className="h-4 w-4" /> Exporter
+      <button className="flex items-center gap-1.5 text-xs text-slate-200 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors font-medium">
+        <Download className="h-3.5 w-3.5" /> Exporter
       </button>
-      <div className="absolute right-0 top-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg shadow-lg py-1 hidden group-hover:block z-20 min-w-[140px]">
-        <button onClick={() => onExport('csv')}   className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700">CSV</button>
-        <button onClick={() => onExport('excel')} className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700">Excel</button>
-        <button onClick={() => onExport('pdf')}   className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700">PDF / Imprimer</button>
+      <div className="absolute right-0 top-full mt-1 bg-slate-800 border border-slate-600 rounded-lg shadow-xl py-1 hidden group-hover:block z-20 min-w-[140px]">
+        <button onClick={() => onExport('csv')}   className="w-full text-left px-4 py-2 text-sm text-slate-200 hover:bg-slate-700">CSV</button>
+        <button onClick={() => onExport('excel')} className="w-full text-left px-4 py-2 text-sm text-slate-200 hover:bg-slate-700">Excel</button>
+        <button onClick={() => onExport('pdf')}   className="w-full text-left px-4 py-2 text-sm text-slate-200 hover:bg-slate-700">PDF / Imprimer</button>
       </div>
     </div>
   );
