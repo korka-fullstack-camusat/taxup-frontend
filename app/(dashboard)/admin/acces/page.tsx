@@ -148,7 +148,7 @@ export default function GestionAccesPage() {
             {/* action */}
             <button
               onClick={openCreate}
-              className="flex items-center gap-1.5 text-xs text-slate-200 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors font-medium"
+              className="flex items-center gap-1.5 text-xs text-white bg-green-700 hover:bg-green-600 px-3 py-1.5 rounded-lg transition-colors font-medium"
             >
               <Plus className="h-3.5 w-3.5" />
               Nouvel Utilisateur
