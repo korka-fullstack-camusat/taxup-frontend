@@ -497,7 +497,6 @@ export default function AnalyseRevenusPage() {
         </DetailModal>
       )}
       </div>
-      </div>
     </div>
   );
 }
