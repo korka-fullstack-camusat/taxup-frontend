@@ -20,7 +20,6 @@ import {
 import { useAuth } from '@/lib/auth';
 import ThemeToggle from '@/components/ThemeToggle';
 
-
 const features = [
   {
     icon: BarChart3,
@@ -103,14 +102,14 @@ export default function LandingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-slate-900 flex items-center justify-center transition-colors">
         <div className="h-12 w-12 border-4 border-[#00853F] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-slate-900 transition-colors">
 
       {/* Senegal flag accent stripe */}
       <div className="flex h-1 fixed top-0 left-0 right-0 z-50">
@@ -120,38 +119,38 @@ export default function LandingPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative bg-slate-900 min-h-screen flex flex-col pt-1">
+      <section className="relative bg-white dark:bg-slate-900 min-h-screen flex flex-col pt-1 transition-colors">
         {/* Background decoration */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-[#00853F]/10 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 -left-20 w-72 h-72 bg-[#00853F]/8 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-1/3 w-64 h-64 bg-slate-700/40 rounded-full blur-3xl" />
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-[#00853F]/8 dark:bg-[#00853F]/10 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 -left-20 w-72 h-72 bg-[#00853F]/5 dark:bg-[#00853F]/8 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-1/3 w-64 h-64 bg-gray-100/80 dark:bg-slate-700/40 rounded-full blur-3xl" />
           {/* Subtle grid */}
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
         </div>
 
         {/* Navigation */}
-        <nav className="sticky top-1 z-40 bg-slate-900/80 backdrop-blur-md border-b border-white/5">
+        <nav className="sticky top-1 z-40 bg-white/90 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-200/60 dark:border-white/5 transition-colors">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="flex items-center justify-between h-20">
               <div className="flex items-center gap-3">
-                <div className="h-11 w-11 rounded-xl bg-white/10 backdrop-blur border border-white/15 flex items-center justify-center p-2 shadow-lg">
+                <div className="h-11 w-11 rounded-xl bg-gray-100 dark:bg-white/10 border border-gray-200 dark:border-white/15 flex items-center justify-center p-2 shadow-sm">
                   <img src="/taxup-logo.svg" alt="TAXUP" className="h-full w-full" />
                 </div>
                 <div>
-                  <span className="text-xl font-bold text-white">TAXUP</span>
-                  <p className="text-xs text-slate-400 leading-none">Senegal Fiscal Digital</p>
+                  <span className="text-xl font-bold text-gray-900 dark:text-white">TAXUP</span>
+                  <p className="text-xs text-gray-500 dark:text-slate-400 leading-none">Senegal Fiscal Digital</p>
                 </div>
               </div>
 
               <div className="hidden md:flex items-center gap-8">
-                <a href="#fonctionnalites" className="text-sm text-slate-400 hover:text-white transition-colors">Fonctionnalites</a>
-                <a href="#profils" className="text-sm text-slate-400 hover:text-white transition-colors">Profils</a>
-                <a href="#contact" className="text-sm text-slate-400 hover:text-white transition-colors">Contact</a>
+                <a href="#fonctionnalites" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors">Fonctionnalites</a>
+                <a href="#profils" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors">Profils</a>
+                <a href="#contact" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors">Contact</a>
               </div>
 
               <div className="flex items-center gap-3">
-                <ThemeToggle variant="nav" />
+                <ThemeToggle />
                 <Link
                   href="/login"
                   className="inline-flex items-center gap-2 bg-[#00853F] hover:bg-[#006830] text-white font-semibold px-6 py-2.5 rounded-full transition-colors shadow-lg shadow-[#00853F]/25"
@@ -170,12 +169,12 @@ export default function LandingPage() {
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               {/* Left side - Text */}
               <div>
-                <div className="inline-flex items-center gap-2 bg-[#00853F]/15 border border-[#00853F]/30 rounded-full px-4 py-2 mb-6">
+                <div className="inline-flex items-center gap-2 bg-[#00853F]/10 dark:bg-[#00853F]/15 border border-[#00853F]/25 dark:border-[#00853F]/30 rounded-full px-4 py-2 mb-6">
                   <span className="flex h-2 w-2 rounded-full bg-[#00853F] animate-pulse" />
-                  <span className="text-sm text-[#4ade80] font-medium">Plateforme Nationale de Fiscalite Digitale</span>
+                  <span className="text-sm text-[#00853F] dark:text-[#4ade80] font-medium">Plateforme Nationale de Fiscalite Digitale</span>
                 </div>
 
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight mb-6">
                   Audit fiscal des{' '}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00853F] to-[#4ade80]">
                     transactions
@@ -183,7 +182,7 @@ export default function LandingPage() {
                   Mobile Money
                 </h1>
 
-                <p className="text-lg text-slate-400 mb-8 max-w-xl leading-relaxed">
+                <p className="text-lg text-gray-600 dark:text-slate-400 mb-8 max-w-xl leading-relaxed">
                   Surveillez, auditez et securisez les transactions financieres electroniques au Senegal avec une plateforme moderne et fiable.
                 </p>
 
@@ -197,7 +196,7 @@ export default function LandingPage() {
                   </Link>
                   <Link
                     href="/register"
-                    className="inline-flex items-center justify-center gap-2 bg-white/5 backdrop-blur-sm text-white font-semibold px-8 py-4 rounded-full hover:bg-white/10 transition-colors border border-white/10"
+                    className="inline-flex items-center justify-center gap-2 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-white font-semibold px-8 py-4 rounded-full hover:bg-gray-200 dark:hover:bg-white/10 transition-colors border border-gray-200 dark:border-white/10"
                   >
                     Creer un compte
                   </Link>
@@ -205,18 +204,18 @@ export default function LandingPage() {
 
                 {/* Trust indicators */}
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-slate-500 text-xs mr-2">Integre avec :</span>
+                  <span className="text-gray-400 dark:text-slate-500 text-xs mr-2">Integre avec :</span>
                   {['Orange Money', 'Wave', 'Free Money'].map((name) => (
-                    <span key={name} className="text-xs font-medium text-slate-400 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-full">
+                    <span key={name} className="text-xs font-medium text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-3 py-1.5 rounded-full">
                       {name}
                     </span>
                   ))}
                 </div>
               </div>
 
-              {/* Right side - Dashboard mockup */}
+              {/* Right side - Dashboard mockup (always dark — it's a screenshot) */}
               <div className="relative hidden lg:block">
-                <div className="absolute -inset-4 bg-[#00853F]/15 rounded-3xl blur-3xl" />
+                <div className="absolute -inset-4 bg-[#00853F]/10 dark:bg-[#00853F]/15 rounded-3xl blur-3xl" />
                 <div className="relative bg-slate-800 rounded-2xl border border-slate-700/60 overflow-hidden shadow-2xl">
 
                   {/* Browser chrome */}
@@ -233,8 +232,6 @@ export default function LandingPage() {
 
                   {/* Dashboard content */}
                   <div className="p-4 space-y-3">
-
-                    {/* Top bar */}
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-[11px] font-bold text-white">Tableau de Bord DGID</p>
@@ -242,8 +239,6 @@ export default function LandingPage() {
                       </div>
                       <span className="bg-[#00853F]/20 text-[#4ade80] text-[9px] px-2 py-0.5 rounded-full border border-[#00853F]/30">● En ligne</span>
                     </div>
-
-                    {/* Stat cards */}
                     <div className="grid grid-cols-2 gap-2">
                       <div className="bg-[#00853F]/10 border border-[#00853F]/20 rounded-xl p-2.5">
                         <p className="text-[9px] text-slate-400">Transactions</p>
@@ -266,17 +261,12 @@ export default function LandingPage() {
                         <p className="text-[9px] text-slate-500">en cours</p>
                       </div>
                     </div>
-
-                    {/* Mini bar chart */}
                     <div className="bg-slate-700/30 rounded-xl p-3">
                       <p className="text-[9px] text-slate-400 mb-2">Evolution transactions — 7 derniers jours</p>
                       <div className="flex items-end gap-1.5 h-14">
                         {[40, 65, 45, 80, 55, 95, 70].map((h, i) => (
                           <div key={i} className="flex-1 flex items-end">
-                            <div
-                              className={`w-full rounded-t-sm transition-all ${i === 5 ? 'bg-[#00853F]' : 'bg-slate-600'}`}
-                              style={{ height: `${h}%` }}
-                            />
+                            <div className={`w-full rounded-t-sm ${i === 5 ? 'bg-[#00853F]' : 'bg-slate-600'}`} style={{ height: `${h}%` }} />
                           </div>
                         ))}
                       </div>
@@ -286,8 +276,6 @@ export default function LandingPage() {
                         ))}
                       </div>
                     </div>
-
-                    {/* Mini transaction list */}
                     <div>
                       <p className="text-[9px] text-slate-400 mb-1.5">Transactions recentes</p>
                       <div className="space-y-1.5">
@@ -311,7 +299,6 @@ export default function LandingPage() {
                         ))}
                       </div>
                     </div>
-
                   </div>
                 </div>
               </div>
@@ -322,26 +309,26 @@ export default function LandingPage() {
         {/* Scroll indicator */}
         <div className="relative z-10 pb-8 flex justify-center">
           <div className="flex flex-col items-center gap-2">
-            <span className="text-xs text-slate-500">Defiler</span>
-            <div className="w-6 h-10 rounded-full border-2 border-slate-600 flex justify-center pt-2">
-              <div className="w-1.5 h-3 bg-slate-500 rounded-full" />
+            <span className="text-xs text-gray-400 dark:text-slate-500">Defiler</span>
+            <div className="w-6 h-10 rounded-full border-2 border-gray-300 dark:border-slate-600 flex justify-center pt-2">
+              <div className="w-1.5 h-3 bg-gray-300 dark:bg-slate-500 rounded-full" />
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="fonctionnalites" className="py-24 px-6 lg:px-8 bg-gray-50">
+      <section id="fonctionnalites" className="py-24 px-6 lg:px-8 bg-gray-50 dark:bg-slate-950 transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <span className="inline-flex items-center gap-2 bg-[#00853F]/10 text-[#00853F] rounded-full px-4 py-2 text-sm font-medium mb-4 border border-[#00853F]/20">
               <Zap className="h-4 w-4" />
               Fonctionnalites
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
               Une solution complete pour la fiscalite digitale
             </h2>
-            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-500 dark:text-slate-400 max-w-2xl mx-auto">
               Tous les outils necessaires pour gerer efficacement la fiscalite des transactions Mobile Money
             </p>
           </div>
@@ -350,13 +337,13 @@ export default function LandingPage() {
             {features.map(({ icon: Icon, title, description, gradient }) => (
               <div
                 key={title}
-                className="group bg-white rounded-2xl p-8 border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all"
+                className="group bg-white dark:bg-slate-900 rounded-2xl p-8 border border-gray-100 dark:border-slate-700/50 hover:border-gray-200 dark:hover:border-slate-600 hover:shadow-xl transition-all"
               >
                 <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-6 shadow-lg`}>
                   <Icon className="h-7 w-7 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{title}</h3>
-                <p className="text-gray-500 leading-relaxed">{description}</p>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{title}</h3>
+                <p className="text-gray-500 dark:text-slate-400 leading-relaxed">{description}</p>
               </div>
             ))}
           </div>
@@ -364,17 +351,17 @@ export default function LandingPage() {
       </section>
 
       {/* Profiles Section */}
-      <section id="profils" className="py-24 px-6 lg:px-8 bg-white">
+      <section id="profils" className="py-24 px-6 lg:px-8 bg-white dark:bg-slate-900 transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="inline-flex items-center gap-2 bg-slate-100 text-slate-600 rounded-full px-4 py-2 text-sm font-medium mb-4">
+            <span className="inline-flex items-center gap-2 bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 rounded-full px-4 py-2 text-sm font-medium mb-4">
               <Users className="h-4 w-4" />
               Profils
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
               Une interface adaptee a chaque role
             </h2>
-            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-500 dark:text-slate-400 max-w-2xl mx-auto">
               Des tableaux de bord personnalises pour repondre aux besoins specifiques de chaque utilisateur
             </p>
           </div>
@@ -383,13 +370,13 @@ export default function LandingPage() {
             {profiles.map(({ icon: Icon, name, description, gradient }) => (
               <div
                 key={name}
-                className="group bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-xl hover:border-gray-200 transition-all"
+                className="group bg-white dark:bg-slate-800 rounded-2xl p-6 border border-gray-100 dark:border-slate-700/50 hover:shadow-xl hover:border-gray-200 dark:hover:border-slate-600 transition-all"
               >
                 <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-4 shadow-lg`}>
                   <Icon className="h-7 w-7 text-white" />
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">{name}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
+                <h3 className="font-bold text-gray-900 dark:text-white mb-2">{name}</h3>
+                <p className="text-sm text-gray-500 dark:text-slate-400 leading-relaxed">{description}</p>
               </div>
             ))}
           </div>
@@ -397,7 +384,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section id="contact" className="py-24 px-6 lg:px-8 bg-slate-900 relative overflow-hidden">
+      <section id="contact" className="py-24 px-6 lg:px-8 bg-gray-50 dark:bg-slate-950 relative overflow-hidden transition-colors">
         {/* Senegal flag bar at top */}
         <div className="absolute top-0 left-0 right-0 flex h-1">
           <div className="flex-1 bg-[#00853F]" />
@@ -405,20 +392,20 @@ export default function LandingPage() {
           <div className="flex-1 bg-[#E31B23]" />
         </div>
 
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-64 h-64 bg-[#00853F]/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-slate-700/40 rounded-full blur-3xl" />
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-64 h-64 bg-[#00853F]/8 dark:bg-[#00853F]/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-gray-200/60 dark:bg-slate-700/40 rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 bg-[#00853F]/15 border border-[#00853F]/30 rounded-full px-4 py-2 mb-6">
-            <CheckCircle className="h-4 w-4 text-[#4ade80]" />
-            <span className="text-sm text-[#4ade80] font-medium">Systeme operationnel</span>
+          <div className="inline-flex items-center gap-2 bg-[#00853F]/10 dark:bg-[#00853F]/15 border border-[#00853F]/25 dark:border-[#00853F]/30 rounded-full px-4 py-2 mb-6">
+            <CheckCircle className="h-4 w-4 text-[#00853F] dark:text-[#4ade80]" />
+            <span className="text-sm text-[#00853F] dark:text-[#4ade80] font-medium">Systeme operationnel</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
             Pret a moderniser la fiscalite de votre organisation ?
           </h2>
-          <p className="text-lg text-slate-400 mb-10 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-slate-400 mb-10 max-w-2xl mx-auto">
             Rejoignez la plateforme nationale de surveillance des transactions Mobile Money.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -431,7 +418,7 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/register"
-              className="inline-flex items-center justify-center gap-2 bg-white/5 text-white font-semibold px-8 py-4 rounded-full hover:bg-white/10 transition-colors border border-white/10"
+              className="inline-flex items-center justify-center gap-2 bg-white dark:bg-white/5 text-gray-700 dark:text-white font-semibold px-8 py-4 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors border border-gray-200 dark:border-white/10"
             >
               Creer un compte
             </Link>
@@ -440,33 +427,33 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 lg:px-8 bg-slate-950">
+      <footer className="py-12 px-6 lg:px-8 bg-gray-900 dark:bg-slate-950 transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center p-1.5">
+              <div className="h-10 w-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center p-1.5">
                 <img src="/taxup-logo.svg" alt="TAXUP" className="h-full w-full" />
               </div>
               <div>
                 <span className="text-lg font-bold text-white">TAXUP</span>
-                <p className="text-xs text-slate-500">Systeme Fiscal Digital du Senegal</p>
+                <p className="text-xs text-gray-500">Systeme Fiscal Digital du Senegal</p>
               </div>
             </div>
 
             <div className="flex items-center gap-6">
-              <a href="#" className="text-sm text-slate-500 hover:text-white transition-colors">Mentions legales</a>
-              <a href="#" className="text-sm text-slate-500 hover:text-white transition-colors">Confidentialite</a>
-              <a href="#" className="text-sm text-slate-500 hover:text-white transition-colors">Contact</a>
+              <a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">Mentions legales</a>
+              <a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">Confidentialite</a>
+              <a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">Contact</a>
             </div>
 
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-[#00853F]" />
-              <span className="text-sm text-slate-500">Systeme operationnel</span>
+              <span className="text-sm text-gray-500">Systeme operationnel</span>
             </div>
           </div>
 
-          <div className="mt-8 pt-8 border-t border-slate-800 text-center">
-            <p className="text-sm text-slate-600">
+          <div className="mt-8 pt-8 border-t border-gray-800 text-center">
+            <p className="text-sm text-gray-600">
               {new Date().getFullYear()} TAXUP — Direction Generale des Impots et Domaines du Senegal. Tous droits reserves.
             </p>
           </div>
