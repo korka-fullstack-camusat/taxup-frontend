@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { MapPin, TrendingUp, ArrowUpRight } from 'lucide-react';
+import { MapPin, TrendingUp, ArrowUpRight, Download, BarChart2 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
+import { exportPDF } from '@/lib/export';
 import type { RegionData } from '@/components/SenegalMap';
 
 // Import dynamique OBLIGATOIRE — Leaflet nécessite le DOM (pas de SSR)
@@ -46,6 +47,12 @@ const LEVEL_BADGE = {
   low:    'bg-slate-100 text-slate-500',
 };
 
+/* ─── computed totals ────────────────────────────────────────── */
+const TOTAL_RECETTES   = REGIONS.reduce((s, r) => s + r.recettes, 0);
+const TOTAL_VOLUME     = REGIONS.reduce((s, r) => s + r.volume, 0);
+const TOTAL_TVA        = REGIONS.reduce((s, r) => s + r.tva, 0);
+const TOP_REGION       = [...REGIONS].sort((a, b) => b.recettes - a.recettes)[0];
+
 function formatXOF(n: number): string {
   if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B F CFA`;
   if (n >= 1_000_000)     return `${(n / 1_000_000).toFixed(1)}M F CFA`;
@@ -72,131 +79,186 @@ export default function CarteFiscalePage() {
   if (!user || (user.role !== 'ADMIN' && user.role !== 'AGENT_DGID')) return null;
 
   return (
-    <div className="p-6 space-y-6">
+    <div data-export>
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Cartographie Fiscale Interactive - Sénégal</h1>
-        <select
-          value={viewType}
-          onChange={e => setViewType(e.target.value as typeof viewType)}
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-600"
-        >
-          <option>Recettes</option>
-          <option>Volume</option>
-          <option>TVA</option>
-        </select>
-      </div>
+      {/* ── sticky dark banner ── */}
+      <div className="sticky top-12 md:top-0 z-10 bg-gray-50 dark:bg-slate-950 px-4 sm:px-6 pt-4 sm:pt-6 pb-3">
+        <div className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 rounded-2xl overflow-hidden shadow-xl">
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        {/* Carte Leaflet */}
-        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-            <h2 className="font-semibold text-gray-800">Carte du Sénégal - {viewType}</h2>
-            <div className="flex items-center gap-4 text-xs">
-              {(['high', 'medium', 'low'] as const).map(l => (
-                <div key={l} className="flex items-center gap-1.5">
-                  <div className="h-3 w-3 rounded-full" style={{ backgroundColor: LEVEL_COLOR[l] }} />
-                  <span className="text-gray-500">{LEVEL_LABEL[l]}</span>
-                </div>
+          {/* top bar — title + view selector + actions */}
+          <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-white/10 flex-wrap">
+            {/* left: title */}
+            <div>
+              <h1 className="text-sm font-bold text-white leading-tight">Cartographie Fiscale Interactive</h1>
+              <p className="text-slate-400 text-xs mt-0.5">Sénégal · {REGIONS.length} régions</p>
+            </div>
+            {/* center: view type selector */}
+            <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1">
+              {(['Recettes', 'Volume', 'TVA'] as const).map(v => (
+                <button
+                  key={v}
+                  onClick={() => setViewType(v)}
+                  className={`text-xs px-3 py-1 rounded-md font-medium transition-colors ${
+                    viewType === v
+                      ? 'bg-[#00853F] text-white'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {v}
+                </button>
               ))}
+            </div>
+            {/* right: actions */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => exportPDF('Cartographie Fiscale')}
+                className="flex items-center gap-1.5 text-xs text-slate-200 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors font-medium"
+              >
+                <Download className="h-3.5 w-3.5" /> Exporter
+              </button>
             </div>
           </div>
 
-          {/* La carte occupe toute la hauteur restante */}
-          <div style={{ height: 480 }}>
-            <SenegalMap
-              regions={REGIONS}
-              selected={selected}
-              onSelect={setSelected}
-            />
+          {/* metrics grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/5">
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">Recettes Totales</p>
+              <p className="text-lg font-bold text-white">{formatXOF(TOTAL_RECETTES)}</p>
+              <p className="text-[#4ade80] text-xs mt-1">14 régions cumulées</p>
+            </div>
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">Transactions Totales</p>
+              <p className="text-lg font-bold text-white">{formatVolume(TOTAL_VOLUME)}</p>
+              <p className="text-[#4ade80] text-xs mt-1">Volume national</p>
+            </div>
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">TVA Nationale</p>
+              <p className="text-lg font-bold text-white">{formatXOF(TOTAL_TVA)}</p>
+              <p className="text-[#4ade80] text-xs mt-1">18% sur recettes</p>
+            </div>
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">Région Phare</p>
+              <p className="text-lg font-bold text-white flex items-center gap-1">
+                <BarChart2 className="h-4 w-4 text-[#4ade80]" />
+                {TOP_REGION.name}
+              </p>
+              <p className="text-amber-400 text-xs mt-1">+{TOP_REGION.croissance}% croissance</p>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Panel détails */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="font-semibold text-gray-800 mb-4">Détails de la région</h2>
-          {selected ? (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
-                <div
-                  className="h-12 w-12 rounded-xl flex items-center justify-center text-white font-bold text-sm"
-                  style={{ backgroundColor: LEVEL_COLOR[selected.level] }}
-                >
-                  {selected.abbr}
+      {/* ── content ── */}
+      <div className="px-4 sm:px-6 pb-6 space-y-6">
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          {/* Carte Leaflet */}
+          <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-slate-700">
+              <h2 className="font-semibold text-gray-800 dark:text-white">Carte du Sénégal — {viewType}</h2>
+              <div className="flex items-center gap-4 text-xs">
+                {(['high', 'medium', 'low'] as const).map(l => (
+                  <div key={l} className="flex items-center gap-1.5">
+                    <div className="h-3 w-3 rounded-full" style={{ backgroundColor: LEVEL_COLOR[l] }} />
+                    <span className="text-gray-500 dark:text-slate-400">{LEVEL_LABEL[l]}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ height: 480 }}>
+              <SenegalMap
+                regions={REGIONS}
+                selected={selected}
+                onSelect={setSelected}
+              />
+            </div>
+          </div>
+
+          {/* Panel détails */}
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700 p-6">
+            <h2 className="font-semibold text-gray-800 dark:text-white mb-4">Détails de la région</h2>
+            {selected ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 pb-4 border-b border-gray-100 dark:border-slate-700">
+                  <div
+                    className="h-12 w-12 rounded-xl flex items-center justify-center text-white font-bold text-sm"
+                    style={{ backgroundColor: LEVEL_COLOR[selected.level] }}
+                  >
+                    {selected.abbr}
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">{selected.name}</h3>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${LEVEL_BADGE[selected.level]}`}>
+                      {LEVEL_LABEL[selected.level]}
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900">{selected.name}</h3>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${LEVEL_BADGE[selected.level]}`}>
-                    {LEVEL_LABEL[selected.level]}
+                <DetailRow label="Recettes"     value={formatXOF(selected.recettes)} />
+                <DetailRow label="Volume Trans." value={formatVolume(selected.volume)} />
+                <DetailRow label="Valeur Moy."  value={formatXOF(selected.valeurMoy)} />
+                <DetailRow label="TVA (18%)"    value={formatXOF(selected.tva)} />
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-sm text-gray-500 dark:text-slate-400">Croissance</span>
+                  <span className="text-sm font-semibold text-green-700 dark:text-green-400 flex items-center gap-1">
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                    +{selected.croissance}%
                   </span>
                 </div>
               </div>
-              <DetailRow label="Recettes"     value={formatXOF(selected.recettes)} />
-              <DetailRow label="Volume Trans." value={formatVolume(selected.volume)} />
-              <DetailRow label="Valeur Moy."  value={formatXOF(selected.valeurMoy)} />
-              <DetailRow label="TVA (18%)"    value={formatXOF(selected.tva)} />
-              <div className="flex items-center justify-between py-2">
-                <span className="text-sm text-gray-500">Croissance</span>
-                <span className="text-sm font-semibold text-green-700 flex items-center gap-1">
-                  <ArrowUpRight className="h-3.5 w-3.5" />
-                  +{selected.croissance}%
-                </span>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-64 text-gray-400 dark:text-slate-500">
+                <MapPin className="h-12 w-12 mb-3 opacity-30" />
+                <p className="text-sm text-center">Cliquez sur un marqueur de la carte pour voir les détails fiscaux</p>
               </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-64 text-gray-400">
-              <MapPin className="h-12 w-12 mb-3 opacity-30" />
-              <p className="text-sm text-center">Cliquez sur un marqueur de la carte pour voir les détails fiscaux</p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Tableau comparatif */}
-      <div className="bg-white rounded-xl border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="font-semibold text-gray-800">Comparaison Régionale Détaillée</h2>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
-                {['Région', 'Recettes', 'Volume Trans.', 'Valeur Moy.', 'TVA (18%)', 'Croissance'].map((h, i) => (
-                  <th key={h} className={`px-6 py-3 text-xs font-semibold text-gray-500 uppercase ${i === 0 ? 'text-left' : 'text-right'}`}>
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {[...REGIONS].sort((a, b) => b.recettes - a.recettes).map(r => (
-                <tr
-                  key={r.name}
-                  className={`hover:bg-green-50 cursor-pointer transition-colors ${selected?.name === r.name ? 'bg-green-50' : ''}`}
-                  onClick={() => setSelected(selected?.name === r.name ? null : r)}
-                >
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full flex-shrink-0" style={{ backgroundColor: LEVEL_COLOR[r.level] }} />
-                      <span className="font-medium text-gray-800">{r.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-right font-medium text-gray-800">{formatXOF(r.recettes)}</td>
-                  <td className="px-6 py-4 text-right text-gray-600">{formatVolume(r.volume)}</td>
-                  <td className="px-6 py-4 text-right text-gray-600">{formatXOF(r.valeurMoy)}</td>
-                  <td className="px-6 py-4 text-right text-gray-600">{formatXOF(r.tva)}</td>
-                  <td className="px-6 py-4 text-right">
-                    <span className="text-green-700 font-medium flex items-center justify-end gap-1">
-                      <TrendingUp className="h-3.5 w-3.5" />
-                      +{r.croissance}%
-                    </span>
-                  </td>
+        {/* Tableau comparatif */}
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700">
+            <h2 className="font-semibold text-gray-800 dark:text-white">Comparaison Régionale Détaillée</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700">
+                <tr>
+                  {['Région', 'Recettes', 'Volume Trans.', 'Valeur Moy.', 'TVA (18%)', 'Croissance'].map((h, i) => (
+                    <th key={h} className={`px-6 py-3 text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase ${i === 0 ? 'text-left' : 'text-right'}`}>
+                      {h}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-50 dark:divide-slate-800">
+                {[...REGIONS].sort((a, b) => b.recettes - a.recettes).map(r => (
+                  <tr
+                    key={r.name}
+                    className={`hover:bg-green-50 dark:hover:bg-[#00853F]/5 cursor-pointer transition-colors ${selected?.name === r.name ? 'bg-green-50 dark:bg-[#00853F]/10' : ''}`}
+                    onClick={() => setSelected(selected?.name === r.name ? null : r)}
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <div className="h-3 w-3 rounded-full flex-shrink-0" style={{ backgroundColor: LEVEL_COLOR[r.level] }} />
+                        <span className="font-medium text-gray-800 dark:text-white">{r.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right font-medium text-gray-800 dark:text-white">{formatXOF(r.recettes)}</td>
+                    <td className="px-6 py-4 text-right text-gray-600 dark:text-slate-300">{formatVolume(r.volume)}</td>
+                    <td className="px-6 py-4 text-right text-gray-600 dark:text-slate-300">{formatXOF(r.valeurMoy)}</td>
+                    <td className="px-6 py-4 text-right text-gray-600 dark:text-slate-300">{formatXOF(r.tva)}</td>
+                    <td className="px-6 py-4 text-right">
+                      <span className="text-green-700 dark:text-green-400 font-medium flex items-center justify-end gap-1">
+                        <TrendingUp className="h-3.5 w-3.5" />
+                        +{r.croissance}%
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -205,9 +267,9 @@ export default function CarteFiscalePage() {
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between py-2 border-b border-gray-50">
-      <span className="text-sm text-gray-500">{label}</span>
-      <span className="text-sm font-semibold text-gray-900">{value}</span>
+    <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-slate-800">
+      <span className="text-sm text-gray-500 dark:text-slate-400">{label}</span>
+      <span className="text-sm font-semibold text-gray-900 dark:text-white">{value}</span>
     </div>
   );
 }

@@ -133,9 +133,10 @@ export default function OperateursPage() {
   if (!user || (user.role !== 'ADMIN' && user.role !== 'AGENT_DGID')) return null;
 
   return (
-    <div className="p-4 sm:p-6 space-y-6" data-export>
+    <div data-export>
 
-      {/* ── dark live banner ── */}
+      {/* ── sticky dark live banner ── */}
+      <div className="sticky top-12 md:top-0 z-10 bg-gray-50 dark:bg-slate-950 px-4 sm:px-6 pt-4 sm:pt-6 pb-3">
       <div className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 rounded-2xl overflow-hidden shadow-xl">
 
         {/* top bar */}
@@ -189,7 +190,10 @@ export default function OperateursPage() {
           <Metric label="Secteurs Actifs"  value={statsDisplay.secteurs.toString()}       sub="Mobile, Banque, Assurance…"                                  pulse={pulse && live} color="amber" />
         </div>
       </div>
+      </div>
 
+      {/* ── content ── */}
+      <div className="px-4 sm:px-6 pb-6 space-y-6">
       {/* ── table ── */}
       <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700">
         {loading ? (
@@ -307,6 +311,7 @@ export default function OperateursPage() {
           onClose={() => setTop5Modal(null)}
         />
       )}
+      </div>
     </div>
   );
 }

@@ -237,35 +237,39 @@ export default function AdminUsersPage() {
   if (!user || user.role !== 'ADMIN') return null;
 
   return (
-    <div className="p-6 space-y-6">
+    <div>
 
-      {/* ── Header ─────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <Users className="h-6 w-6 text-green-700" />
-            Gestion des utilisateurs
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">{total} utilisateur{total !== 1 ? 's' : ''} au total</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowExport(true)}
-            disabled={users.length === 0}
-            className="flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-40"
-          >
-            <Download className="h-4 w-4" />
-            Exporter
-          </button>
-          <button
-            onClick={openCreate}
-            className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            Nouvel utilisateur
-          </button>
+      {/* ── sticky header ── */}
+      <div className="sticky top-12 md:top-0 z-10 bg-gray-50 dark:bg-slate-950 px-6 pt-6 pb-3 border-b border-gray-200 dark:border-slate-700/60">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+              <Users className="h-6 w-6 text-green-700" />
+              Gestion des utilisateurs
+            </h1>
+            <p className="text-gray-500 dark:text-slate-400 text-sm mt-1">{total} utilisateur{total !== 1 ? 's' : ''} au total</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowExport(true)}
+              disabled={users.length === 0}
+              className="flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-40"
+            >
+              <Download className="h-4 w-4" />
+              Exporter
+            </button>
+            <button
+              onClick={openCreate}
+              className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+            >
+              <Plus className="h-4 w-4" />
+              Nouvel utilisateur
+            </button>
+          </div>
         </div>
       </div>
+
+      <div className="p-6 space-y-6">
 
       {/* ── Filters ────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row gap-3">
@@ -732,6 +736,7 @@ export default function AdminUsersPage() {
           onClose={() => setShowExport(false)}
         />
       )}
+      </div>
     </div>
   );
 }

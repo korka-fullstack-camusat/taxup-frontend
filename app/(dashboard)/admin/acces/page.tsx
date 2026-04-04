@@ -132,19 +132,23 @@ export default function GestionAccesPage() {
   ];
 
   return (
-    <div className="p-6 space-y-6">
+    <div>
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Gestion des Accès et Permissions</h1>
-        <button
-          onClick={openCreate}
-          className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          Nouvel Utilisateur
-        </button>
+      {/* ── sticky header ── */}
+      <div className="sticky top-12 md:top-0 z-10 bg-gray-50 dark:bg-slate-950 px-6 pt-6 pb-3 border-b border-gray-200 dark:border-slate-700/60">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Gestion des Accès et Permissions</h1>
+          <button
+            onClick={openCreate}
+            className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Nouvel Utilisateur
+          </button>
+        </div>
       </div>
+
+      <div className="p-6 space-y-6">
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -487,6 +491,7 @@ export default function GestionAccesPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

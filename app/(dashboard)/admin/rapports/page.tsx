@@ -91,20 +91,24 @@ export default function RapportsPage() {
   const totalTax = evolution.reduce((s, d) => s + d.tax_collected, 0);
 
   return (
-    <div className="p-6 space-y-6" data-export>
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Rapports</h1>
-          <p className="text-gray-500 text-sm mt-1">Générer et exporter les rapports de la plateforme</p>
+    <div data-export>
+      {/* ── sticky header ── */}
+      <div className="sticky top-12 md:top-0 z-10 bg-gray-50 dark:bg-slate-950 px-6 pt-6 pb-3 border-b border-gray-200 dark:border-slate-700/60">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Rapports</h1>
+            <p className="text-gray-500 dark:text-slate-400 text-sm mt-1">Générer et exporter les rapports de la plateforme</p>
+          </div>
+          <select value={period} onChange={e => setPeriod(Number(e.target.value))}
+            className="border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-600">
+            <option value={7}>7 jours</option>
+            <option value={30}>30 jours</option>
+            <option value={90}>90 jours</option>
+          </select>
         </div>
-        <select value={period} onChange={e => setPeriod(Number(e.target.value))}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
-          <option value={7}>7 jours</option>
-          <option value={30}>30 jours</option>
-          <option value={90}>90 jours</option>
-        </select>
       </div>
+
+      <div className="p-6 space-y-6">
 
       {loading ? (
         <div className="flex items-center justify-center h-48">
@@ -209,6 +213,7 @@ export default function RapportsPage() {
           )}
         </>
       )}
+      </div>
     </div>
   );
 }

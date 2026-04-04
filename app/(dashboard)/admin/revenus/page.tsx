@@ -158,9 +158,9 @@ export default function AnalyseRevenusPage() {
 
   return (
     <div data-export>
-      <div className="p-4 sm:p-6 space-y-6">
 
-      {/* ── live banner ── */}
+      {/* ── sticky live banner ── */}
+      <div className="sticky top-12 md:top-0 z-10 bg-gray-50 dark:bg-slate-950 px-4 sm:px-6 pt-4 sm:pt-6 pb-3">
       <div className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 rounded-2xl overflow-hidden shadow-xl">
         {/* top bar — title + live controls + action buttons all in one row */}
         <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-white/10 flex-wrap">
@@ -243,8 +243,10 @@ export default function AnalyseRevenusPage() {
           </div>
         </div>
       </div>
+      </div>
 
       {/* ── charts section ── */}
+      <div className="px-4 sm:px-6 pb-6 space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 1. Évolution Mensuelle */}
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700 p-5">
@@ -494,6 +496,7 @@ export default function AnalyseRevenusPage() {
           </div>
         </DetailModal>
       )}
+      </div>
       </div>
     </div>
   );
