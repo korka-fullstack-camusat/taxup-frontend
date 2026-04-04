@@ -73,9 +73,11 @@ export default function TransactionsPage() {
   const [statsDisplay, setStatsDisplay] = useState<LiveStats>({ total: 0, totalValue: 0, successRate: 0, lastUpdate: '--:--' });
   const [pulse, setPulse] = useState(false);
   const [activeRows, setActiveRows] = useState<Set<string>>(new Set());
+  const [displayAmounts, setDisplayAmounts] = useState<Record<string, number>>({});
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const tickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const rowTickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const amountTickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const statsBaseRef = useRef<LiveStats>({ total: 0, totalValue: 0, successRate: 0, lastUpdate: '--:--' });
   const transactionsRef = useRef<Transaction[]>([]);
   const pageSize = 20;
@@ -91,6 +93,10 @@ export default function TransactionsPage() {
         const t = res.data.total || 0;
         setTransactions(items);
         transactionsRef.current = items;
+        // Initialise les montants affichés avec les vraies valeurs
+        const init: Record<string, number> = {};
+        items.forEach(it => { init[it.id] = it.amount; });
+        setDisplayAmounts(init);
         setTotal(t);
         const base = computeStats(items, t);
         statsBaseRef.current = base;
@@ -156,6 +162,30 @@ export default function TransactionsPage() {
       setActiveRows(new Set());
     }
     return () => { if (rowTickerRef.current) clearInterval(rowTickerRef.current); };
+  }, [live]);
+
+  // Ticker montants : varie les 5 premiers montants toutes les 2s
+  useEffect(() => {
+    if (live) {
+      amountTickerRef.current = setInterval(() => {
+        const rows = transactionsRef.current;
+        if (rows.length === 0) return;
+        setDisplayAmounts(prev => {
+          const next = { ...prev };
+          rows.slice(0, 5).forEach(tx => {
+            next[tx.id] = Math.round(vary(tx.amount, tx.amount * 0.005, 1));
+          });
+          return next;
+        });
+      }, TICKER_INTERVAL);
+    } else {
+      if (amountTickerRef.current) clearInterval(amountTickerRef.current);
+      // repasse aux vraies valeurs
+      const real: Record<string, number> = {};
+      transactionsRef.current.forEach(tx => { real[tx.id] = tx.amount; });
+      setDisplayAmounts(real);
+    }
+    return () => { if (amountTickerRef.current) clearInterval(amountTickerRef.current); };
   }, [live]);
 
   const filtered = transactions.filter(t =>
@@ -338,7 +368,7 @@ export default function TransactionsPage() {
                           <td className="px-6 py-4 text-gray-500 dark:text-slate-400 font-mono text-xs">{tx.recipient_phone || '—'}</td>
                           <td className={`px-6 py-4 text-right font-semibold transition-colors duration-500 ${
                             isActive ? 'text-[#00853F] dark:text-[#4ade80]' : 'text-gray-800 dark:text-white'
-                          }`}>{formatXOF(tx.amount)}</td>
+                          }`}>{formatXOF(displayAmounts[tx.id] ?? tx.amount)}</td>
                           <td className="px-6 py-4 text-center">
                             <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full transition-all duration-500 ${
                               isActive && tx.status === 'COMPLETED'
