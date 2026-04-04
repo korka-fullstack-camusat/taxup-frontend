@@ -76,11 +76,24 @@ function formatXOF(n: number): string {
   return n.toLocaleString('fr-FR');
 }
 
+function formatFull(n: number): string {
+  return `${n.toLocaleString('fr-FR')} F CFA`;
+}
+
 function fmtShort(n: number): string {
   if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B`;
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
   return n.toString();
+}
+
+function computeTrend(data: EvolutionPoint[], key: 'volume' | 'transactions' | 'tax_collected' | 'fraud_alerts'): number {
+  if (data.length < 2) return 0;
+  const mid = Math.floor(data.length / 2);
+  const first  = data.slice(0, mid).reduce((s, d) => s + d[key], 0);
+  const second = data.slice(mid).reduce((s, d)  => s + d[key], 0);
+  if (first === 0) return 0;
+  return parseFloat(((second - first) / first * 100).toFixed(1));
 }
 
 export default function AdminDashboard() {
@@ -129,6 +142,30 @@ export default function AdminDashboard() {
   };
 
   if (!user || (user.role !== 'ADMIN' && user.role !== 'AGENT_DGID')) return null;
+
+  /* ── métriques banner ── */
+  const recettesTotales     = summary?.fiscal.total_volume_xof          ?? 0;
+  const transactionsDigital = summary?.transactions.month_volume         ?? 0;
+  const tauxCollecte        = recettesTotales > 0
+    ? parseFloat(((summary?.fiscal.total_tax_collected_xof ?? 0) / recettesTotales * 100).toFixed(1))
+    : 0;
+  const fraudesDetectees    = summary?.fraud.total_alerts                ?? 0;
+
+  const trendRecettes       = computeTrend(evolution, 'volume');
+  const trendTransactions   = computeTrend(evolution, 'transactions');
+  const trendFraudes        = computeTrend(evolution, 'fraud_alerts');
+  /* Taux de collecte : tendance sur ratio tax/volume entre deux moitiés */
+  const trendTaux = (() => {
+    if (evolution.length < 2) return 0;
+    const mid = Math.floor(evolution.length / 2);
+    const r1 = evolution.slice(0, mid);
+    const r2 = evolution.slice(mid);
+    const ratio1 = r1.reduce((s, d) => s + d.volume, 0) > 0
+      ? r1.reduce((s, d) => s + d.tax_collected, 0) / r1.reduce((s, d) => s + d.volume, 0) * 100 : 0;
+    const ratio2 = r2.reduce((s, d) => s + d.volume, 0) > 0
+      ? r2.reduce((s, d) => s + d.tax_collected, 0) / r2.reduce((s, d) => s + d.volume, 0) * 100 : 0;
+    return ratio1 > 0 ? parseFloat(((ratio2 - ratio1) / ratio1 * 100).toFixed(1)) : 0;
+  })();
 
   const roleData = summary ? Object.entries(summary.users.by_role).map(([role, count], i) => ({
     name: roleLabel[role] || role, value: count, color: COLORS[i % COLORS.length],
@@ -189,23 +226,31 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/5">
             <div className="bg-slate-900/60 px-5 py-4">
               <p className="text-slate-400 text-xs mb-1">Recettes Totales</p>
-              <p className="text-lg font-bold text-white">45 600 000 000 F CFA</p>
-              <p className="text-[#4ade80] text-xs mt-1">+15.2% vs période préc.</p>
+              <p className="text-lg font-bold text-white">{formatFull(recettesTotales)}</p>
+              <p className={`text-xs mt-1 ${trendRecettes >= 0 ? 'text-[#4ade80]' : 'text-red-400'}`}>
+                {trendRecettes >= 0 ? '+' : ''}{trendRecettes}% vs période préc.
+              </p>
             </div>
             <div className="bg-slate-900/60 px-5 py-4">
               <p className="text-slate-400 text-xs mb-1">Transactions Digitales</p>
-              <p className="text-lg font-bold text-white">12 800 000 000 F CFA</p>
-              <p className="text-[#4ade80] text-xs mt-1">+18.7% vs période préc.</p>
+              <p className="text-lg font-bold text-white">{formatFull(transactionsDigital)}</p>
+              <p className={`text-xs mt-1 ${trendTransactions >= 0 ? 'text-[#4ade80]' : 'text-red-400'}`}>
+                {trendTransactions >= 0 ? '+' : ''}{trendTransactions}% vs période préc.
+              </p>
             </div>
             <div className="bg-slate-900/60 px-5 py-4">
               <p className="text-slate-400 text-xs mb-1">Taux de Collecte</p>
-              <p className="text-lg font-bold text-white">78.5%</p>
-              <p className="text-[#4ade80] text-xs mt-1">+2.3% vs période préc.</p>
+              <p className="text-lg font-bold text-white">{tauxCollecte.toFixed(1)}%</p>
+              <p className={`text-xs mt-1 ${trendTaux >= 0 ? 'text-[#4ade80]' : 'text-red-400'}`}>
+                {trendTaux >= 0 ? '+' : ''}{trendTaux}% vs période préc.
+              </p>
             </div>
             <div className="bg-slate-900/60 px-5 py-4">
               <p className="text-slate-400 text-xs mb-1">Fraudes Détectées</p>
-              <p className="text-lg font-bold text-white">156</p>
-              <p className="text-[#4ade80] text-xs mt-1">-12% vs période préc.</p>
+              <p className="text-lg font-bold text-white">{fraudesDetectees.toLocaleString('fr-FR')}</p>
+              <p className={`text-xs mt-1 ${trendFraudes <= 0 ? 'text-[#4ade80]' : 'text-red-400'}`}>
+                {trendFraudes >= 0 ? '+' : ''}{trendFraudes}% vs période préc.
+              </p>
             </div>
           </div>
         </div>
