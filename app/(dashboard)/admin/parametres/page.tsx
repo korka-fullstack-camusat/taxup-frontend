@@ -216,13 +216,7 @@ export default function ParametresPage() {
       {/* ── Tab: Utilisateurs ──────────────────────────────────────────────── */}
       {activeTab === 'users' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-800">Gestion des utilisateurs et des rôles</h2>
-            <button onClick={openCreate}
-              className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors">
-              <Plus className="h-4 w-4" /> Nouvel Utilisateur
-            </button>
-          </div>
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Gestion des utilisateurs et des rôles</h2>
 
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             {usersLoading ? (
