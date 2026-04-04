@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Users, Plus, Search, Edit2, Trash2, Eye, X, EyeOff,
-  ChevronLeft, ChevronRight, UserCheck, Shield, AlertTriangle, Key,
+  ChevronLeft, ChevronRight, Key,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import api from '@/lib/api';
@@ -134,29 +134,54 @@ export default function GestionAccesPage() {
   return (
     <div>
 
-      {/* ── sticky header ── */}
-      <div className="sticky top-12 md:top-0 z-10 bg-gray-50 dark:bg-slate-950 px-6 pt-6 pb-3 border-b border-gray-200 dark:border-slate-700/60">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Gestion des Accès et Permissions</h1>
-          <button
-            onClick={openCreate}
-            className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            Nouvel Utilisateur
-          </button>
+      {/* ── sticky dark banner ── */}
+      <div className="sticky top-12 md:top-0 z-10 bg-gray-50 dark:bg-slate-950 px-4 sm:px-6 pt-4 sm:pt-6 pb-3">
+        <div className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 rounded-2xl overflow-hidden shadow-xl">
+
+          {/* top bar */}
+          <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-white/10 flex-wrap">
+            {/* title */}
+            <div>
+              <h1 className="text-sm font-bold text-white leading-tight">Gestion des Accès et Permissions</h1>
+              <p className="text-slate-400 text-xs mt-0.5">Administration · {total} utilisateur{total !== 1 ? 's' : ''}</p>
+            </div>
+            {/* action */}
+            <button
+              onClick={openCreate}
+              className="flex items-center gap-1.5 text-xs text-slate-200 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors font-medium"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Nouvel Utilisateur
+            </button>
+          </div>
+
+          {/* metrics grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/5">
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">Utilisateurs Actifs</p>
+              <p className="text-lg font-bold text-white">{activeUsers}</p>
+              <p className="text-[#4ade80] text-xs mt-1">+{Math.min(activeUsers, 2)} ce mois</p>
+            </div>
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">Rôles Définis</p>
+              <p className="text-lg font-bold text-white">{ROLES.length}</p>
+              <p className="text-[#4ade80] text-xs mt-1">Système sécurisé</p>
+            </div>
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">Sessions Actives</p>
+              <p className="text-lg font-bold text-white">{Math.min(total, 12)}</p>
+              <p className="text-[#4ade80] text-xs mt-1">En temps réel</p>
+            </div>
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">Tentatives Échouées</p>
+              <p className="text-lg font-bold text-white">3</p>
+              <p className="text-amber-400 text-xs mt-1">Dernières 24h</p>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="p-6 space-y-6">
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={UserCheck}     iconBg="bg-green-50"  iconColor="text-green-700"  label="Utilisateurs Actifs"    value={activeUsers.toString()}           subtitle={`+${Math.min(activeUsers, 2)} ce mois`}  subtitleColor="text-green-700" />
-        <StatCard icon={Shield}        iconBg="bg-green-50"  iconColor="text-green-800"  label="Rôles Définis"          value={ROLES.length.toString()}          subtitle="Système sécurisé"                          subtitleColor="text-green-800" />
-        <StatCard icon={Users}         iconBg="bg-green-100" iconColor="text-green-700"  label="Sessions Actives"       value={Math.min(total, 12).toString()}   subtitle="En temps réel"                             subtitleColor="text-green-700" />
-        <StatCard icon={AlertTriangle} iconBg="bg-green-100" iconColor="text-green-900"  label="Tentatives Échouées"    value="3"                                subtitle="Dernières 24h"                             subtitleColor="text-green-900" />
-      </div>
 
       {/* Tabs */}
       <div className="border-b border-gray-200">
@@ -496,23 +521,6 @@ export default function GestionAccesPage() {
   );
 }
 
-function StatCard({ icon: Icon, iconBg, iconColor, label, value, subtitle, subtitleColor }: {
-  icon: React.ElementType; iconBg: string; iconColor: string;
-  label: string; value: string; subtitle: string; subtitleColor: string;
-}) {
-  return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition-shadow">
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-sm text-gray-500">{label}</p>
-        <div className={`p-2.5 rounded-xl ${iconBg}`}>
-          <Icon className={`h-5 w-5 ${iconColor}`} />
-        </div>
-      </div>
-      <p className="text-2xl font-bold text-gray-900">{value}</p>
-      <p className={`text-xs mt-1 ${subtitleColor}`}>{subtitle}</p>
-    </div>
-  );
-}
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
