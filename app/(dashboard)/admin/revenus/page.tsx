@@ -157,12 +157,12 @@ export default function AnalyseRevenusPage() {
   if (!user || (user.role !== 'ADMIN' && user.role !== 'AGENT_DGID')) return null;
 
   return (
-    <div className="p-4 sm:p-6 space-y-6" data-export>
-      {/* ── page title row ── */}
-      <div className="flex items-center justify-between gap-3 flex-wrap">
+    <div data-export>
+      {/* ── sticky page header ── */}
+      <div className="sticky top-12 md:top-0 z-10 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 px-4 sm:px-6 py-3 flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-xl font-bold text-gray-800 dark:text-white">Analyse des Revenus</h1>
-          <p className="text-gray-500 dark:text-slate-400 text-sm mt-0.5">Synthèse fiscale · Sénégal</p>
+          <h1 className="text-base font-bold text-gray-800 dark:text-white leading-tight">Analyse des Revenus</h1>
+          <p className="text-gray-500 dark:text-slate-400 text-xs mt-0.5">Synthèse fiscale · Sénégal</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -176,6 +176,8 @@ export default function AnalyseRevenusPage() {
           <ExportMenu onExport={handleExport} />
         </div>
       </div>
+
+      <div className="p-4 sm:p-6 space-y-6">
 
       {/* ── live banner ── */}
       <div className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 rounded-2xl overflow-hidden shadow-xl">
@@ -494,6 +496,7 @@ export default function AnalyseRevenusPage() {
           </div>
         </DetailModal>
       )}
+      </div>
     </div>
   );
 }
