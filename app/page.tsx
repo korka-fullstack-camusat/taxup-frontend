@@ -114,15 +114,8 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 transition-colors">
 
-      {/* Senegal flag accent stripe */}
-      <div className="flex h-1 fixed top-0 left-0 right-0 z-50">
-        <div className="flex-1 bg-[#00853F]" />
-        <div className="flex-1 bg-[#FDEF42]" />
-        <div className="flex-1 bg-[#E31B23]" />
-      </div>
-
       {/* Hero Section */}
-      <section className="relative bg-white dark:bg-slate-900 min-h-screen flex flex-col pt-1 transition-colors">
+      <section className="relative bg-white dark:bg-slate-900 min-h-screen flex flex-col transition-colors">
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -right-40 w-96 h-96 bg-[#00853F]/8 dark:bg-[#00853F]/10 rounded-full blur-3xl" />
@@ -133,7 +126,7 @@ export default function LandingPage() {
         </div>
 
         {/* Navigation */}
-        <nav className="sticky top-1 z-40 bg-white/90 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-200/60 dark:border-white/5 transition-colors">
+        <nav className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-200/60 dark:border-white/5 transition-colors">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="flex items-center justify-between h-20">
               <div className="flex items-center gap-3">
@@ -172,6 +165,13 @@ export default function LandingPage() {
             </div>
           </div>
         </nav>
+
+        {/* Senegal flag stripe — just below the nav */}
+        <div className="flex h-1 w-full">
+          <div className="flex-1 bg-[#00853F]" />
+          <div className="flex-1 bg-[#FDEF42]" />
+          <div className="flex-1 bg-[#E31B23]" />
+        </div>
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
