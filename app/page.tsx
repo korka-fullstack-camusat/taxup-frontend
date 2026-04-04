@@ -18,6 +18,7 @@ import {
   Lock
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
+import ThemeToggle from '@/components/ThemeToggle';
 
 
 const features = [
@@ -149,13 +150,16 @@ export default function LandingPage() {
                 <a href="#contact" className="text-sm text-slate-400 hover:text-white transition-colors">Contact</a>
               </div>
 
-              <Link
-                href="/login"
-                className="inline-flex items-center gap-2 bg-[#00853F] hover:bg-[#006830] text-white font-semibold px-6 py-2.5 rounded-full transition-colors shadow-lg shadow-[#00853F]/25"
-              >
-                Connexion
-                <ArrowRight className="h-4 w-4" />
-              </Link>
+              <div className="flex items-center gap-3">
+                <ThemeToggle variant="nav" />
+                <Link
+                  href="/login"
+                  className="inline-flex items-center gap-2 bg-[#00853F] hover:bg-[#006830] text-white font-semibold px-6 py-2.5 rounded-full transition-colors shadow-lg shadow-[#00853F]/25"
+                >
+                  Connexion
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
             </div>
           </div>
         </nav>

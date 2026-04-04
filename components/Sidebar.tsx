@@ -59,7 +59,6 @@ const navConfig: Record<string, { href: string; label: string; icon: React.Eleme
     { href: '/admin', label: 'Tableau de Bord', icon: BarChart3 },
     { href: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
     { href: '/fraud', label: 'Detection Fraude', icon: Shield },
-    { href: '/audits', label: 'Audits', icon: ClipboardList },
     { href: '/receipts', label: 'Reçus Fiscaux', icon: Receipt },
     { href: '/admin/revenus', label: 'Analyse Revenus', icon: TrendingUp },
     { href: '/admin/operateurs', label: 'Operateurs', icon: Building2 },
