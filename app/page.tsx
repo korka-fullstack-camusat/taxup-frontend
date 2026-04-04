@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -15,7 +15,9 @@ import {
   Receipt,
   TrendingUp,
   Zap,
-  Lock
+  Lock,
+  Menu,
+  X as XIcon,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -95,6 +97,7 @@ const profiles = [
 export default function LandingPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && user) router.replace('/dashboard');
@@ -149,23 +152,56 @@ export default function LandingPage() {
                 <a href="#contact" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors">Contact</a>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 md:gap-3">
                 <ThemeToggle />
                 <Link
                   href="/login"
-                  className="inline-flex items-center gap-2 bg-[#00853F] hover:bg-[#006830] text-white font-semibold px-6 py-2.5 rounded-full transition-colors shadow-lg shadow-[#00853F]/25"
+                  className="hidden sm:inline-flex items-center gap-2 bg-[#00853F] hover:bg-[#006830] text-white font-semibold px-5 py-2.5 rounded-full transition-colors shadow-lg shadow-[#00853F]/25 text-sm"
                 >
                   Connexion
                   <ArrowRight className="h-4 w-4" />
                 </Link>
+                <button
+                  onClick={() => setMobileMenuOpen(o => !o)}
+                  className="md:hidden p-2 rounded-lg text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                  aria-label="Menu"
+                >
+                  {mobileMenuOpen ? <XIcon className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </button>
               </div>
             </div>
           </div>
         </nav>
 
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden sticky top-[81px] z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-gray-200/60 dark:border-white/5 px-6 py-4 space-y-1 transition-colors">
+            {[
+              { href: '#fonctionnalites', label: 'Fonctionnalites' },
+              { href: '#profils', label: 'Profils' },
+              { href: '#contact', label: 'Contact' },
+            ].map(({ href, label }) => (
+              <a
+                key={href}
+                href={href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-3 px-4 rounded-xl text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
+              >
+                {label}
+              </a>
+            ))}
+            <Link
+              href="/login"
+              className="mt-2 flex items-center justify-center gap-2 bg-[#00853F] hover:bg-[#006830] text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+            >
+              Connexion <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        )}
+
         {/* Hero Content */}
         <div className="relative z-10 flex-1 flex items-center">
-          <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               {/* Left side - Text */}
               <div>

@@ -22,6 +22,11 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
 // Navigation items par role
 const navConfig: Record<string, { href: string; label: string; icon: React.ElementType }[]> = {
   CITOYEN: [
@@ -77,7 +82,7 @@ const roleLabel: Record<string, string> = {
   ADMIN: 'Administrateur',
 };
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -92,16 +97,32 @@ export default function Sidebar() {
 
   return (
     <>
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-gradient-to-b from-slate-900 to-slate-800 text-white flex flex-col z-20 shadow-xl">
+      {/* Mobile backdrop */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 md:hidden"
+          onClick={onClose}
+        />
+      )}
+
+    <aside className={`fixed left-0 top-0 h-screen w-64 bg-gradient-to-b from-slate-900 to-slate-800 text-white flex flex-col z-40 shadow-xl transition-transform duration-300 ${
+        isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+      }`}>
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-5 border-b border-slate-700/50">
         <div className="h-10 w-10 rounded-xl overflow-hidden shadow-lg flex-shrink-0 bg-white/10 flex items-center justify-center p-1.5">
           <img src="/taxup-logo.svg" alt="TAXUP" className="h-full w-full" />
         </div>
-        <div>
+        <div className="flex-1">
           <h1 className="text-lg font-bold tracking-wide text-white">TAXUP</h1>
           <p className="text-xs text-green-400">Systeme Fiscal Digital</p>
         </div>
+        <button
+          onClick={onClose}
+          className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+        >
+          <X className="h-4 w-4" />
+        </button>
       </div>
 
       {/* Navigation */}

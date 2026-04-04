@@ -1,11 +1,15 @@
 'use client';
 
-import { Bell, Search } from 'lucide-react';
+import { Bell, Search, Menu } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { useState, useEffect } from 'react';
 import ThemeToggle from '@/components/ThemeToggle';
 
-export default function Header() {
+interface HeaderProps {
+  onMenuClick: () => void;
+}
+
+export default function Header({ onMenuClick }: HeaderProps) {
   const { user } = useAuth();
   const [currentTime, setCurrentTime] = useState('');
 
@@ -19,11 +23,18 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700/60 flex items-center justify-between px-6 sticky top-0 z-10 transition-colors">
-      <div className="flex items-center gap-4">
-        <h1 className="text-lg font-bold text-gray-800 dark:text-white">Taxup - Tableau de Bord Fiscal</h1>
-        <span className="px-2.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold rounded-full">En ligne</span>
-        <span className="text-sm text-gray-400 dark:text-slate-500">Dernière mise à jour: {currentTime}</span>
+    <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700/60 flex items-center justify-between px-4 md:px-6 sticky top-0 z-10 transition-colors">
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onMenuClick}
+          className="md:hidden p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+          aria-label="Menu"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <h1 className="text-base md:text-lg font-bold text-gray-800 dark:text-white truncate max-w-[140px] sm:max-w-none">TAXUP</h1>
+        <span className="hidden sm:inline px-2.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold rounded-full">En ligne</span>
+        <span className="hidden lg:inline text-sm text-gray-400 dark:text-slate-500">Dernière mise à jour: {currentTime}</span>
       </div>
       <div className="flex items-center gap-3">
         <div className="relative hidden lg:block">
