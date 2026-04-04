@@ -81,8 +81,8 @@ export default function CarteFiscalePage() {
   return (
     <div data-export>
 
-      {/* ── sticky dark banner ── */}
-      <div className="sticky top-12 md:top-0 z-10 bg-gray-50 dark:bg-slate-950 px-4 sm:px-6 pt-4 sm:pt-6 pb-3">
+      {/* ── dark banner ── */}
+      <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3">
         <div className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 rounded-2xl overflow-hidden shadow-xl">
 
           {/* top bar — title + view selector + actions */}
