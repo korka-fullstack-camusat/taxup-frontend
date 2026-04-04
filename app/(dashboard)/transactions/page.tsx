@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeftRight, Search, Filter, CheckCircle, Clock,
-  XCircle, AlertTriangle, Play, Pause, TrendingUp, Wallet, Activity
+  XCircle, AlertTriangle, Play, Pause, TrendingUp, Wallet, Activity, RefreshCw
 } from 'lucide-react';
 import api from '@/lib/api';
 
@@ -147,42 +147,56 @@ export default function TransactionsPage() {
           {/* Stats grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/5">
             {/* Transactions */}
-            <div className={`px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60 transition-all ${pulse ? 'brightness-125' : ''}`}>
-              <div className="flex items-center gap-2 mb-1">
+            <div className="px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60">
+              <div className="flex items-center gap-2 mb-2">
                 <Activity className="h-3.5 w-3.5 text-slate-400" />
                 <p className="text-xs text-slate-400 uppercase tracking-wide">Transactions</p>
               </div>
-              <p className="text-2xl font-bold text-white">{stats.total.toLocaleString('fr-FR')}</p>
+              <p className={`text-2xl font-bold transition-all duration-500 ${pulse ? 'text-[#4ade80] scale-105' : 'text-white'}`}>
+                {stats.total.toLocaleString('fr-FR')}
+              </p>
             </div>
 
             {/* Valeur Totale */}
-            <div className={`px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60 transition-all ${pulse ? 'brightness-125' : ''}`}>
-              <div className="flex items-center gap-2 mb-1">
+            <div className="px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60">
+              <div className="flex items-center gap-2 mb-2">
                 <Wallet className="h-3.5 w-3.5 text-slate-400" />
                 <p className="text-xs text-slate-400 uppercase tracking-wide">Valeur Totale</p>
               </div>
-              <p className="text-lg font-bold text-white leading-tight">{formatXOF(stats.totalValue)}</p>
+              <p className={`text-base font-bold leading-tight transition-all duration-500 ${pulse ? 'text-[#4ade80]' : 'text-white'}`}>
+                {formatXOF(stats.totalValue)}
+              </p>
             </div>
 
             {/* Taux de Succès */}
-            <div className={`px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60 transition-all ${pulse ? 'brightness-125' : ''}`}>
-              <div className="flex items-center gap-2 mb-1">
+            <div className="px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60">
+              <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="h-3.5 w-3.5 text-slate-400" />
                 <p className="text-xs text-slate-400 uppercase tracking-wide">Taux de Succès</p>
               </div>
-              <div className="flex items-end gap-2">
-                <p className="text-2xl font-bold text-[#4ade80]">{stats.successRate.toFixed(1)}%</p>
-              </div>
+              <p className={`text-2xl font-bold transition-all duration-500 ${pulse ? 'text-white scale-105' : 'text-[#4ade80]'}`}>
+                {stats.successRate.toFixed(1)}%
+              </p>
             </div>
 
             {/* Dernière MAJ */}
             <div className="px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60">
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 mb-2">
                 <Clock className="h-3.5 w-3.5 text-slate-400" />
                 <p className="text-xs text-slate-400 uppercase tracking-wide">Dernière MAJ</p>
               </div>
-              <p className="text-2xl font-bold text-white">{stats.lastUpdate}</p>
-              <p className="text-xs text-slate-500 mt-1">Actualisation {live ? `auto / ${REFRESH_INTERVAL / 1000}s` : 'suspendue'}</p>
+              <p className={`text-2xl font-bold transition-all duration-500 ${pulse ? 'text-[#4ade80]' : 'text-white'}`}>
+                {stats.lastUpdate}
+              </p>
+              <div className="flex items-center gap-1.5 mt-1">
+                <RefreshCw
+                  className={`h-3 w-3 flex-shrink-0 transition-colors ${live ? 'text-[#4ade80]' : 'text-slate-600'}`}
+                  style={{ animation: live ? 'spin 2s linear infinite' : 'none' }}
+                />
+                <p className="text-xs text-slate-500">
+                  Actualisation {live ? `auto / ${REFRESH_INTERVAL / 1000}s` : 'suspendue'}
+                </p>
+              </div>
             </div>
           </div>
         </div>
