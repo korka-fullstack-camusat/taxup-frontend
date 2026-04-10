@@ -1,18 +1,16 @@
 import axios from 'axios';
 import { getMockResponse } from './mockData';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
 
+// All API calls go through Next.js rewrites (/api/v1/* → FastAPI backend).
+// This avoids CORS issues and build-time URL baking problems.
 const api = axios.create({
-  baseURL: `${API_URL}/api/v1`,
+  baseURL: '/api/v1',
   headers: { 'Content-Type': 'application/json' },
 });
 
 // ─── Mock interceptor (dev/demo mode) ─────────────────────────────────────────
-// Injects a per-request adapter for mocked endpoints so the global adapter
-// (which may be an array in axios v1.x) is never replaced.
-// Auth endpoints (/auth/*) always fall through to the real network.
 if (USE_MOCK) {
   api.interceptors.request.use((config) => {
     const url = config.url || '';
@@ -31,7 +29,6 @@ if (USE_MOCK) {
     const mockData = getMockResponse(cleanUrl, urlParams);
 
     if (mockData !== null) {
-      // Override the adapter for this single request only
       config.adapter = async () => ({
         data: mockData,
         status: 200,
@@ -81,7 +78,6 @@ api.interceptors.response.use(
       }
 
       if (isRefreshing) {
-        // Wait for the ongoing refresh
         return new Promise((resolve, reject) => {
           pendingQueue.push({ resolve, reject });
         }).then((token) => {
@@ -95,7 +91,7 @@ api.interceptors.response.use(
 
       try {
         const res = await axios.post(
-          `${API_URL}/api/v1/auth/refresh`,
+          '/api/v1/auth/refresh',
           null,
           { headers: { Authorization: `Bearer ${refreshToken}` } },
         );
