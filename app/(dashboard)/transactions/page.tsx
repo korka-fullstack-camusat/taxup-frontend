@@ -3,9 +3,11 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeftRight, Search, Filter, CheckCircle, Clock,
-  XCircle, AlertTriangle, Play, Pause, TrendingUp, Wallet, Activity, RefreshCw
+  XCircle, AlertTriangle, Play, Pause, TrendingUp, Wallet, Activity, RefreshCw,
+  Plus, X
 } from 'lucide-react';
 import api from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 
 interface Transaction {
   id: string;
@@ -15,7 +17,7 @@ interface Transaction {
   currency: string;
   created_at: string;
   sender_phone?: string;
-  recipient_phone?: string;
+  receiver_phone?: string;
   description?: string;
   risk_score?: number;
 }
@@ -27,7 +29,17 @@ interface LiveStats {
   lastUpdate: string;
 }
 
-// Variation aléatoire bornée autour d'une valeur
+interface TransactionForm {
+  amount: string;
+  currency: string;
+  transaction_type: string;
+  sender_phone: string;
+  receiver_phone: string;
+  sender_name: string;
+  receiver_name: string;
+  transaction_date: string;
+}
+
 function vary(base: number, maxDelta: number, min = 0): number {
   const delta = (Math.random() * 2 - 1) * maxDelta;
   return Math.max(min, base + delta);
@@ -38,11 +50,20 @@ const statusConfig: Record<string, { label: string; color: string; icon: React.E
   PENDING: { label: 'En attente', color: 'text-yellow-600 bg-yellow-50 dark:text-yellow-400 dark:bg-yellow-900/30', icon: Clock },
   FAILED: { label: 'Échoué', color: 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/30', icon: XCircle },
   FLAGGED: { label: 'Signalé', color: 'text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-900/30', icon: AlertTriangle },
+  UNDER_REVIEW: { label: 'En examen', color: 'text-purple-600 bg-purple-50 dark:text-purple-400 dark:bg-purple-900/30', icon: AlertTriangle },
 };
 
 const typeLabel: Record<string, string> = {
-  TRANSFER: 'Transfert', PAYMENT: 'Paiement', DEPOSIT: 'Dépôt',
-  WITHDRAWAL: 'Retrait', MOBILE_PAYMENT: 'Paiement mobile',
+  TRANSFERT: 'Transfert',
+  PAIEMENT: 'Paiement',
+  RETRAIT: 'Retrait',
+  DEPOT: 'Dépôt',
+  REMBOURSEMENT: 'Remboursement',
+  TRANSFER: 'Transfert',
+  PAYMENT: 'Paiement',
+  DEPOSIT: 'Dépôt',
+  WITHDRAWAL: 'Retrait',
+  MOBILE_PAYMENT: 'Paiement mobile',
 };
 
 function formatXOF(n: number) {
@@ -57,10 +78,19 @@ function computeStats(items: Transaction[], total: number): LiveStats {
   return { total, totalValue, successRate, lastUpdate };
 }
 
-const REFRESH_INTERVAL = 15_000; // 15 secondes
-const TICKER_INTERVAL = 2_000;   // variation toutes les 2 secondes
+function nowLocalDatetime(): string {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 16);
+}
+
+const REFRESH_INTERVAL = 15_000;
+const TICKER_INTERVAL = 2_000;
 
 export default function TransactionsPage() {
+  const { user } = useAuth();
+  const isOperateur = user?.role === 'OPERATEUR_MOBILE';
+
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -69,11 +99,26 @@ export default function TransactionsPage() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [live, setLive] = useState(true);
-  // statsDisplay = valeurs affichées (légèrement variées pour simuler le flux)
   const [statsDisplay, setStatsDisplay] = useState<LiveStats>({ total: 0, totalValue: 0, successRate: 0, lastUpdate: '--:--' });
   const [pulse, setPulse] = useState(false);
   const [activeRows, setActiveRows] = useState<Set<string>>(new Set());
   const [displayAmounts, setDisplayAmounts] = useState<Record<string, number>>({});
+
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [form, setForm] = useState<TransactionForm>({
+    amount: '',
+    currency: 'XOF',
+    transaction_type: 'TRANSFERT',
+    sender_phone: '',
+    receiver_phone: '',
+    sender_name: '',
+    receiver_name: '',
+    transaction_date: nowLocalDatetime(),
+  });
+
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const tickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const rowTickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -93,7 +138,6 @@ export default function TransactionsPage() {
         const t = res.data.total || 0;
         setTransactions(items);
         transactionsRef.current = items;
-        // Initialise les montants affichés avec les vraies valeurs
         const init: Record<string, number> = {};
         items.forEach(it => { init[it.id] = it.amount; });
         setDisplayAmounts(init);
@@ -101,7 +145,6 @@ export default function TransactionsPage() {
         const base = computeStats(items, t);
         statsBaseRef.current = base;
         setStatsDisplay(base);
-        // flash pulse
         setPulse(true);
         setTimeout(() => setPulse(false), 600);
       })
@@ -109,10 +152,8 @@ export default function TransactionsPage() {
       .finally(() => { if (!silent) setLoading(false); });
   };
 
-  // Initial + filter/page change fetch
   useEffect(() => { fetchData(); }, [page, statusFilter, typeFilter]);
 
-  // Live API refresh
   useEffect(() => {
     if (live) {
       intervalRef.current = setInterval(() => fetchData(true), REFRESH_INTERVAL);
@@ -122,7 +163,6 @@ export default function TransactionsPage() {
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [live, page, statusFilter, typeFilter]);
 
-  // Ticker : micro-variation des valeurs affichées toutes les 2s
   useEffect(() => {
     if (live) {
       tickerRef.current = setInterval(() => {
@@ -137,13 +177,11 @@ export default function TransactionsPage() {
       }, TICKER_INTERVAL);
     } else {
       if (tickerRef.current) clearInterval(tickerRef.current);
-      // repasse aux valeurs réelles
       setStatsDisplay(statsBaseRef.current);
     }
     return () => { if (tickerRef.current) clearInterval(tickerRef.current); };
   }, [live]);
 
-  // Ticker lignes : flash aléatoire sur 1-2 lignes toutes les 2.5s
   useEffect(() => {
     if (live) {
       rowTickerRef.current = setInterval(() => {
@@ -164,7 +202,6 @@ export default function TransactionsPage() {
     return () => { if (rowTickerRef.current) clearInterval(rowTickerRef.current); };
   }, [live]);
 
-  // Ticker montants : varie les 5 premiers montants toutes les 2s
   useEffect(() => {
     if (live) {
       amountTickerRef.current = setInterval(() => {
@@ -180,7 +217,6 @@ export default function TransactionsPage() {
       }, TICKER_INTERVAL);
     } else {
       if (amountTickerRef.current) clearInterval(amountTickerRef.current);
-      // repasse aux vraies valeurs
       const real: Record<string, number> = {};
       transactionsRef.current.forEach(tx => { real[tx.id] = tx.amount; });
       setDisplayAmounts(real);
@@ -188,8 +224,72 @@ export default function TransactionsPage() {
     return () => { if (amountTickerRef.current) clearInterval(amountTickerRef.current); };
   }, [live]);
 
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormError('');
+  };
+
+  const handleOpenModal = () => {
+    setForm({
+      amount: '',
+      currency: 'XOF',
+      transaction_type: 'TRANSFERT',
+      sender_phone: '',
+      receiver_phone: '',
+      sender_name: '',
+      receiver_name: '',
+      transaction_date: nowLocalDatetime(),
+    });
+    setFormError('');
+    setShowModal(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.amount || isNaN(Number(form.amount)) || Number(form.amount) <= 0) {
+      setFormError('Le montant doit être un nombre positif.');
+      return;
+    }
+    if (!form.sender_phone.trim()) {
+      setFormError('Le numéro de l\'expéditeur est requis.');
+      return;
+    }
+    if (!form.receiver_phone.trim()) {
+      setFormError('Le numéro du destinataire est requis.');
+      return;
+    }
+    if (form.sender_phone === form.receiver_phone) {
+      setFormError('L\'expéditeur et le destinataire ne peuvent pas être identiques.');
+      return;
+    }
+    setSubmitting(true);
+    setFormError('');
+    try {
+      const payload: Record<string, string> = {
+        amount: String(parseFloat(form.amount)),
+        currency: form.currency,
+        transaction_type: form.transaction_type,
+        sender_phone: form.sender_phone.trim(),
+        receiver_phone: form.receiver_phone.trim(),
+        transaction_date: new Date(form.transaction_date).toISOString(),
+      };
+      if (form.sender_name.trim()) payload.sender_name = form.sender_name.trim();
+      if (form.receiver_name.trim()) payload.receiver_name = form.receiver_name.trim();
+      await api.post('/transactions', payload);
+      setShowModal(false);
+      fetchData();
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ||
+        'Une erreur est survenue. Vérifiez les données saisies.';
+      setFormError(typeof msg === 'string' ? msg : JSON.stringify(msg));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const filtered = transactions.filter(t =>
-    !search || t.sender_phone?.includes(search) || t.recipient_phone?.includes(search) || t.id.includes(search)
+    !search || t.sender_phone?.includes(search) || t.receiver_phone?.includes(search) || t.id.includes(search)
   );
 
   return (
@@ -198,7 +298,6 @@ export default function TransactionsPage() {
 
         {/* Live Stats Banner */}
         <div className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 rounded-2xl overflow-hidden shadow-lg">
-          {/* Top bar: title + live indicator + pause button */}
           <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
             <div className="flex items-center gap-3">
               <div className="bg-white/10 p-2 rounded-lg">
@@ -209,9 +308,7 @@ export default function TransactionsPage() {
                 <p className="text-xs text-slate-400">Suivi en temps réel</p>
               </div>
             </div>
-
             <div className="flex items-center gap-3">
-              {/* Live / Paused badge */}
               <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
                 live
                   ? 'bg-[#00853F]/20 border border-[#00853F]/40 text-[#4ade80]'
@@ -220,8 +317,6 @@ export default function TransactionsPage() {
                 <span className={`h-1.5 w-1.5 rounded-full ${live ? 'bg-[#4ade80] animate-pulse' : 'bg-slate-500'}`} />
                 {live ? 'En direct' : 'En pause'}
               </div>
-
-              {/* Play / Pause button */}
               <button
                 onClick={() => setLive(l => !l)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition-colors"
@@ -231,10 +326,7 @@ export default function TransactionsPage() {
               </button>
             </div>
           </div>
-
-          {/* Stats grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/5">
-            {/* Transactions */}
             <div className="px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60">
               <div className="flex items-center gap-2 mb-2">
                 <Activity className="h-3.5 w-3.5 text-slate-400" />
@@ -244,8 +336,6 @@ export default function TransactionsPage() {
                 {statsDisplay.total.toLocaleString('fr-FR')}
               </p>
             </div>
-
-            {/* Valeur Totale */}
             <div className="px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60">
               <div className="flex items-center gap-2 mb-2">
                 <Wallet className="h-3.5 w-3.5 text-slate-400" />
@@ -255,8 +345,6 @@ export default function TransactionsPage() {
                 {formatXOF(statsDisplay.totalValue)}
               </p>
             </div>
-
-            {/* Taux de Succès */}
             <div className="px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="h-3.5 w-3.5 text-slate-400" />
@@ -266,8 +354,6 @@ export default function TransactionsPage() {
                 {statsDisplay.successRate.toFixed(1)}%
               </p>
             </div>
-
-            {/* Dernière MAJ */}
             <div className="px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60">
               <div className="flex items-center gap-2 mb-2">
                 <Clock className="h-3.5 w-3.5 text-slate-400" />
@@ -289,7 +375,7 @@ export default function TransactionsPage() {
           </div>
         </div>
 
-        {/* Filters */}
+        {/* Filters + New Transaction button */}
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-700/50 shadow-sm p-4 flex flex-wrap gap-3 items-center">
           <div className="relative flex-1 min-w-[180px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
@@ -309,14 +395,27 @@ export default function TransactionsPage() {
               <option value="COMPLETED">Complété</option>
               <option value="PENDING">En attente</option>
               <option value="FAILED">Échoué</option>
-              <option value="FLAGGED">Signalé</option>
+              <option value="UNDER_REVIEW">En examen</option>
             </select>
             <select value={typeFilter} onChange={e => { setTypeFilter(e.target.value); setPage(1); }}
               className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500">
               <option value="">Tous les types</option>
-              {Object.entries(typeLabel).map(([val, lbl]) => <option key={val} value={val}>{lbl}</option>)}
+              <option value="TRANSFERT">Transfert</option>
+              <option value="PAIEMENT">Paiement</option>
+              <option value="RETRAIT">Retrait</option>
+              <option value="DEPOT">Dépôt</option>
+              <option value="REMBOURSEMENT">Remboursement</option>
             </select>
           </div>
+          {isOperateur && (
+            <button
+              onClick={handleOpenModal}
+              className="ml-auto flex items-center gap-2 px-4 py-2.5 bg-[#00853F] hover:bg-[#006d33] text-white text-sm font-semibold rounded-lg transition-colors shadow-sm"
+            >
+              <Plus className="h-4 w-4" />
+              Nouvelle transaction
+            </button>
+          )}
         </div>
 
         {/* Table */}
@@ -327,6 +426,15 @@ export default function TransactionsPage() {
             <div className="text-center py-16 text-gray-400 dark:text-slate-500">
               <ArrowLeftRight className="h-12 w-12 mx-auto mb-3 opacity-30" />
               <p>Aucune transaction trouvée</p>
+              {isOperateur && (
+                <button
+                  onClick={handleOpenModal}
+                  className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-[#00853F] hover:bg-[#006d33] text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  <Plus className="h-4 w-4" />
+                  Créer la première transaction
+                </button>
+              )}
             </div>
           ) : (
             <>
@@ -357,7 +465,6 @@ export default function TransactionsPage() {
                               : 'hover:bg-gray-50 dark:hover:bg-slate-800'
                           }`}
                         >
-                          {/* Barre latérale d'activité */}
                           <td className="relative px-6 py-4 font-medium text-gray-800 dark:text-white">
                             {isActive && (
                               <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-[#00853F] rounded-r-full" />
@@ -365,7 +472,7 @@ export default function TransactionsPage() {
                             {typeLabel[tx.transaction_type] || tx.transaction_type}
                           </td>
                           <td className="px-6 py-4 text-gray-500 dark:text-slate-400 font-mono text-xs">{tx.sender_phone || '—'}</td>
-                          <td className="px-6 py-4 text-gray-500 dark:text-slate-400 font-mono text-xs">{tx.recipient_phone || '—'}</td>
+                          <td className="px-6 py-4 text-gray-500 dark:text-slate-400 font-mono text-xs">{tx.receiver_phone || '—'}</td>
                           <td className={`px-6 py-4 text-right font-semibold transition-colors duration-500 ${
                             isActive ? 'text-[#00853F] dark:text-[#4ade80]' : 'text-gray-800 dark:text-white'
                           }`}>{formatXOF(displayAmounts[tx.id] ?? tx.amount)}</td>
@@ -395,7 +502,6 @@ export default function TransactionsPage() {
                   </tbody>
                 </table>
               </div>
-              {/* Pagination */}
               <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 dark:border-slate-700/50">
                 <p className="text-sm text-gray-500 dark:text-slate-400">Page {page} · {total} résultats</p>
                 <div className="flex gap-2">
@@ -413,6 +519,176 @@ export default function TransactionsPage() {
           )}
         </div>
       </main>
+
+      {/* Modal nouvelle transaction */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg border border-gray-100 dark:border-slate-700">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-slate-700">
+              <div className="flex items-center gap-3">
+                <div className="bg-[#00853F]/10 p-2 rounded-lg">
+                  <ArrowLeftRight className="h-4 w-4 text-[#00853F]" />
+                </div>
+                <h2 className="font-bold text-gray-900 dark:text-white">Nouvelle transaction</h2>
+              </div>
+              <button onClick={() => setShowModal(false)} className="p-1.5 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                <X className="h-4 w-4 text-gray-500 dark:text-slate-400" />
+              </button>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+              {/* Montant + Devise */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1.5">Montant *</label>
+                  <input
+                    type="number"
+                    name="amount"
+                    value={form.amount}
+                    onChange={handleFormChange}
+                    placeholder="Ex : 50000"
+                    min="1"
+                    step="any"
+                    required
+                    className="w-full px-3 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00853F]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1.5">Devise *</label>
+                  <select
+                    name="currency"
+                    value={form.currency}
+                    onChange={handleFormChange}
+                    className="w-full px-3 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00853F]"
+                  >
+                    <option value="XOF">XOF</option>
+                    <option value="XAF">XAF</option>
+                    <option value="EUR">EUR</option>
+                    <option value="USD">USD</option>
+                    <option value="GBP">GBP</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Type */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1.5">Type de transaction *</label>
+                <select
+                  name="transaction_type"
+                  value={form.transaction_type}
+                  onChange={handleFormChange}
+                  className="w-full px-3 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00853F]"
+                >
+                  <option value="TRANSFERT">Transfert</option>
+                  <option value="PAIEMENT">Paiement</option>
+                  <option value="RETRAIT">Retrait</option>
+                  <option value="DEPOT">Dépôt</option>
+                  <option value="REMBOURSEMENT">Remboursement</option>
+                </select>
+              </div>
+
+              {/* Téléphones */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1.5">N° expéditeur *</label>
+                  <input
+                    type="tel"
+                    name="sender_phone"
+                    value={form.sender_phone}
+                    onChange={handleFormChange}
+                    placeholder="+224621000001"
+                    required
+                    className="w-full px-3 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00853F] font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1.5">N° destinataire *</label>
+                  <input
+                    type="tel"
+                    name="receiver_phone"
+                    value={form.receiver_phone}
+                    onChange={handleFormChange}
+                    placeholder="+224661000002"
+                    required
+                    className="w-full px-3 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00853F] font-mono"
+                  />
+                </div>
+              </div>
+
+              {/* Noms */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1.5">Nom expéditeur</label>
+                  <input
+                    type="text"
+                    name="sender_name"
+                    value={form.sender_name}
+                    onChange={handleFormChange}
+                    placeholder="Optionnel"
+                    className="w-full px-3 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00853F]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1.5">Nom destinataire</label>
+                  <input
+                    type="text"
+                    name="receiver_name"
+                    value={form.receiver_name}
+                    onChange={handleFormChange}
+                    placeholder="Optionnel"
+                    className="w-full px-3 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00853F]"
+                  />
+                </div>
+              </div>
+
+              {/* Date */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1.5">Date de la transaction *</label>
+                <input
+                  type="datetime-local"
+                  name="transaction_date"
+                  value={form.transaction_date}
+                  onChange={handleFormChange}
+                  required
+                  className="w-full px-3 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00853F]"
+                />
+              </div>
+
+              {/* Erreur */}
+              {formError && (
+                <div className="flex items-start gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm px-3 py-2.5 rounded-lg">
+                  <XCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                  <span>{formError}</span>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-300 text-sm font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 px-4 py-2.5 bg-[#00853F] hover:bg-[#006d33] disabled:opacity-60 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
+                  {submitting ? (
+                    <><div className="h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Envoi...</>
+                  ) : (
+                    <><Plus className="h-4 w-4" /> Soumettre</>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
