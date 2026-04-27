@@ -1,418 +1,372 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  ArrowLeftRight, Search, Filter, CheckCircle, Clock,
-  XCircle, AlertTriangle, Play, Pause, TrendingUp, Wallet, Activity, RefreshCw
+  Pause, Play, DollarSign, TrendingUp, RefreshCw,
+  CheckCircle, AlertCircle, Clock, ChevronDown, AlertTriangle, Activity,
 } from 'lucide-react';
 import api from '@/lib/api';
 
+/* ── Types ───────────────────────────────────────────────────────────────── */
 interface Transaction {
   id: string;
-  transaction_type: string;
+  reference: string;
+  operator_id: string;
   amount: number;
-  status: string;
   currency: string;
+  transaction_type: string;
+  sender_phone: string;
+  receiver_phone: string;
+  sender_name?: string;
+  receiver_name?: string;
+  transaction_date: string;
   created_at: string;
-  sender_phone?: string;
-  recipient_phone?: string;
-  description?: string;
-  risk_score?: number;
+  status: string;
 }
 
-interface LiveStats {
-  total: number;
-  totalValue: number;
-  successRate: number;
-  lastUpdate: string;
-}
+interface Operator { id: string; full_name: string; organization?: string; }
 
-// Variation aléatoire bornée autour d'une valeur
-function vary(base: number, maxDelta: number, min = 0): number {
-  const delta = (Math.random() * 2 - 1) * maxDelta;
-  return Math.max(min, base + delta);
-}
-
-const statusConfig: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  COMPLETED: { label: 'Complété', color: 'text-green-700 bg-green-50 dark:text-green-400 dark:bg-green-900/30', icon: CheckCircle },
-  PENDING: { label: 'En attente', color: 'text-yellow-600 bg-yellow-50 dark:text-yellow-400 dark:bg-yellow-900/30', icon: Clock },
-  FAILED: { label: 'Échoué', color: 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/30', icon: XCircle },
-  FLAGGED: { label: 'Signalé', color: 'text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-900/30', icon: AlertTriangle },
+/* ── Mappings ────────────────────────────────────────────────────────────── */
+const TYPE_MAP: Record<string, { label: string; cls: string }> = {
+  TRANSFERT:     { label: 'Mobile Money',      cls: 'bg-blue-100 text-blue-800' },
+  DEPOT:         { label: 'Mobile Money',      cls: 'bg-blue-100 text-blue-800' },
+  RETRAIT:       { label: 'Mobile Money',      cls: 'bg-blue-100 text-blue-800' },
+  PAIEMENT:      { label: 'E-commerce',        cls: 'bg-sky-100 text-sky-700' },
+  REMBOURSEMENT: { label: 'Services digitaux', cls: 'bg-teal-100 text-teal-700' },
 };
 
-const typeLabel: Record<string, string> = {
-  TRANSFER: 'Transfert', PAYMENT: 'Paiement', DEPOSIT: 'Dépôt',
-  WITHDRAWAL: 'Retrait', MOBILE_PAYMENT: 'Paiement mobile',
+const STATUS_MAP: Record<string, { label: string; cls: string; Icon: React.ElementType }> = {
+  COMPLETED:    { label: 'Succès',     cls: 'text-green-600', Icon: CheckCircle },
+  FAILED:       { label: 'Échec',      cls: 'text-red-500',   Icon: AlertCircle },
+  PENDING:      { label: 'En attente', cls: 'text-yellow-600', Icon: Clock },
+  UNDER_REVIEW: { label: 'En revue',   cls: 'text-orange-500', Icon: Activity },
+  CANCELLED:    { label: 'Annulé',     cls: 'text-gray-500',  Icon: AlertCircle },
 };
 
-function formatXOF(n: number) {
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 }).format(n);
+const FILTER_OPTIONS = [
+  { value: '', label: 'Toutes les transactions' },
+  { value: 'COMPLETED', label: 'Succès uniquement' },
+  { value: 'FAILED', label: 'Échecs uniquement' },
+  { value: 'PENDING', label: 'En attente' },
+];
+
+/* ── Helpers ─────────────────────────────────────────────────────────────── */
+function fmtTime(iso: string): string {
+  try { return new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
+  catch { return '—'; }
 }
 
-function computeStats(items: Transaction[], total: number): LiveStats {
-  const completed = items.filter(t => t.status === 'COMPLETED').length;
-  const totalValue = items.reduce((s, t) => s + t.amount, 0);
-  const successRate = items.length > 0 ? (completed / items.length) * 100 : 0;
-  const lastUpdate = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-  return { total, totalValue, successRate, lastUpdate };
+function fmtCFA(n: number): string {
+  return `${Math.round(n).toLocaleString('fr-FR')} F CFA`;
 }
 
-const REFRESH_INTERVAL = 15_000; // 15 secondes
-const TICKER_INTERVAL = 2_000;   // variation toutes les 2 secondes
+function fmtPhone(phone?: string): string {
+  if (!phone) return '—';
+  return phone.replace(/(\+\d{3})(\d{2})(\d{3})(\d{4})/, '$1 $2 $3 $4');
+}
 
-export default function TransactionsPage() {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [typeFilter, setTypeFilter] = useState('');
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [live, setLive] = useState(true);
-  // statsDisplay = valeurs affichées (légèrement variées pour simuler le flux)
-  const [statsDisplay, setStatsDisplay] = useState<LiveStats>({ total: 0, totalValue: 0, successRate: 0, lastUpdate: '--:--' });
-  const [pulse, setPulse] = useState(false);
-  const [activeRows, setActiveRows] = useState<Set<string>>(new Set());
-  const [displayAmounts, setDisplayAmounts] = useState<Record<string, number>>({});
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const tickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const rowTickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const amountTickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const statsBaseRef = useRef<LiveStats>({ total: 0, totalValue: 0, successRate: 0, lastUpdate: '--:--' });
-  const transactionsRef = useRef<Transaction[]>([]);
-  const pageSize = 20;
+const PAGE_SIZE = 20;
 
-  const fetchData = (silent = false) => {
-    if (!silent) setLoading(true);
-    const params = new URLSearchParams({ page: String(page), page_size: String(pageSize) });
-    if (statusFilter) params.append('status', statusFilter);
-    if (typeFilter) params.append('transaction_type', typeFilter);
-    api.get(`/transactions?${params}`)
-      .then(res => {
-        const items: Transaction[] = res.data.items || [];
-        const t = res.data.total || 0;
-        setTransactions(items);
-        transactionsRef.current = items;
-        // Initialise les montants affichés avec les vraies valeurs
-        const init: Record<string, number> = {};
-        items.forEach(it => { init[it.id] = it.amount; });
-        setDisplayAmounts(init);
-        setTotal(t);
-        const base = computeStats(items, t);
-        statsBaseRef.current = base;
-        setStatsDisplay(base);
-        // flash pulse
-        setPulse(true);
-        setTimeout(() => setPulse(false), 600);
-      })
-      .catch(() => {})
-      .finally(() => { if (!silent) setLoading(false); });
-  };
+/* ── Pagination component ─────────────────────────────────────────────────── */
+function Pagination({ page, total, pageSize, onChange }: {
+  page: number; total: number; pageSize: number; onChange: (p: number) => void;
+}) {
+  const totalPages = Math.ceil(total / pageSize);
+  if (totalPages <= 1) return null;
 
-  // Initial + filter/page change fetch
-  useEffect(() => { fetchData(); }, [page, statusFilter, typeFilter]);
+  const from = (page - 1) * pageSize + 1;
+  const to   = Math.min(page * pageSize, total);
 
-  // Live API refresh
-  useEffect(() => {
-    if (live) {
-      intervalRef.current = setInterval(() => fetchData(true), REFRESH_INTERVAL);
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    }
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [live, page, statusFilter, typeFilter]);
-
-  // Ticker : micro-variation des valeurs affichées toutes les 2s
-  useEffect(() => {
-    if (live) {
-      tickerRef.current = setInterval(() => {
-        const b = statsBaseRef.current;
-        if (b.total === 0) return;
-        setStatsDisplay({
-          total: Math.round(vary(b.total, 3, 0)),
-          totalValue: Math.round(vary(b.totalValue, b.totalValue * 0.003, 0)),
-          successRate: parseFloat(vary(b.successRate, 0.8, 0).toFixed(1)),
-          lastUpdate: b.lastUpdate,
-        });
-      }, TICKER_INTERVAL);
-    } else {
-      if (tickerRef.current) clearInterval(tickerRef.current);
-      // repasse aux valeurs réelles
-      setStatsDisplay(statsBaseRef.current);
-    }
-    return () => { if (tickerRef.current) clearInterval(tickerRef.current); };
-  }, [live]);
-
-  // Ticker lignes : flash aléatoire sur 1-2 lignes toutes les 2.5s
-  useEffect(() => {
-    if (live) {
-      rowTickerRef.current = setInterval(() => {
-        const rows = transactionsRef.current;
-        if (rows.length === 0) return;
-        const count = Math.random() > 0.4 ? 2 : 1;
-        const picks = new Set<string>();
-        while (picks.size < count) {
-          picks.add(rows[Math.floor(Math.random() * rows.length)].id);
-        }
-        setActiveRows(picks);
-        setTimeout(() => setActiveRows(new Set()), 800);
-      }, 2500);
-    } else {
-      if (rowTickerRef.current) clearInterval(rowTickerRef.current);
-      setActiveRows(new Set());
-    }
-    return () => { if (rowTickerRef.current) clearInterval(rowTickerRef.current); };
-  }, [live]);
-
-  // Ticker montants : varie les 5 premiers montants toutes les 2s
-  useEffect(() => {
-    if (live) {
-      amountTickerRef.current = setInterval(() => {
-        const rows = transactionsRef.current;
-        if (rows.length === 0) return;
-        setDisplayAmounts(prev => {
-          const next = { ...prev };
-          rows.slice(0, 5).forEach(tx => {
-            next[tx.id] = Math.round(vary(tx.amount, tx.amount * 0.005, 1));
-          });
-          return next;
-        });
-      }, TICKER_INTERVAL);
-    } else {
-      if (amountTickerRef.current) clearInterval(amountTickerRef.current);
-      // repasse aux vraies valeurs
-      const real: Record<string, number> = {};
-      transactionsRef.current.forEach(tx => { real[tx.id] = tx.amount; });
-      setDisplayAmounts(real);
-    }
-    return () => { if (amountTickerRef.current) clearInterval(amountTickerRef.current); };
-  }, [live]);
-
-  const filtered = transactions.filter(t =>
-    !search || t.sender_phone?.includes(search) || t.recipient_phone?.includes(search) || t.id.includes(search)
-  );
+  const pages: (number | '…')[] = [];
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (page > 3) pages.push('…');
+    for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) pages.push(i);
+    if (page < totalPages - 2) pages.push('…');
+    pages.push(totalPages);
+  }
 
   return (
-    <div className="flex-1 flex flex-col">
-      <main className="flex-1 p-4 md:p-6 space-y-4">
+    <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100">
+      <p className="text-xs text-gray-500">{from}–{to} sur {total} résultats</p>
+      <div className="flex items-center gap-1">
+        <button
+          disabled={page === 1}
+          onClick={() => onChange(page - 1)}
+          className="px-3 py-1.5 text-xs border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition-colors"
+        >
+          ← Préc.
+        </button>
+        {pages.map((p, i) =>
+          p === '…'
+            ? <span key={`e${i}`} className="px-2 text-xs text-gray-400">…</span>
+            : <button
+                key={p}
+                onClick={() => onChange(p as number)}
+                className={`w-8 h-8 text-xs rounded-lg transition-colors ${
+                  p === page
+                    ? 'bg-[#00853F] text-white font-semibold'
+                    : 'border border-gray-200 text-gray-700 hover:bg-gray-50'
+                }`}
+              >{p}</button>
+        )}
+        <button
+          disabled={page >= totalPages}
+          onClick={() => onChange(page + 1)}
+          className="px-3 py-1.5 text-xs border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition-colors"
+        >
+          Suiv. →
+        </button>
+      </div>
+    </div>
+  );
+}
 
-        {/* Live Stats Banner */}
-        <div className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 rounded-2xl overflow-hidden shadow-lg">
-          {/* Top bar: title + live indicator + pause button */}
-          <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <div className="bg-white/10 p-2 rounded-lg">
-                <ArrowLeftRight className="h-4 w-4 text-white" />
-              </div>
-              <div>
-                <h1 className="text-base font-bold text-white">Transactions</h1>
-                <p className="text-xs text-slate-400">Suivi en temps réel</p>
-              </div>
+/* ── Component ───────────────────────────────────────────────────────────── */
+export default function SuiviTransactions() {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [operators, setOperators]       = useState<Record<string, string>>({});
+  const [paused, setPaused]             = useState(false);
+  const [loading, setLoading]           = useState(true);
+  const [filterOpen, setFilterOpen]     = useState(false);
+  const [statusFilter, setStatusFilter] = useState('');
+  const [lastUpdate, setLastUpdate]     = useState('—');
+  const [page, setPage]                 = useState(1);
+  const [totalItems, setTotalItems]     = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  /* derived KPIs */
+  const total      = transactions.length;
+  const totalValue = transactions.reduce((s, t) => s + t.amount, 0);
+  const successes  = transactions.filter(t => t.status === 'COMPLETED').length;
+  const failures   = transactions.filter(t => t.status === 'FAILED').length;
+  const successRate = total > 0 ? ((successes / total) * 100).toFixed(1) : '0.0';
+
+  /* visible rows after filter */
+  const visible = statusFilter
+    ? transactions.filter(t => t.status === statusFilter)
+    : transactions;
+
+  /* fetch operators once */
+  useEffect(() => {
+    api.get('/users?page_size=50').then(r => {
+      const map: Record<string, string> = {};
+      (r.data?.items ?? []).forEach((u: Operator) => {
+        map[u.id] = u.organization ?? u.full_name;
+      });
+      setOperators(map);
+    }).catch(() => {});
+  }, []);
+
+  /* fetch transactions */
+  const fetchData = useCallback(async () => {
+    try {
+      const r = await api.get(`/transactions?page=${page}&page_size=${PAGE_SIZE}`);
+      const items: Transaction[] = r.data?.items ?? [];
+      setTransactions(items.sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      ));
+      setTotalItems(r.data?.total ?? 0);
+      setLastUpdate(new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }));
+    } catch { /* ignore */ }
+    finally { setLoading(false); }
+  }, [page]);
+
+  /* initial + polling — pause auto-refresh when not on page 1 */
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    if (paused || page > 1) {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    } else {
+      intervalRef.current = setInterval(fetchData, 5000);
+    }
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [paused, page, fetchData]);
+
+  const goToPage = (p: number) => { setPage(p); setPaused(true); };
+
+  return (
+    <div className="bg-gray-50 min-h-screen">
+
+      {/* ── Dark banner ──────────────────────────────────────────────────── */}
+      <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3">
+        <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-white/10 flex-wrap">
+            <div>
+              <h1 className="text-sm font-bold text-white leading-tight">Suivi des Transactions en Temps Réel</h1>
+              <p className="text-slate-400 text-xs mt-0.5">Monitoring des flux transactionnels digitaux</p>
             </div>
-
-            <div className="flex items-center gap-3">
-              {/* Live / Paused badge */}
-              <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
-                live
-                  ? 'bg-[#00853F]/20 border border-[#00853F]/40 text-[#4ade80]'
-                  : 'bg-slate-700/50 border border-slate-600 text-slate-400'
-              }`}>
-                <span className={`h-1.5 w-1.5 rounded-full ${live ? 'bg-[#4ade80] animate-pulse' : 'bg-slate-500'}`} />
-                {live ? 'En direct' : 'En pause'}
-              </div>
-
-              {/* Play / Pause button */}
+            <div className="flex items-center gap-2">
               <button
-                onClick={() => setLive(l => !l)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition-colors"
+                onClick={() => setPaused(p => !p)}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  paused
+                    ? 'bg-[#00853F] text-white hover:bg-[#006d33]'
+                    : 'bg-red-500 text-white hover:bg-red-600'
+                }`}
               >
-                {live ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-                {live ? 'Pause' : 'Reprendre'}
+                {paused ? <Play className="h-3 w-3" /> : <Pause className="h-3 w-3" />}
+                {paused ? 'Reprendre' : 'Pause'}
               </button>
+              <div className="relative">
+                <button
+                  onClick={() => setFilterOpen(o => !o)}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 text-xs text-white hover:bg-white/20 transition-colors"
+                >
+                  {FILTER_OPTIONS.find(o => o.value === statusFilter)?.label ?? 'Toutes'}
+                  <ChevronDown className="h-3 w-3 text-slate-400" />
+                </button>
+                {filterOpen && (
+                  <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-20 min-w-[200px]">
+                    {FILTER_OPTIONS.map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => { setStatusFilter(opt.value); setFilterOpen(false); }}
+                        className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
+                          statusFilter === opt.value ? 'text-[#00853F] font-medium' : 'text-gray-700'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-
-          {/* Stats grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/5">
-            {/* Transactions */}
-            <div className="px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60">
-              <div className="flex items-center gap-2 mb-2">
-                <Activity className="h-3.5 w-3.5 text-slate-400" />
-                <p className="text-xs text-slate-400 uppercase tracking-wide">Transactions</p>
-              </div>
-              <p className={`text-2xl font-bold transition-all duration-500 ${pulse ? 'text-[#4ade80] scale-105' : 'text-white'}`}>
-                {statsDisplay.total.toLocaleString('fr-FR')}
-              </p>
-            </div>
-
-            {/* Valeur Totale */}
-            <div className="px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60">
-              <div className="flex items-center gap-2 mb-2">
-                <Wallet className="h-3.5 w-3.5 text-slate-400" />
-                <p className="text-xs text-slate-400 uppercase tracking-wide">Valeur Totale</p>
-              </div>
-              <p className={`text-base font-bold leading-tight transition-all duration-500 ${pulse ? 'text-[#4ade80]' : 'text-white'}`}>
-                {formatXOF(statsDisplay.totalValue)}
-              </p>
-            </div>
-
-            {/* Taux de Succès */}
-            <div className="px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="h-3.5 w-3.5 text-slate-400" />
-                <p className="text-xs text-slate-400 uppercase tracking-wide">Taux de Succès</p>
-              </div>
-              <p className={`text-2xl font-bold transition-all duration-500 ${pulse ? 'text-white scale-105' : 'text-[#4ade80]'}`}>
-                {statsDisplay.successRate.toFixed(1)}%
-              </p>
-            </div>
-
-            {/* Dernière MAJ */}
-            <div className="px-5 py-4 bg-slate-900/60 dark:bg-slate-950/60">
-              <div className="flex items-center gap-2 mb-2">
-                <Clock className="h-3.5 w-3.5 text-slate-400" />
-                <p className="text-xs text-slate-400 uppercase tracking-wide">Dernière MAJ</p>
-              </div>
-              <p className={`text-2xl font-bold transition-all duration-500 ${pulse ? 'text-[#4ade80]' : 'text-white'}`}>
-                {statsDisplay.lastUpdate}
-              </p>
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">Transactions</p>
+              <p className="text-lg font-bold text-white">{total}</p>
               <div className="flex items-center gap-1.5 mt-1">
-                <RefreshCw
-                  className={`h-3 w-3 flex-shrink-0 transition-colors ${live ? 'text-[#4ade80]' : 'text-slate-600'}`}
-                  style={{ animation: live ? 'spin 2s linear infinite' : 'none' }}
-                />
-                <p className="text-xs text-slate-500">
-                  Actualisation {live ? `auto / ${REFRESH_INTERVAL / 1000}s` : 'suspendue'}
-                </p>
+                <span className="h-1.5 w-1.5 rounded-full bg-[#4ade80] animate-pulse" />
+                <span className="text-[#4ade80] text-xs">En direct</span>
               </div>
+            </div>
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">Valeur Totale</p>
+              <p className="text-lg font-bold text-white leading-tight">{fmtCFA(totalValue)}</p>
+              <p className="text-slate-500 text-xs mt-1">Volume cumulé</p>
+            </div>
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">Taux de Succès</p>
+              <p className="text-lg font-bold text-white">{successRate}%</p>
+              <p className="text-[#4ade80] text-xs mt-1">{successes} complétées</p>
+            </div>
+            <div className="bg-slate-900/60 px-5 py-4">
+              <p className="text-slate-400 text-xs mb-1">Dernière MAJ</p>
+              <p className="text-lg font-bold text-white">{lastUpdate}</p>
+              <p className="text-slate-500 text-xs mt-1">{paused ? 'En pause' : 'Rafraîchissement auto'}</p>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Filters */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-700/50 shadow-sm p-4 flex flex-wrap gap-3 items-center">
-          <div className="relative flex-1 min-w-[180px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
-            <input
-              type="text"
-              placeholder="Rechercher par numéro, ID..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500 bg-white dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-400"
-            />
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <Filter className="h-4 w-4 text-gray-400 dark:text-slate-500" />
-            <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
-              className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500">
-              <option value="">Tous les statuts</option>
-              <option value="COMPLETED">Complété</option>
-              <option value="PENDING">En attente</option>
-              <option value="FAILED">Échoué</option>
-              <option value="FLAGGED">Signalé</option>
-            </select>
-            <select value={typeFilter} onChange={e => { setTypeFilter(e.target.value); setPage(1); }}
-              className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500">
-              <option value="">Tous les types</option>
-              {Object.entries(typeLabel).map(([val, lbl]) => <option key={val} value={val}>{lbl}</option>)}
-            </select>
-          </div>
-        </div>
+      <div className="px-4 sm:px-6 pb-6 space-y-4">
 
-        {/* Table */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700/50 overflow-hidden">
+        {/* ── Alert banner ─────────────────────────────────────────────── */}
+        {failures > 0 && (
+          <div className="flex items-start gap-3 px-4 py-3 bg-yellow-50 border border-yellow-200 rounded-xl">
+            <AlertTriangle className="h-4 w-4 text-yellow-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-yellow-800">Surveillance Active</p>
+              <p className="text-xs text-yellow-700 mt-0.5">
+                {failures} transaction{failures > 1 ? 's' : ''} échouée{failures > 1 ? 's' : ''} détectée{failures > 1 ? 's' : ''} dans les dernières minutes
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ── Table ────────────────────────────────────────────────────── */}
+        <div className="border border-gray-200 rounded-xl overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+            <p className="text-sm font-semibold text-gray-800">
+              Flux Transactionnel —{' '}
+              {FILTER_OPTIONS.find(o => o.value === statusFilter)?.label.replace('uniquement', '').trim() ?? 'Toutes'}
+            </p>
+            <div className="flex items-center gap-1.5 text-xs text-gray-400">
+              <Clock className="h-3.5 w-3.5" />
+              Mis à jour en temps réel
+            </div>
+          </div>
+
           {loading ? (
-            <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-700" /></div>
-          ) : filtered.length === 0 ? (
-            <div className="text-center py-16 text-gray-400 dark:text-slate-500">
-              <ArrowLeftRight className="h-12 w-12 mx-auto mb-3 opacity-30" />
-              <p>Aucune transaction trouvée</p>
+            <div className="flex items-center justify-center h-48">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00853F]" />
+            </div>
+          ) : visible.length === 0 ? (
+            <div className="flex items-center justify-center h-48 text-gray-400 text-sm">
+              Aucune transaction trouvée
             </div>
           ) : (
-            <>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-slate-400 text-xs uppercase">
-                    <tr>
-                      <th className="px-6 py-3 text-left">Type</th>
-                      <th className="px-6 py-3 text-left">Émetteur</th>
-                      <th className="px-6 py-3 text-left">Destinataire</th>
-                      <th className="px-6 py-3 text-right">Montant</th>
-                      <th className="px-6 py-3 text-center">Statut</th>
-                      <th className="px-6 py-3 text-center">Risque</th>
-                      <th className="px-6 py-3 text-left">Date</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50 dark:divide-slate-700/50">
-                    {filtered.map(tx => {
-                      const s = statusConfig[tx.status] || statusConfig.PENDING;
-                      const StatusIcon = s.icon;
-                      const isActive = activeRows.has(tx.id);
-                      return (
-                        <tr
-                          key={tx.id}
-                          className={`transition-all duration-500 ${
-                            isActive
-                              ? 'bg-[#00853F]/8 dark:bg-[#00853F]/12'
-                              : 'hover:bg-gray-50 dark:hover:bg-slate-800'
-                          }`}
-                        >
-                          {/* Barre latérale d'activité */}
-                          <td className="relative px-6 py-4 font-medium text-gray-800 dark:text-white">
-                            {isActive && (
-                              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-[#00853F] rounded-r-full" />
-                            )}
-                            {typeLabel[tx.transaction_type] || tx.transaction_type}
-                          </td>
-                          <td className="px-6 py-4 text-gray-500 dark:text-slate-400 font-mono text-xs">{tx.sender_phone || '—'}</td>
-                          <td className="px-6 py-4 text-gray-500 dark:text-slate-400 font-mono text-xs">{tx.recipient_phone || '—'}</td>
-                          <td className={`px-6 py-4 text-right font-semibold transition-colors duration-500 ${
-                            isActive ? 'text-[#00853F] dark:text-[#4ade80]' : 'text-gray-800 dark:text-white'
-                          }`}>{formatXOF(displayAmounts[tx.id] ?? tx.amount)}</td>
-                          <td className="px-6 py-4 text-center">
-                            <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full transition-all duration-500 ${
-                              isActive && tx.status === 'COMPLETED'
-                                ? 'bg-[#00853F] text-white shadow-sm shadow-[#00853F]/30'
-                                : s.color
-                            }`}>
-                              {isActive ? <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse" /> : <StatusIcon className="h-3 w-3" />}
-                              {s.label}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-center">
-                            {tx.risk_score != null ? (
-                              <span className={`text-xs font-bold px-2 py-1 rounded-full ${
-                                tx.risk_score >= 0.7 ? 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/30' :
-                                tx.risk_score >= 0.4 ? 'text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-900/30' :
-                                'text-green-700 bg-green-50 dark:text-green-400 dark:bg-green-900/30'
-                              }`}>{Math.round(tx.risk_score * 100)}%</span>
-                            ) : <span className="text-gray-300 dark:text-slate-600">—</span>}
-                          </td>
-                          <td className="px-6 py-4 text-gray-400 dark:text-slate-500 text-xs">{new Date(tx.created_at).toLocaleString('fr-FR')}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-              {/* Pagination */}
-              <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 dark:border-slate-700/50">
-                <p className="text-sm text-gray-500 dark:text-slate-400">Page {page} · {total} résultats</p>
-                <div className="flex gap-2">
-                  <button disabled={page === 1} onClick={() => setPage(p => p - 1)}
-                    className="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-600 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:text-slate-300">
-                    Précédent
-                  </button>
-                  <button disabled={page * pageSize >= total} onClick={() => setPage(p => p + 1)}
-                    className="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-600 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:text-slate-300">
-                    Suivant
-                  </button>
-                </div>
-              </div>
-            </>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100 bg-gray-50">
+                    {['HEURE', 'RÉFÉRENCE', 'OPÉRATEUR', 'TYPE', 'ÉMETTEUR', 'DESTINATAIRE', 'MONTANT', 'STATUT'].map(h => (
+                      <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-gray-400 tracking-wider whitespace-nowrap">
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {visible.map((tx, idx) => {
+                    const type   = TYPE_MAP[tx.transaction_type]   ?? { label: tx.transaction_type, cls: 'bg-gray-100 text-gray-600' };
+                    const status = STATUS_MAP[tx.status]            ?? { label: tx.status, cls: 'text-gray-500', Icon: Clock };
+                    const StatusIcon = status.Icon;
+                    const opName = operators[tx.operator_id] ?? 'Opérateur';
+                    return (
+                      <tr
+                        key={tx.id}
+                        className={`border-b border-gray-50 hover:bg-gray-50 transition-colors ${
+                          idx === 0 && !paused ? 'bg-green-50/40' : ''
+                        }`}
+                      >
+                        <td className="px-4 py-3 text-xs text-gray-500 font-mono whitespace-nowrap">
+                          {fmtTime(tx.created_at)}
+                        </td>
+                        <td className="px-4 py-3 text-xs font-mono text-gray-700 whitespace-nowrap">
+                          {tx.reference}
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-700 whitespace-nowrap">
+                          {opName}
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium ${type.cls}`}>
+                            {type.label}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-600 whitespace-nowrap">
+                          {tx.sender_name || fmtPhone(tx.sender_phone)}
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-600 whitespace-nowrap">
+                          {tx.receiver_name || fmtPhone(tx.receiver_phone)}
+                        </td>
+                        <td className="px-4 py-3 text-xs font-semibold text-gray-800 whitespace-nowrap">
+                          {fmtCFA(tx.amount)}
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${status.cls}`}>
+                            <StatusIcon className="h-3.5 w-3.5" />
+                            {status.label}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
+          <Pagination page={page} total={totalItems} pageSize={PAGE_SIZE} onChange={goToPage} />
         </div>
-      </main>
+      </div>
     </div>
   );
 }

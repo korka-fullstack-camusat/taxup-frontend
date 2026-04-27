@@ -25,38 +25,32 @@ import ThemeToggle from '@/components/ThemeToggle';
 const features = [
   {
     icon: BarChart3,
-    title: 'Monitoring Temps Reel',
-    description: 'Suivez chaque transaction Mobile Money en temps reel avec des tableaux de bord interactifs.',
+    title: 'Monitoring Temps Réel',
+    description: 'Suivez chaque transaction numérique en temps réel avec des tableaux de bord interactifs.',
     gradient: 'from-[#00853F] to-[#006830]',
   },
   {
-    icon: Shield,
-    title: 'Detection de Fraude',
-    description: 'Algorithmes avances pour identifier automatiquement les anomalies et transactions suspectes.',
-    gradient: 'from-red-500 to-red-700',
-  },
-  {
     icon: FileCheck,
-    title: 'Recus Fiscaux',
-    description: 'Generation automatique de recus fiscaux conformes aux normes senegalaises.',
+    title: 'Reçus Fiscaux',
+    description: 'Génération automatique de reçus fiscaux conformes aux normes sénégalaises.',
     gradient: 'from-amber-500 to-amber-700',
   },
   {
     icon: TrendingUp,
-    title: 'Analyse Revenus',
-    description: 'Visualisez les tendances et analysez les revenus fiscaux detailles.',
+    title: 'Analyse des Revenus',
+    description: 'Visualisez les tendances et analysez les revenus fiscaux détaillés.',
     gradient: 'from-purple-500 to-purple-700',
   },
   {
     icon: Lock,
-    title: 'Securite Avancee',
+    title: 'Sécurité Avancée',
     description: 'Chiffrement de bout en bout et authentification multi-facteurs.',
     gradient: 'from-slate-600 to-slate-800',
   },
   {
     icon: Zap,
     title: 'Performance Optimale',
-    description: 'Infrastructure haute disponibilite pour une experience fluide.',
+    description: 'Infrastructure haute disponibilité pour une expérience fluide.',
     gradient: 'from-orange-500 to-orange-700',
   },
 ];
@@ -65,31 +59,25 @@ const profiles = [
   {
     icon: Users,
     name: 'Citoyen',
-    description: 'Consultez vos transactions et telechargez vos recus fiscaux',
+    description: 'Consultez vos transactions et téléchargez vos reçus fiscaux',
     gradient: 'from-[#00853F] to-[#006830]',
   },
   {
     icon: Smartphone,
-    name: 'Operateur Mobile',
-    description: 'Gerez les transactions et assurez la conformite',
+    name: 'Opérateur Mobile',
+    description: 'Gérez les transactions et assurez la conformité',
     gradient: 'from-amber-500 to-amber-700',
   },
   {
     icon: Receipt,
     name: 'Auditeur Fiscal',
-    description: 'Controlez les operations et menez des audits',
+    description: 'Contrôlez les opérations et menez des audits',
     gradient: 'from-purple-500 to-purple-700',
-  },
-  {
-    icon: Building2,
-    name: 'Agent DGID',
-    description: 'Supervisez la conformite et analysez les revenus',
-    gradient: 'from-slate-600 to-slate-800',
   },
   {
     icon: Shield,
     name: 'Administrateur',
-    description: 'Administration complete de la plateforme',
+    description: 'Administration complète de la plateforme',
     gradient: 'from-red-500 to-red-700',
   },
 ];
@@ -135,12 +123,12 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <span className="text-xl font-bold text-gray-900 dark:text-white">TAXUP</span>
-                  <p className="text-xs text-gray-500 dark:text-slate-400 leading-none">Senegal Fiscal Digital</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400 leading-none">Système Fiscal Digital du Sénégal</p>
                 </div>
               </div>
 
               <div className="hidden md:flex items-center gap-8">
-                <a href="#fonctionnalites" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors">Fonctionnalites</a>
+                <a href="#fonctionnalites" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors">Fonctionnalités</a>
                 <a href="#profils" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors">Profils</a>
                 <a href="#contact" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors">Contact</a>
               </div>
@@ -177,7 +165,7 @@ export default function LandingPage() {
         {mobileMenuOpen && (
           <div className="md:hidden sticky top-[81px] z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-gray-200/60 dark:border-white/5 px-6 py-4 space-y-1 transition-colors">
             {[
-              { href: '#fonctionnalites', label: 'Fonctionnalites' },
+              { href: '#fonctionnalites', label: 'Fonctionnalités' },
               { href: '#profils', label: 'Profils' },
               { href: '#contact', label: 'Contact' },
             ].map(({ href, label }) => (
@@ -207,7 +195,7 @@ export default function LandingPage() {
               <div>
                 <div className="inline-flex items-center gap-2 bg-[#00853F]/10 dark:bg-[#00853F]/15 border border-[#00853F]/25 dark:border-[#00853F]/30 rounded-full px-4 py-2 mb-6">
                   <span className="flex h-2 w-2 rounded-full bg-[#00853F] animate-pulse" />
-                  <span className="text-sm text-[#00853F] dark:text-[#4ade80] font-medium">Plateforme Nationale de Fiscalite Digitale</span>
+                  <span className="text-sm text-[#00853F] dark:text-[#4ade80] font-medium">Plateforme Nationale de Fiscalité Digitale</span>
                 </div>
 
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight mb-6">
@@ -215,11 +203,11 @@ export default function LandingPage() {
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00853F] to-[#4ade80]">
                     transactions
                   </span>{' '}
-                  Mobile Money
+                  Numériques
                 </h1>
 
                 <p className="text-lg text-gray-600 dark:text-slate-400 mb-8 max-w-xl leading-relaxed">
-                  Surveillez, auditez et securisez les transactions financieres electroniques au Senegal avec une plateforme moderne et fiable.
+                  Surveillez, auditez et sécurisez les transactions numériques au Sénégal avec une plateforme moderne et fiable.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 mb-12">
@@ -227,21 +215,21 @@ export default function LandingPage() {
                     href="/login"
                     className="inline-flex items-center justify-center gap-2 bg-[#00853F] hover:bg-[#006830] text-white font-semibold px-8 py-4 rounded-full transition-colors shadow-xl shadow-[#00853F]/25"
                   >
-                    Acceder a la plateforme
+                    Accéder à la plateforme
                     <ArrowRight className="h-5 w-5" />
                   </Link>
                   <Link
                     href="/register"
                     className="inline-flex items-center justify-center gap-2 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-white font-semibold px-8 py-4 rounded-full hover:bg-gray-200 dark:hover:bg-white/10 transition-colors border border-gray-200 dark:border-white/10"
                   >
-                    Creer un compte
+                    Créer un compte
                   </Link>
                 </div>
 
                 {/* Trust indicators */}
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-gray-400 dark:text-slate-500 text-xs mr-2">Integre avec :</span>
-                  {['Orange Money', 'Wave', 'Free Money'].map((name) => (
+                  <span className="text-gray-400 dark:text-slate-500 text-xs mr-2">Intégré avec :</span>
+                  {['Mobile Money', 'Jeux en ligne', 'E-commerce', 'Services digitaux'].map((name) => (
                     <span key={name} className="text-xs font-medium text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-3 py-1.5 rounded-full">
                       {name}
                     </span>
@@ -270,8 +258,8 @@ export default function LandingPage() {
                   <div className="p-4 space-y-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-[11px] font-bold text-white">Tableau de Bord DGID</p>
-                        <p className="text-[9px] text-slate-400">Bienvenue, Agent DGID</p>
+                        <p className="text-[11px] font-bold text-white">Tableau de Bord</p>
+                        <p className="text-[9px] text-slate-400">Bienvenue, Administrateur</p>
                       </div>
                       <span className="bg-[#00853F]/20 text-[#4ade80] text-[9px] px-2 py-0.5 rounded-full border border-[#00853F]/30">● En ligne</span>
                     </div>
@@ -282,23 +270,23 @@ export default function LandingPage() {
                         <p className="text-[9px] text-[#4ade80]">↑ +12% ce mois</p>
                       </div>
                       <div className="bg-slate-700/40 rounded-xl p-2.5">
-                        <p className="text-[9px] text-slate-400">TVA Collectee</p>
+                        <p className="text-[9px] text-slate-400">TVA Collectée</p>
                         <p className="text-sm font-bold text-white mt-0.5">48.2M XOF</p>
                         <p className="text-[9px] text-[#4ade80]">↑ +8%</p>
                       </div>
-                      <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-2.5">
-                        <p className="text-[9px] text-slate-400">Alertes Fraude</p>
-                        <p className="text-sm font-bold text-red-400 mt-0.5">14</p>
-                        <p className="text-[9px] text-orange-400">⚠ A traiter</p>
+                      <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-2.5">
+                        <p className="text-[9px] text-slate-400">Audits actifs</p>
+                        <p className="text-sm font-bold text-amber-400 mt-0.5">6</p>
+                        <p className="text-[9px] text-amber-400">En cours</p>
                       </div>
                       <div className="bg-slate-700/40 rounded-xl p-2.5">
-                        <p className="text-[9px] text-slate-400">Audits actifs</p>
-                        <p className="text-sm font-bold text-white mt-0.5">6</p>
-                        <p className="text-[9px] text-slate-500">en cours</p>
+                        <p className="text-[9px] text-slate-400">Reçus émis</p>
+                        <p className="text-sm font-bold text-white mt-0.5">1 204</p>
+                        <p className="text-[9px] text-slate-500">ce mois</p>
                       </div>
                     </div>
                     <div className="bg-slate-700/30 rounded-xl p-3">
-                      <p className="text-[9px] text-slate-400 mb-2">Evolution transactions — 7 derniers jours</p>
+                      <p className="text-[9px] text-slate-400 mb-2">Évolution transactions — 7 derniers jours</p>
                       <div className="flex items-end gap-1.5 h-14">
                         {[40, 65, 45, 80, 55, 95, 70].map((h, i) => (
                           <div key={i} className="flex-1 flex items-end">
@@ -313,12 +301,12 @@ export default function LandingPage() {
                       </div>
                     </div>
                     <div>
-                      <p className="text-[9px] text-slate-400 mb-1.5">Transactions recentes</p>
+                      <p className="text-[9px] text-slate-400 mb-1.5">Transactions récentes</p>
                       <div className="space-y-1.5">
                         {[
                           { type: 'Transfert', phone: '+221 77 xxx xxxx', amount: '25 000', ok: true },
                           { type: 'Paiement mobile', phone: '+221 78 xxx xxxx', amount: '12 500', ok: false },
-                          { type: 'Depot', phone: '+221 76 xxx xxxx', amount: '50 000', ok: true },
+                          { type: 'Dépôt', phone: '+221 76 xxx xxxx', amount: '50 000', ok: true },
                         ].map((tx, i) => (
                           <div key={i} className="flex items-center justify-between bg-slate-700/30 rounded-lg px-2.5 py-1.5">
                             <div>
@@ -328,7 +316,7 @@ export default function LandingPage() {
                             <div className="text-right">
                               <p className="text-[9px] font-bold text-white">{tx.amount} XOF</p>
                               <p className={`text-[8px] ${tx.ok ? 'text-[#4ade80]' : 'text-amber-400'}`}>
-                                {tx.ok ? '● Complete' : '● En attente'}
+                                {tx.ok ? '● Complété' : '● En attente'}
                               </p>
                             </div>
                           </div>
@@ -345,7 +333,7 @@ export default function LandingPage() {
         {/* Scroll indicator */}
         <div className="relative z-10 pb-8 flex justify-center">
           <div className="flex flex-col items-center gap-2">
-            <span className="text-xs text-gray-400 dark:text-slate-500">Defiler</span>
+            <span className="text-xs text-gray-400 dark:text-slate-500">Défiler</span>
             <div className="w-6 h-10 rounded-full border-2 border-gray-300 dark:border-slate-600 flex justify-center pt-2">
               <div className="w-1.5 h-3 bg-gray-300 dark:bg-slate-500 rounded-full" />
             </div>
@@ -359,13 +347,13 @@ export default function LandingPage() {
           <div className="text-center mb-16">
             <span className="inline-flex items-center gap-2 bg-[#00853F]/10 text-[#00853F] rounded-full px-4 py-2 text-sm font-medium mb-4 border border-[#00853F]/20">
               <Zap className="h-4 w-4" />
-              Fonctionnalites
+              Fonctionnalités
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Une solution complete pour la fiscalite digitale
+              Solution Complète et Innovante pour Optimiser la Fiscalité Digitale
             </h2>
             <p className="text-lg text-gray-500 dark:text-slate-400 max-w-2xl mx-auto">
-              Tous les outils necessaires pour gerer efficacement la fiscalite des transactions Mobile Money
+              Un ensemble d&apos;outils performants pour le pilotage et le contrôle de la fiscalité des transactions numériques
             </p>
           </div>
 
@@ -395,14 +383,14 @@ export default function LandingPage() {
               Profils
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Une interface adaptee a chaque role
+              Une interface adaptée à chaque rôle
             </h2>
             <p className="text-lg text-gray-500 dark:text-slate-400 max-w-2xl mx-auto">
-              Des tableaux de bord personnalises pour repondre aux besoins specifiques de chaque utilisateur
+              Des tableaux de bord personnalisés pour répondre aux besoins spécifiques de chaque utilisateur
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {profiles.map(({ icon: Icon, name, description, gradient }) => (
               <div
                 key={name}
@@ -436,13 +424,13 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 bg-[#00853F]/10 dark:bg-[#00853F]/15 border border-[#00853F]/25 dark:border-[#00853F]/30 rounded-full px-4 py-2 mb-6">
             <CheckCircle className="h-4 w-4 text-[#00853F] dark:text-[#4ade80]" />
-            <span className="text-sm text-[#00853F] dark:text-[#4ade80] font-medium">Systeme operationnel</span>
+            <span className="text-sm text-[#00853F] dark:text-[#4ade80] font-medium">Système opérationnel</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
-            Pret a moderniser la fiscalite de votre organisation ?
+            Prêt à moderniser la fiscalité de votre organisation ?
           </h2>
           <p className="text-lg text-gray-600 dark:text-slate-400 mb-10 max-w-2xl mx-auto">
-            Rejoignez la plateforme nationale de surveillance des transactions Mobile Money.
+            Rejoignez la plateforme nationale de surveillance des transactions numériques.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -456,7 +444,7 @@ export default function LandingPage() {
               href="/register"
               className="inline-flex items-center justify-center gap-2 bg-white dark:bg-white/5 text-gray-700 dark:text-white font-semibold px-8 py-4 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors border border-gray-200 dark:border-white/10"
             >
-              Creer un compte
+              Créer un compte
             </Link>
           </div>
         </div>
@@ -472,25 +460,25 @@ export default function LandingPage() {
               </div>
               <div>
                 <span className="text-lg font-bold text-white">TAXUP</span>
-                <p className="text-xs text-gray-500">Systeme Fiscal Digital du Senegal</p>
+                <p className="text-xs text-gray-500">Système Fiscal Digital du Sénégal</p>
               </div>
             </div>
 
             <div className="flex items-center gap-6">
-              <a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">Mentions legales</a>
-              <a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">Confidentialite</a>
+              <a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">Mentions légales</a>
+              <a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">Confidentialité</a>
               <a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">Contact</a>
             </div>
 
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-[#00853F]" />
-              <span className="text-sm text-gray-500">Systeme operationnel</span>
+              <span className="text-sm text-gray-500">Système opérationnel</span>
             </div>
           </div>
 
           <div className="mt-8 pt-8 border-t border-gray-800 text-center">
             <p className="text-sm text-gray-600">
-              {new Date().getFullYear()} TAXUP — Direction Generale des Impots et Domaines du Senegal. Tous droits reserves.
+              {new Date().getFullYear()} TAXUP — Direction Générale des Impôts et Domaines du Sénégal. Tous droits réservés.
             </p>
           </div>
         </div>
